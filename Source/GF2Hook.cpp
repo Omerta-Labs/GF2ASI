@@ -14,6 +14,7 @@
 #include "Addons/imgui/backends/imgui_impl_win32.h"
 
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
+#include "SDK/EARS_Godfather/Modules/Player/Player.h"
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
@@ -316,6 +317,11 @@ void GF2Hook::Tick()
 	if (GetAsyncKeyState(VK_F2) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		show_demo_window = !show_demo_window;
+	}
+
+	if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
+	{
+		int z = 0;
 	}
 
 	// Update cursor visibility
