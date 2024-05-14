@@ -1,5 +1,9 @@
 # Prerequisites
 *.d
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 
 # Compiled Object files
 *.slo
@@ -24,9 +28,12 @@
 *.lai
 *.la
 *.a
-*.lib
 
 # Executables
-*.exe
 *.out
 *.app
+
+# premake stuff
+/.vs
+/obj
+
