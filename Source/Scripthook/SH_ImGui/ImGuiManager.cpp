@@ -78,6 +78,19 @@ void ImGuiManager::OnTick()
 	{
 		bIsCursorVisible = bCursorVisibilityThisFrame;
 		bTakeoverCursor = bIsCursorVisible;
+
+		if (bTakeoverCursor)
+		{
+			// DISABLE CONTROLS
+			hook::Type<RWS::CEventId> PlayerDisableControlsEventId = hook::Type<RWS::CEventId>(0x112B56C);
+			MemUtils::CallCdeclMethod<void, RWS::CEventId&, bool>(0x0408A00, PlayerDisableControlsEventId, false);
+		}
+		else
+		{
+			// ENABLE CONTROLS
+			hook::Type<RWS::CEventId> PlayerEnableControlsEventId = hook::Type<RWS::CEventId>(0x112B39C);
+			MemUtils::CallCdeclMethod<void, RWS::CEventId&, bool>(0x0408A00, PlayerEnableControlsEventId, false);
+		}
 	}
 
 	ImGuiIO& IO = ImGui::GetIO();
@@ -104,14 +117,6 @@ void ImGuiManager::OnTick()
 
 		if (ImGui::Begin("Parted Model Manager", &show_parted_model_window))
 		{
-			if (ImGui::Button("SWITCH TO FREDO"))
-			{
-				if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
-				{
-					LocalPlayer->TrySwapPlayerModel();
-				}
-			}
-
 			ImGui::Text("Parted Model List");
 			ImGui::BeginChild("parted_model_list");
 
@@ -121,11 +126,25 @@ void ImGuiManager::OnTick()
 				for (uint32_t i = 0; i < CurrentAssembly->m_NumAssemblies; i++)
 				{
 					const PartedModel::Assembly& ThisAssembly = CurrentAssembly->m_Assemblies[i];
-					ImGui::Text("%s [%s]", ThisAssembly.m_AssemblyName, (ThisAssembly.m_Flags == 4 ? "VEHICLE" : "CHARACTER"));
-
-					if (ThisAssembly.m_AssemblyName == "unq_fredo_corleone")
+					if (ImGui::TreeNodeEx(&ThisAssembly, ImGuiTreeNodeFlags_None, "%s [%s]", ThisAssembly.m_AssemblyName, (ThisAssembly.m_Flags == 4 ? "VEHICLE" : "CHARACTER")))
 					{
-						int z = 0;
+						for (uint32_t x = 0; x < ThisAssembly.m_NumPresets; x++)
+						{
+							const PartedModel::Preset& ThisPreset = ThisAssembly.m_PresetsArr[x];
+							ImGui::PushID(&ThisPreset);
+							if (ImGui::Button("SWTICH"))
+							{
+								if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
+								{
+									LocalPlayer->TrySwapPlayerModel(ThisAssembly.m_AssemblyName, ThisPreset.m_PresetName);
+								}
+							}
+							ImGui::SameLine();
+							ImGui::Text("%s", ThisPreset.m_PresetName);
+							ImGui::PopID();
+						}
+
+						ImGui::TreePop();
 					}
 				}
 

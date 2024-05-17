@@ -3,8 +3,6 @@
 #include "Addons/tConsole.h"
 #include "Addons/tLog.h"
 
-#include <detours.h>
-#include <intrin.h>
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
 
@@ -197,10 +195,8 @@ void HOOK_SetCursorPos(int x, int y)
 
 void GF2Hook::Init()
 {
-	//tConsole::fCreate("Godfather II: ASI Hook");
 	C_Logger::Create("GF2_Hook.txt");
 
-	//tConsole::fWriteLine("Welcome to GF2 hook");
 	OurImGuiManager = ImGuiManager();
 	OurImGuiManager.Open();
 

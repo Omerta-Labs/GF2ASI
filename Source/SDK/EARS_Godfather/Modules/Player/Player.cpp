@@ -14,14 +14,14 @@ namespace EARS
 {
 	namespace Modules
 	{
-		void Player::TrySwapPlayerModel()
+		void Player::TrySwapPlayerModel(const char* AssemblyName, const char* PresetName)
 		{
 			// FREDO
-			m_PartsAssemblyName.m_pCStr = "unq_fredo_corleone";
-			m_PartsAssemblyName.m_len = 20;
+			m_PartsAssemblyName.m_pCStr = AssemblyName;
+			m_PartsAssemblyName.m_len = strlen(AssemblyName);
 			m_PartsAssemblyName.m_allocLen = 32;
 
-			MemUtils::CallClassMethod<void, EARS::Modules::Player*, void*, const char*>(0x09C58C0, this, nullptr, "unq_0005_miami");
+			MemUtils::CallClassMethod<void, EARS::Modules::Player*, void*, const char*>(0x09C58C0, this, nullptr, PresetName);
 		}
 
 		Player* Player::GetLocalPlayer()

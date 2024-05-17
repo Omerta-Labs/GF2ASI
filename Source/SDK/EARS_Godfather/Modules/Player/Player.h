@@ -32,7 +32,7 @@ namespace EARS
 		{
 		public:
 
-			void TrySwapPlayerModel();
+			void TrySwapPlayerModel(const char* AssemblyName, const char* PresetName);
 
 			/**
 			 * Get the Local Player
