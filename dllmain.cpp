@@ -17,11 +17,6 @@ void InitialiseHook()
             Hook.Init();
             bHookInit = true;
         }
-
-        if (bHookInit)
-        {
-            Hook.Tick();
-        }
     }
 }
 

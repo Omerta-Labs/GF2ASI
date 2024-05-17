@@ -7,11 +7,13 @@
 #include <polyhook2/ZydisDisassembler.hpp>
 
 #include "Addons/imgui/backends/imgui_impl_win32.h"
+#include "Addons/imgui/backends/imgui_impl_dx9.h"
 
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
+#define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
 
 ImGuiManager OurImGuiManager;
 
@@ -124,7 +126,10 @@ int _cdecl HOOK_ProtoAriesRecv(void* a1, void* a2, void* a3, void* a4, void* a5)
 }
 #endif // ENABLE_GF2_MULTIPLAYER
 
-// STREAM MANAGER
+/**
+ * Hook to dump which Stream files are loaded
+ * (Doesn't actually do that though)
+ */
 uint64_t StreamManager_Load_Old;
 typedef void* (__thiscall* StreamManager_Load)(void* pThis, const char*, float, uint32_t, void*, void*);
 void* __fastcall HOOK_StreamManager_Load(void* pThis, void* ecx, const char* a1, float a2, uint32_t a3, void* a4, void* a5)
@@ -136,7 +141,11 @@ void* __fastcall HOOK_StreamManager_Load(void* pThis, void* ecx, const char* a1,
 	return value;
 }
 
-// GODFATHER BASE SERVICES
+/**
+ * Hook to allow our systems to receive a tick
+ * Good example is ImGui, so we can trigger bespoke behaviour.
+ * Unfortunately we cannot replicate their approach (a class with an RWS::CEventHandler)
+ */
 uint64_t GodfatherBaseServices_HandleEvents_Old;
 typedef void(__thiscall* GodfatherBaseServices_HandleEvents)(void* pThis, const RWS::CMsg& MsgEvent);
 void __fastcall HOOK_GodfatherBaseServices_HandleEvents(void* pThis, void* ecx, const RWS::CMsg& MsgEvent)
@@ -149,23 +158,51 @@ void __fastcall HOOK_GodfatherBaseServices_HandleEvents(void* pThis, void* ecx, 
 	OurImGuiManager.HandleEvents(MsgEvent);
 }
 
+#if ENABLE_GF2_DISPL_BEGINSCENE_HOOK
 /**
- * DISPL
+ * Not used for anything anymore;
+ * Keeping around (BUT UNHOOKED) if it ever is required
  */
 uint64_t Displ_BeginScene_Old;
-void __fastcall HOOK_Displ_BeginScene()
+void __cdecl HOOK_Displ_BeginScene()
 {
 	PLH::FnCast(Displ_BeginScene_Old, &HOOK_Displ_BeginScene)();
 }
+#endif // ENABLE_GF2_DISPL_BEGINSCENE_HOOK
 
+/**
+ * Used to implement the 'end scene' call for ImGuiManager
+ */
 uint64_t Displ_EndScene_Old;
-void __fastcall HOOK_Displ_EndScene()
+void __cdecl HOOK_Displ_EndScene()
 {
 	OurImGuiManager.OnEndScene();
 
 	PLH::FnCast(Displ_EndScene_Old, &HOOK_Displ_EndScene)();
 }
 
+/**
+ * Used to implement reset for ImGui
+ * Resolve crash when anything resets the DX9 device
+ */
+uint64_t Displ_ResetDevice_Old;
+bool __cdecl HOOK_Displ_ResetDevice(int a1)
+{
+	ImGui_ImplDX9_InvalidateDeviceObjects();
+
+	const bool bResult = PLH::FnCast(Displ_ResetDevice_Old, &HOOK_Displ_ResetDevice)(a1);
+
+	if (bResult)
+	{
+		ImGui_ImplDX9_CreateDeviceObjects();
+	}
+
+	return bResult;
+}
+
+/**
+ * Allows ImGui the ability to react to Window messages
+ */
 uint64_t WinProc_GF2_Old;
 int __stdcall WndProc_GF2(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
@@ -180,6 +217,9 @@ int __stdcall WndProc_GF2(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	return PLH::FnCast(WinProc_GF2_Old, &WndProc_GF2)(hWnd, Msg, wParam, lParam);
 }
 
+/**
+ * Allows ImGui to disable the cursor from automatically being recentered
+ */
 uint64_t SetCursorPos_old;
 void HOOK_SetCursorPos(int x, int y)
 {
@@ -235,11 +275,16 @@ void GF2Hook::Init()
 	detour103.hook();
 #endif // ENABLE_GF2_MULTIPLAYER
 
+#if ENABLE_GF2_DISPL_BEGINSCENE_HOOK
 	PLH::x86Detour detour102((char*)0x608620, (char*)&HOOK_Displ_BeginScene, &Displ_BeginScene_Old, dis);
 	detour102.hook();
+#endif // ENABLE_GF2_DISPL_BEGINSCENE_HOOK
 
 	PLH::x86Detour detour155((char*)0x608930, (char*)&HOOK_Displ_EndScene, &Displ_EndScene_Old, dis);
 	detour155.hook();
+
+	PLH::x86Detour detour125((char*)0x608250, (char*)&HOOK_Displ_ResetDevice, &Displ_ResetDevice_Old, dis);
+	detour125.hook();
 
 	PLH::x86Detour detour157((char*)0x0403A50, (char*)&HOOK_StreamManager_Load, &StreamManager_Load_Old, dis);
 	detour157.hook();
@@ -253,9 +298,3 @@ void GF2Hook::Init()
 	PLH::x86Detour detour172((char*)0x69E840, (char*)&HOOK_SetCursorPos, &SetCursorPos_old, dis);
 	detour172.hook();
 }
-
-void GF2Hook::Tick()
-{
-	// todo
-}
-
