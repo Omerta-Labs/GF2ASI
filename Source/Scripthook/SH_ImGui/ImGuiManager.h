@@ -14,7 +14,12 @@ public:
 	//~ End RWS::CEventHandler Interface
 
 	void Open();
-	void Close();
+
+	void OnEndScene();
+
+	bool HasCursorControl() const;
 
 private:
+
+	void OnTick();
 };

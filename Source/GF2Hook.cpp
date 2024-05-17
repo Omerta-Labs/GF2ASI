@@ -8,16 +8,14 @@
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
 
-#include "Addons/Hook.h"
-
-#include "Addons/imgui/backends/imgui_impl_dx9.h"
 #include "Addons/imgui/backends/imgui_impl_win32.h"
 
-#include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
-#include "SDK/EARS_Godfather/Modules/Player/Player.h"
+#include "Scripthook/SH_ImGui/ImGuiManager.h"
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
+
+ImGuiManager OurImGuiManager;
 
 #if ENABLE_GF2_MULTIPLAYER
 struct ConnectionParams
@@ -148,22 +146,10 @@ void __fastcall HOOK_GodfatherBaseServices_HandleEvents(void* pThis, void* ecx, 
 	GodfatherBaseServices_HandleEvents funcCast = (GodfatherBaseServices_HandleEvents)GodfatherBaseServices_HandleEvents_Old;
 	funcCast(pThis, MsgEvent);
 
-	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
-	if (MsgEvent.IsEvent(RunningTickEvent))
-	{
-		if (GetAsyncKeyState(VK_F3) & 1)
-		{
-			if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
-			{
-				LocalPlayer->TrySwapPlayerModel();
-			}
-		}
-	}
+	// Piggy back of the Godfather base services, 
+	// for some reason we cant create our own event handler as of yet
+	OurImGuiManager.HandleEvents(MsgEvent);
 }
-
-static bool show_demo_window = false;
-static bool show_parted_model_window = false;
-static bool bTakeoverCursor = false;
 
 /**
  * DISPL
@@ -171,65 +157,13 @@ static bool bTakeoverCursor = false;
 uint64_t Displ_BeginScene_Old;
 void __fastcall HOOK_Displ_BeginScene()
 {
-	ImGuiIO& IO = ImGui::GetIO();
-	IO.MouseDrawCursor = bTakeoverCursor;
-
-	ImGui_ImplDX9_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-
-	ImGui::NewFrame();
-
-	if (show_demo_window)
-	{
-		ImGui::ShowDemoWindow(&show_demo_window);
-	}
-
-	if (show_parted_model_window)
-	{
-		PartedModelMgr* ModelMgr = PartedModelMgr::GetInstance();
-		if (ModelMgr == nullptr)
-		{
-			// not loaded yet so don't show anything
-			return;
-		}
-
-		if (ImGui::Begin("Parted Model Manager", &show_parted_model_window))
-		{
-			ImGui::Text("Parted Model List");
-			ImGui::BeginChild("parted_model_list");
-
-			PartedModel::AssemblyListHeader* CurrentAssembly = ModelMgr->m_AssembliesList;
-			while (CurrentAssembly != nullptr)
-			{
-				for (uint32_t i = 0; i < CurrentAssembly->m_NumAssemblies; i++)
-				{
-					const PartedModel::Assembly& ThisAssembly = CurrentAssembly->m_Assemblies[i];
-					ImGui::Text("%s [%s]", ThisAssembly.m_AssemblyName, (ThisAssembly.m_Flags == 4 ? "VEHICLE" : "CHARACTER"));
-
-					if (ThisAssembly.m_AssemblyName == "unq_fredo_corleone")
-					{
-						int z = 0;
-					}
-				}
-
-				CurrentAssembly = CurrentAssembly->m_NextHeader;
-			}
-
-			ImGui::EndChild();
-			ImGui::End();
-		}
-	}
-
-	ImGui::EndFrame();
-
 	PLH::FnCast(Displ_BeginScene_Old, &HOOK_Displ_BeginScene)();
 }
 
 uint64_t Displ_EndScene_Old;
 void __fastcall HOOK_Displ_EndScene()
 {
-	ImGui::Render();
-	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+	OurImGuiManager.OnEndScene();
 
 	PLH::FnCast(Displ_EndScene_Old, &HOOK_Displ_EndScene)();
 }
@@ -251,7 +185,7 @@ int __stdcall WndProc_GF2(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 uint64_t SetCursorPos_old;
 void HOOK_SetCursorPos(int x, int y)
 {
-	if (bTakeoverCursor)
+	if (OurImGuiManager.HasCursorControl())
 	{
 		// TODO: We can do better than this
 		// avoid the game from forcing the mouse to the centre
@@ -267,21 +201,10 @@ void GF2Hook::Init()
 	C_Logger::Create("GF2_Hook.txt");
 
 	//tConsole::fWriteLine("Welcome to GF2 hook");
+	OurImGuiManager = ImGuiManager();
+	OurImGuiManager.Open();
 
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-	// Setup Platform/Renderer backends
-	hook::Type<HWND> windowHandle = hook::Type<HWND>(0x112A024);
-	ImGui_ImplWin32_Init(windowHandle);
-
-	hook::Type<IDirect3DDevice9*> class_index = hook::Type<IDirect3DDevice9*>(0x1205750);
-	ImGui_ImplDX9_Init(class_index);
 
 #if ENABLE_GF2_MULTIPLAYER
 	// TODO: Adjust all addresses to use Steam EXE addresses
@@ -335,27 +258,8 @@ void GF2Hook::Init()
 	detour172.hook();
 }
 
-static bool bIsCursorVisible = false;
 void GF2Hook::Tick()
 {
-	if (GetAsyncKeyState(VK_F1) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
-	{
-		show_parted_model_window = !show_parted_model_window;
-	}
-
-	if (GetAsyncKeyState(VK_F2) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
-	{
-		show_demo_window = !show_demo_window;
-	}
-
-	// Update cursor visibility
-	// Should only really be present when any ImGui windows are open - 
-	// The ingame cursor (for menus) is expected to be powered by Apt.
-	const bool bCursorVisibilityThisFrame = show_demo_window || show_parted_model_window;
-	if (bCursorVisibilityThisFrame != bIsCursorVisible)
-	{
-		bIsCursorVisible = bCursorVisibilityThisFrame;
-		bTakeoverCursor = bIsCursorVisible;
-	}
+	// todo
 }
 
