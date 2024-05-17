@@ -13,6 +13,8 @@ static bool show_demo_window = false;
 static bool show_parted_model_window = false;
 static bool bTakeoverCursor = false;
 static bool bIsCursorVisible = false;
+static int model_button = 0x70;
+static int demo_button = 0x72;
 
 ImGuiManager::ImGuiManager()
 	: CEventHandler()
@@ -43,6 +45,9 @@ void ImGuiManager::Open()
 
 	hook::Type<IDirect3DDevice9*> class_index = hook::Type<IDirect3DDevice9*>(0x1205750);
 	ImGui_ImplDX9_Init(class_index);
+
+	model_button = GetPrivateProfileInt("Keybinds", "model", 0x70, "./gf2asi.ini");
+	demo_button = GetPrivateProfileInt("Keybinds", "demo", 0x72, "./gf2asi.ini");
 }
 
 void ImGuiManager::OnEndScene()
@@ -60,12 +65,12 @@ bool ImGuiManager::HasCursorControl() const
 
 void ImGuiManager::OnTick()
 {
-	if (GetAsyncKeyState(VK_F1) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(model_button) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		show_parted_model_window = !show_parted_model_window;
 	}
 
-	if (GetAsyncKeyState(VK_F2) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(demo_button) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		show_demo_window = !show_demo_window;
 	}
