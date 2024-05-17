@@ -9,13 +9,6 @@
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 
-static bool show_demo_window = false;
-static bool show_parted_model_window = false;
-static bool bTakeoverCursor = false;
-static bool bIsCursorVisible = false;
-static int model_button = 0x70;
-static int demo_button = 0x72;
-
 ImGuiManager::ImGuiManager()
 	: CEventHandler()
 {
@@ -43,11 +36,12 @@ void ImGuiManager::Open()
 	hook::Type<HWND> windowHandle = hook::Type<HWND>(0x112A024);
 	ImGui_ImplWin32_Init(windowHandle);
 
-	hook::Type<IDirect3DDevice9*> class_index = hook::Type<IDirect3DDevice9*>(0x1205750);
-	ImGui_ImplDX9_Init(class_index);
+	hook::Type<IDirect3DDevice9*> Dx9Device = hook::Type<IDirect3DDevice9*>(0x1205750);
+	ImGui_ImplDX9_Init(Dx9Device);
 
-	model_button = GetPrivateProfileInt("Keybinds", "model", 0x70, "./gf2asi.ini");
-	demo_button = GetPrivateProfileInt("Keybinds", "demo", 0x72, "./gf2asi.ini");
+	// TODO: When the scripthook has an actual setting system, this should fetch from that manager
+	ShowPartedModelWindowInput = GetPrivateProfileInt("Keybinds", "model", VK_F1, "./gf2asi.ini");
+	ShowImGuiDemoWindowInput = GetPrivateProfileInt("Keybinds", "demo", VK_F2, "./gf2asi.ini");
 }
 
 void ImGuiManager::OnEndScene()
@@ -65,24 +59,23 @@ bool ImGuiManager::HasCursorControl() const
 
 void ImGuiManager::OnTick()
 {
-	if (GetAsyncKeyState(model_button) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(ShowPartedModelWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
-		show_parted_model_window = !show_parted_model_window;
+		bShowPartedModelWindow = !bShowPartedModelWindow;
 	}
 
-	if (GetAsyncKeyState(demo_button) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(ShowImGuiDemoWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
-		show_demo_window = !show_demo_window;
+		bShowImGuiDemoWindow = !bShowImGuiDemoWindow;
 	}
 
 	// Update cursor visibility
 	// Should only really be present when any ImGui windows are open - 
 	// The ingame cursor (for menus) is expected to be powered by Apt.
-	const bool bCursorVisibilityThisFrame = show_demo_window || show_parted_model_window;
-	if (bCursorVisibilityThisFrame != bIsCursorVisible)
+	const bool bCursorVisibilityThisFrame = bShowImGuiDemoWindow || bShowPartedModelWindow;
+	if (bCursorVisibilityThisFrame != bTakeoverCursor)
 	{
-		bIsCursorVisible = bCursorVisibilityThisFrame;
-		bTakeoverCursor = bIsCursorVisible;
+		bTakeoverCursor = bCursorVisibilityThisFrame;
 
 		if (bTakeoverCursor)
 		{
@@ -106,12 +99,12 @@ void ImGuiManager::OnTick()
 
 	ImGui::NewFrame();
 
-	if (show_demo_window)
+	if (bShowImGuiDemoWindow)
 	{
-		ImGui::ShowDemoWindow(&show_demo_window);
+		ImGui::ShowDemoWindow(&bShowImGuiDemoWindow);
 	}
 
-	if (show_parted_model_window)
+	if (bShowPartedModelWindow)
 	{
 		PartedModelMgr* ModelMgr = PartedModelMgr::GetInstance();
 		if (ModelMgr == nullptr)
@@ -120,7 +113,7 @@ void ImGuiManager::OnTick()
 			return;
 		}
 
-		if (ImGui::Begin("Parted Model Manager", &show_parted_model_window))
+		if (ImGui::Begin("Parted Model Manager", &bShowPartedModelWindow))
 		{
 			ImGui::Text("Parted Model List");
 			ImGui::BeginChild("parted_model_list");
