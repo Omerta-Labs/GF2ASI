@@ -12,6 +12,7 @@ struct guid128_t
 	uint32_t a, b, c, d = 0;
 };
 
+// TODO: Move elsewhere when we find the code file for it
 struct String
 {
 	const char* m_pCStr;
@@ -31,8 +32,6 @@ namespace EARS
 		{
 		public:
 
-			void HandleEvents(RWS::CMsg& MsgEvent);
-
 			void TrySwapPlayerModel();
 
 			/**
@@ -42,7 +41,7 @@ namespace EARS
 			 */
 			static Player* GetLocalPlayer();
 
-		//private:
+		private:
 
 			void* VTABLE = nullptr; // Player vtable
 			char m_Padding_0[0x2AC];
