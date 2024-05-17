@@ -1,5 +1,8 @@
 #pragma once
 
+// RenderWare Framework
+#include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
+
 // CPP
 #include <cstdint>
 
@@ -7,6 +10,14 @@
 struct guid128_t
 {
 	uint32_t a, b, c, d = 0;
+};
+
+struct String
+{
+	const char* m_pCStr;
+	unsigned __int32 m_len;
+	unsigned __int32 m_allocLen;
+	void* m_Unk0;
 };
 
 namespace EARS
@@ -20,6 +31,10 @@ namespace EARS
 		{
 		public:
 
+			void HandleEvents(RWS::CMsg& MsgEvent);
+
+			void TrySwapPlayerModel();
+
 			/**
 			 * Get the Local Player
 			 * *NOT PART OF MAIN GAME, UTILITY FUNCTION*
@@ -27,10 +42,16 @@ namespace EARS
 			 */
 			static Player* GetLocalPlayer();
 
-		private:
+		//private:
 
 			void* VTABLE = nullptr; // Player vtable
-			char m_Padding[0x248C];
+			char m_Padding_0[0x2AC];
+			String m_PartsPresetName; // 0x2B0 // (EARS::Modules::PartedAnimated)
+			String m_PartsThemeName; // 0x2C0 // (EARS::Modules::PartedAnimated)
+			String m_PartsSwapSetName; // 0x2D0 // (EARS::Modules::PartedAnimated)
+			String m_PartsAssemblyName; // 0x2E0 // (EARS::Modules::PartedAnimated)
+			void* m_PartsPresetInstance = nullptr; // 0x2F0 - 0x2F4 // (EARS::Modules::PartedAnimated)
+			char m_Padding[0x219C];
 			uint32_t m_CurrentModelType = 0;		// 0x2490 - 0x2494
 			uint32_t m_PlayerID = 0;				// 0x2494 - 0x2498
 			uint32_t m_ControllerID = 0;			// 0x2498 - 0x249C
@@ -38,7 +59,7 @@ namespace EARS
 			char m_Padding2[0x460];
 			guid128_t m_ModelGUID;
 			uint32_t m_ModelStreamHandle = 0;
-			guid128_t m_PlayerRCB_GUID;
+			guid128_t m_PlayerRCB_GUID; 
 			guid128_t m_FatherModelGUID;
 			guid128_t m_FatherRCB_GUID;
 			int32_t m_PlayerDisableCount = 0;

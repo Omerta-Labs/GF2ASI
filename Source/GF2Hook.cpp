@@ -16,6 +16,8 @@
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 
+#include "Scripthook/SH_ImGui/ImGuiManager.h"
+
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
 
@@ -140,6 +142,60 @@ void* __fastcall HOOK_StreamManager_Load(void* pThis, void* ecx, const char* a1,
 	return value;
 }
 
+// STREAM MANAGER
+uint64_t Player_SetPlayerModel_Old;
+typedef void(__thiscall* Player_SetPlayerModel)(EARS::Modules::Player* pThis, int ModelType);
+void __fastcall HOOK_Player_SetPlayerModel(EARS::Modules::Player* pThis, void* ecx, int ModelType)
+{
+	Player_SetPlayerModel funcCast = (Player_SetPlayerModel)Player_SetPlayerModel_Old;
+	funcCast(pThis, ModelType);
+
+	pThis->m_CurrentModelType = ModelType;
+
+	if (ModelType == 2)
+	{
+		MemUtils::CallClassMethod<void, EARS::Modules::Player*, void*, const char*>(0x09C58C0, pThis, nullptr, "unq_0005_miami");
+	}
+}
+
+uint64_t Player_HandleEvents_Old;
+typedef void(__thiscall* Player_HandleEvents)(EARS::Modules::Player* pThis, RWS::CMsg& MsgEvent);
+void __fastcall HOOK_Player_HandleEvents(EARS::Modules::Player* pThis, void* ecx, RWS::CMsg& MsgEvent)
+{
+	Player_HandleEvents funcCast = (Player_HandleEvents)Player_HandleEvents_Old;
+	funcCast(pThis, MsgEvent);
+
+	pThis->HandleEvents(MsgEvent);
+}
+
+uint64_t Services_OpenLevelServices_Old;
+typedef void(__thiscall* Services_OpenLevelServices)(void* pThis);
+void __fastcall HOOK_Services_OpenLevelServices(void* pThis, void* ecx)
+{
+	Services_OpenLevelServices funcCast = (Services_OpenLevelServices)Services_OpenLevelServices_Old;
+	funcCast(pThis);
+}
+
+uint64_t GodfatherBaseServices_HandleEvents_Old;
+typedef void(__thiscall* GodfatherBaseServices_HandleEvents)(void* pThis, const RWS::CMsg& MsgEvent);
+void __fastcall HOOK_GodfatherBaseServices_HandleEvents(void* pThis, void* ecx, const RWS::CMsg& MsgEvent)
+{
+	GodfatherBaseServices_HandleEvents funcCast = (GodfatherBaseServices_HandleEvents)GodfatherBaseServices_HandleEvents_Old;
+	funcCast(pThis, MsgEvent);
+
+	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
+	if (MsgEvent.IsEvent(RunningTickEvent))
+	{
+		if (GetAsyncKeyState(VK_F3) & 1)
+		{
+			if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
+			{
+				LocalPlayer->TrySwapPlayerModel();
+			}
+		}
+	}
+}
+
 static bool show_demo_window = false;
 static bool show_parted_model_window = false;
 static bool bTakeoverCursor = false;
@@ -184,6 +240,11 @@ void __fastcall HOOK_Displ_BeginScene()
 				{
 					const PartedModel::Assembly& ThisAssembly = CurrentAssembly->m_Assemblies[i];
 					ImGui::Text("%s [%s]", ThisAssembly.m_AssemblyName, (ThisAssembly.m_Flags == 4 ? "VEHICLE" : "CHARACTER"));
+
+					if (ThisAssembly.m_AssemblyName == "unq_fredo_corleone")
+					{
+						int z = 0;
+					}
 				}
 
 				CurrentAssembly = CurrentAssembly->m_NextHeader;
@@ -299,6 +360,18 @@ void GF2Hook::Init()
 	PLH::x86Detour detour157((char*)0x0403A50, (char*)&HOOK_StreamManager_Load, &StreamManager_Load_Old, dis);
 	detour157.hook();
 
+	PLH::x86Detour detour171((char*)0x07A60C0, (char*)&HOOK_Player_SetPlayerModel, &Player_SetPlayerModel_Old, dis);
+	detour171.hook();
+
+	PLH::x86Detour detour173((char*)0x07A93A0, (char*)&HOOK_Player_HandleEvents, &Player_HandleEvents_Old, dis);
+	detour173.hook();
+
+	PLH::x86Detour detour1733((char*)0x0680EF0, (char*)&HOOK_Services_OpenLevelServices, &Services_OpenLevelServices_Old, dis);
+	detour1733.hook();
+
+	PLH::x86Detour detour17343((char*)0x8F6CE0, (char*)&HOOK_GodfatherBaseServices_HandleEvents, &GodfatherBaseServices_HandleEvents_Old, dis);
+	detour17343.hook();
+
 	PLH::x86Detour detour159((char*)0x69DE10, (char*)&WndProc_GF2, &WinProc_GF2_Old, dis);
 	detour159.hook();
 
@@ -317,11 +390,6 @@ void GF2Hook::Tick()
 	if (GetAsyncKeyState(VK_F2) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		show_demo_window = !show_demo_window;
-	}
-
-	if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
-	{
-		int z = 0;
 	}
 
 	// Update cursor visibility
