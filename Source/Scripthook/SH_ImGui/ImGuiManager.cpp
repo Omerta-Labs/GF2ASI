@@ -40,7 +40,7 @@ void ImGuiManager::Open()
 	ImGui_ImplDX9_Init(Dx9Device);
 
 	// TODO: When the scripthook has an actual setting system, this should fetch from that manager
-	ShowPartedModelWindowInput = GetPrivateProfileInt("Keybinds", "model", VK_F1, "./gf2asi.ini");
+	ShowModMenuWindowInput = GetPrivateProfileInt("Keybinds", "model", VK_F1, "./gf2asi.ini");
 	ShowImGuiDemoWindowInput = GetPrivateProfileInt("Keybinds", "demo", VK_F2, "./gf2asi.ini");
 }
 
@@ -57,11 +57,69 @@ bool ImGuiManager::HasCursorControl() const
 	return bTakeoverCursor;
 }
 
+void ImGuiManager::DrawTab_PlayerModelSwap()
+{
+	if (ImGui::BeginTabItem("Player Model Swap", nullptr, ImGuiTabItemFlags_SetSelected))
+	{
+		ImGui::BeginChild("parted_model_list");
+
+		PartedModelMgr* ModelMgr = PartedModelMgr::GetInstance();
+		if (ModelMgr == nullptr)
+		{
+			// not loaded yet so don't show anything
+			ImGui::Text("Parted Model Manager is not active, cannot switch models!");
+			return;
+		}
+
+		ImGui::Text("Find a Preset and press 'SWITCH' to swap Player Models.");
+
+		ModelMgr->ForEachAssemblyHeader([](const PartedModel::AssemblyListHeader& InAssemblyHeader) {
+
+			// First iterate through the assemblies within this header
+			for (uint32_t i = 0; i < InAssemblyHeader.m_NumAssemblies; i++)
+			{
+				const PartedModel::Assembly& ThisAssembly = InAssemblyHeader.m_Assemblies[i];
+				if (ThisAssembly.m_Flags == 4)
+				{
+					// we do not want people turning into cars
+					continue;
+				}
+
+				// Present the tree node for the presets within the assembly
+				if (ImGui::TreeNodeEx(&ThisAssembly, ImGuiTreeNodeFlags_None, "%s", ThisAssembly.m_AssemblyName))
+				{
+					for (uint32_t x = 0; x < ThisAssembly.m_NumPresets; x++)
+					{
+						const PartedModel::Preset& ThisPreset = ThisAssembly.m_PresetsArr[x];
+						ImGui::PushID(&ThisPreset);
+						if (ImGui::Button("SWTICH"))
+						{
+							if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
+							{
+								LocalPlayer->TrySwapPlayerModel(ThisAssembly.m_AssemblyName, ThisPreset.m_PresetName);
+							}
+						}
+						ImGui::SameLine();
+						ImGui::Text(ThisPreset.m_PresetName);
+						ImGui::PopID();
+					}
+
+					ImGui::TreePop();
+				}
+			}
+			});
+
+		ImGui::EndChild();
+
+		ImGui::EndTabItem();
+	}
+}
+
 void ImGuiManager::OnTick()
 {
-	if (GetAsyncKeyState(ShowPartedModelWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(ShowModMenuWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
-		bShowPartedModelWindow = !bShowPartedModelWindow;
+		bShowModMenuWindow = !bShowModMenuWindow;
 	}
 
 	if (GetAsyncKeyState(ShowImGuiDemoWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
@@ -72,7 +130,7 @@ void ImGuiManager::OnTick()
 	// Update cursor visibility
 	// Should only really be present when any ImGui windows are open - 
 	// The ingame cursor (for menus) is expected to be powered by Apt.
-	const bool bCursorVisibilityThisFrame = bShowImGuiDemoWindow || bShowPartedModelWindow;
+	const bool bCursorVisibilityThisFrame = bShowImGuiDemoWindow || bShowModMenuWindow;
 	if (bCursorVisibilityThisFrame != bTakeoverCursor)
 	{
 		bTakeoverCursor = bCursorVisibilityThisFrame;
@@ -104,52 +162,17 @@ void ImGuiManager::OnTick()
 		ImGui::ShowDemoWindow(&bShowImGuiDemoWindow);
 	}
 
-	if (bShowPartedModelWindow)
+	if (bShowModMenuWindow)
 	{
-		PartedModelMgr* ModelMgr = PartedModelMgr::GetInstance();
-		if (ModelMgr == nullptr)
+		if (ImGui::Begin("Scripthook Menu", &bShowModMenuWindow))
 		{
-			// not loaded yet so don't show anything
-			return;
-		}
-
-		if (ImGui::Begin("Parted Model Manager", &bShowPartedModelWindow))
-		{
-			ImGui::Text("Parted Model List");
-			ImGui::BeginChild("parted_model_list");
-
-			PartedModel::AssemblyListHeader* CurrentAssembly = ModelMgr->m_AssembliesList;
-			while (CurrentAssembly != nullptr)
+			if (ImGui::BeginTabBar("mod_menu_tab_bar"))
 			{
-				for (uint32_t i = 0; i < CurrentAssembly->m_NumAssemblies; i++)
-				{
-					const PartedModel::Assembly& ThisAssembly = CurrentAssembly->m_Assemblies[i];
-					if (ImGui::TreeNodeEx(&ThisAssembly, ImGuiTreeNodeFlags_None, "%s [%s]", ThisAssembly.m_AssemblyName, (ThisAssembly.m_Flags == 4 ? "VEHICLE" : "CHARACTER")))
-					{
-						for (uint32_t x = 0; x < ThisAssembly.m_NumPresets; x++)
-						{
-							const PartedModel::Preset& ThisPreset = ThisAssembly.m_PresetsArr[x];
-							ImGui::PushID(&ThisPreset);
-							if (ImGui::Button("SWTICH"))
-							{
-								if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
-								{
-									LocalPlayer->TrySwapPlayerModel(ThisAssembly.m_AssemblyName, ThisPreset.m_PresetName);
-								}
-							}
-							ImGui::SameLine();
-							ImGui::Text("%s", ThisPreset.m_PresetName);
-							ImGui::PopID();
-						}
+				DrawTab_PlayerModelSwap();
 
-						ImGui::TreePop();
-					}
-				}
-
-				CurrentAssembly = CurrentAssembly->m_NextHeader;
+				ImGui::EndTabBar();
 			}
 
-			ImGui::EndChild();
 			ImGui::End();
 		}
 	}

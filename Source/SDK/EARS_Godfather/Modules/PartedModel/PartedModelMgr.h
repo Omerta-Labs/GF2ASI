@@ -2,6 +2,7 @@
 
 // CPP
 #include <cstdint>
+#include <functional>
 
 namespace PartedModel
 {
@@ -63,12 +64,29 @@ class PartedModelMgr
 {
 public:
 
+	/**
+	 * Utility function to iterate through all loaded assembly headers
+	 * All const, we do not expect to modify any of the assemblies during iteration.
+	 * All headers pass-by-ref, so none of them should be nullptr.
+	 * Function does not exist in GF2 exe, merely utility header for us to use.
+	 */
+	typedef std::function<void(const PartedModel::AssemblyListHeader&)> TVisitAssemblyHeaderFunctor;
+	void ForEachAssemblyHeader(const TVisitAssemblyHeaderFunctor& InFunction) const;
+
+	// Access to the Parted Model Manager singleton instance
 	static PartedModelMgr* GetInstance();
+
+
+private:
 
 	void* VTable_0 = nullptr;
 	void* VTable_1 = nullptr;
 	void* VTable_2 = nullptr;
+
+	// Unsure, MP related
 	const char* m_MultiplayerPaletteName = nullptr;
+
+	// A list of loaded assemblies
 	PartedModel::AssemblyListHeader* m_AssembliesList = nullptr;
 };
 

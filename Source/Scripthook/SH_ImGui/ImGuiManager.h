@@ -38,6 +38,8 @@ public:
 
 private:
 
+	void DrawTab_PlayerModelSwap();
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 
@@ -45,13 +47,13 @@ private:
 	int ShowImGuiDemoWindowInput = VK_F2;
 
 	// Virtual Key to show the Parted Model Window
-	int ShowPartedModelWindowInput = VK_F1;
+	int ShowModMenuWindowInput = VK_F1;
 
 	// Should we render the ImGui demo window
 	bool bShowImGuiDemoWindow = false;
 
 	// Should we render the Parted Model window
-	bool bShowPartedModelWindow = false;
+	bool bShowModMenuWindow = false;
 
 	// Should we enter a state where we take control of the Cursor?
 	// In this state, we disable Player inputs, and get ImGui to visualise a cursor.
