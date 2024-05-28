@@ -8,6 +8,7 @@
 // Godfather
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
+#include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 
 ImGuiManager::ImGuiManager()
 	: CEventHandler()
@@ -59,7 +60,7 @@ bool ImGuiManager::HasCursorControl() const
 
 void ImGuiManager::DrawTab_PlayerModelSwap()
 {
-	if (ImGui::BeginTabItem("Player Model Swap", nullptr, ImGuiTabItemFlags_SetSelected))
+	if (ImGui::BeginTabItem("Player Model Swap", nullptr, ImGuiTabItemFlags_None))
 	{
 		ImGui::BeginChild("parted_model_list");
 
@@ -110,6 +111,45 @@ void ImGuiManager::DrawTab_PlayerModelSwap()
 			});
 
 		ImGui::EndChild();
+
+		ImGui::EndTabItem();
+	}
+}
+
+void ImGuiManager::DrawTab_PlayerSettings()
+{
+	if (ImGui::BeginTabItem("Player", nullptr, ImGuiTabItemFlags_None))
+	{
+		EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
+		if (LocalPlayer)
+		{
+			bool bNewFlyModeState = bPlayerFlyModeActive;
+			if (ImGui::Checkbox("Fly Mode", &bNewFlyModeState))
+			{
+				// only change state if updated
+				if (bPlayerFlyModeActive != bNewFlyModeState)
+				{
+					if (bNewFlyModeState)
+					{
+						EARS::Havok::CharacterProxy* PlayerProxy = LocalPlayer->GetCharacterProxy();
+						PlayerProxy->EnableGravity(false);
+						PlayerProxy->SetCollisionState(EARS::Havok::CharacterProxy::CollisionState::CS_ALL_DISABLED);
+					}
+					else
+					{
+						EARS::Havok::CharacterProxy* PlayerProxy = LocalPlayer->GetCharacterProxy();
+						PlayerProxy->EnableGravity(true);
+						PlayerProxy->SetCollisionState(EARS::Havok::CharacterProxy::CollisionState::CS_ENABLED);
+					}
+
+					bPlayerFlyModeActive = bNewFlyModeState;
+				}
+			}
+		}
+		else
+		{
+			ImGui::Text("Local Player is missing!");
+		}
 
 		ImGui::EndTabItem();
 	}
@@ -169,6 +209,8 @@ void ImGuiManager::OnTick()
 			if (ImGui::BeginTabBar("mod_menu_tab_bar"))
 			{
 				DrawTab_PlayerModelSwap();
+
+				DrawTab_PlayerSettings();
 
 				ImGui::EndTabBar();
 			}
