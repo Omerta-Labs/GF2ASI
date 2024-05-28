@@ -42,6 +42,8 @@ private:
 
 	void DrawTab_PlayerSettings();
 
+	void DrawTab_TimeOfDaySettings();
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 

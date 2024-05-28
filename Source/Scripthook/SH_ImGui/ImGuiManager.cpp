@@ -8,6 +8,7 @@
 // Godfather
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
+#include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 
 ImGuiManager::ImGuiManager()
@@ -155,6 +156,30 @@ void ImGuiManager::DrawTab_PlayerSettings()
 	}
 }
 
+void ImGuiManager::DrawTab_TimeOfDaySettings()
+{
+	if (ImGui::BeginTabItem("Time Of Day", nullptr, ImGuiTabItemFlags_None))
+	{
+		EARS::Modules::TimeOfDayManager* TODManager = EARS::Modules::TimeOfDayManager::GetInstance();
+		if (TODManager)
+		{
+			EARS::Modules::TimeOfDayManager::GameTime CurrentTime = TODManager->GetGameTime();
+
+			ImGui::TextDisabled("Year/Day/Hour/Minute");
+			if (ImGui::InputInt4("##time_of_day_input", &CurrentTime.m_Year, ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				TODManager->SetGameTime(CurrentTime);
+			}
+		}
+		else
+		{
+			ImGui::Text("Time Of Day is missing!");
+		}
+
+		ImGui::EndTabItem();
+	}
+}
+
 void ImGuiManager::OnTick()
 {
 	if (GetAsyncKeyState(ShowModMenuWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
@@ -165,6 +190,23 @@ void ImGuiManager::OnTick()
 	if (GetAsyncKeyState(ShowImGuiDemoWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		bShowImGuiDemoWindow = !bShowImGuiDemoWindow;
+	}
+
+
+	if (bPlayerFlyModeActive)
+	{
+		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
+		{
+			if (GetAsyncKeyState(VK_PRIOR) & 1)
+			{
+				LocalPlayer->Translate(0.0f, 10.0f, 0.0f);
+			}
+
+			if (GetAsyncKeyState(VK_NEXT) & 1)
+			{
+				LocalPlayer->Translate(0.0f, -10.0f, 0.0f);
+			}
+		}
 	}
 
 	// Update cursor visibility
@@ -211,6 +253,8 @@ void ImGuiManager::OnTick()
 				DrawTab_PlayerModelSwap();
 
 				DrawTab_PlayerSettings();
+
+				DrawTab_TimeOfDaySettings();
 
 				ImGui::EndTabBar();
 			}

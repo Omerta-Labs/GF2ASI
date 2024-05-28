@@ -35,6 +35,9 @@ namespace EARS
 
 			void TrySwapPlayerModel(const char* AssemblyName, const char* PresetName);
 
+			// TODO: This should be a virtual method, once we split up the Player class to PartedAnimated, Sentient, Entity etc.
+			void Translate(const float X, const float Y, const float Z);
+
 			EARS::Havok::CharacterProxy* GetCharacterProxy() { return &m_CharacterProxy; }
 
 			/**
