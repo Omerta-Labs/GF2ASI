@@ -6,6 +6,7 @@
 #include "Addons/imgui/backends/imgui_impl_win32.h"
 
 // Godfather
+#include "SDK/EARS_Framework/Game_Framework/Core/Camera/CameraManager.h"
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
@@ -217,17 +218,23 @@ void ImGuiManager::OnTick()
 	{
 		bTakeoverCursor = bCursorVisibilityThisFrame;
 
+		EARS::Framework::CameraManager* CameraMgr = EARS::Framework::CameraManager::GetInstance();
+
 		if (bTakeoverCursor)
 		{
 			// DISABLE CONTROLS
 			hook::Type<RWS::CEventId> PlayerDisableControlsEventId = hook::Type<RWS::CEventId>(0x112B56C);
 			MemUtils::CallCdeclMethod<void, RWS::CEventId&, bool>(0x0408A00, PlayerDisableControlsEventId, false);
+
+			CameraMgr->DisableUpdate();
 		}
 		else
 		{
 			// ENABLE CONTROLS
 			hook::Type<RWS::CEventId> PlayerEnableControlsEventId = hook::Type<RWS::CEventId>(0x112B39C);
 			MemUtils::CallCdeclMethod<void, RWS::CEventId&, bool>(0x0408A00, PlayerEnableControlsEventId, false);
+
+			CameraMgr->EnableUpdate();
 		}
 	}
 
