@@ -11,6 +11,8 @@
 
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
 
+#include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
+
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
@@ -297,4 +299,6 @@ void GF2Hook::Init()
 
 	PLH::x86Detour detour172((char*)0x69E840, (char*)&HOOK_SetCursorPos, &SetCursorPos_old, dis);
 	detour172.hook();
+
+	EARS::Modules::DemographicRegion::StaticApplyHooks();
 }
