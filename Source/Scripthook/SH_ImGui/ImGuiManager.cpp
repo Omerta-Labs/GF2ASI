@@ -2,6 +2,7 @@
 
 // Addons
 #include "Addons/Hook.h"
+#include "Addons/Settings.h"
 #include "Addons/imgui/backends/imgui_impl_dx9.h"
 #include "Addons/imgui/backends/imgui_impl_win32.h"
 
@@ -13,6 +14,8 @@
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
+
+Settings OurSettings;
 
 ImGuiManager::ImGuiManager()
 	: CEventHandler()
@@ -44,9 +47,7 @@ void ImGuiManager::Open()
 	hook::Type<IDirect3DDevice9*> Dx9Device = hook::Type<IDirect3DDevice9*>(0x1205750);
 	ImGui_ImplDX9_Init(Dx9Device);
 
-	// TODO: When the scripthook has an actual setting system, this should fetch from that manager
-	ShowModMenuWindowInput = GetPrivateProfileInt("Keybinds", "model", VK_F1, "./gf2asi.ini");
-	ShowImGuiDemoWindowInput = GetPrivateProfileInt("Keybinds", "demo", VK_F2, "./gf2asi.ini");
+	OurSettings.Init();
 }
 
 void ImGuiManager::OnEndScene()
@@ -212,12 +213,12 @@ void ImGuiManager::DrawTab_DemographicSettings()
 
 void ImGuiManager::OnTick()
 {
-	if (GetAsyncKeyState(ShowModMenuWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(OurSettings.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		bShowModMenuWindow = !bShowModMenuWindow;
 	}
 
-	if (GetAsyncKeyState(ShowImGuiDemoWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(OurSettings.GetShowImGuiDemoWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		bShowImGuiDemoWindow = !bShowImGuiDemoWindow;
 	}
@@ -227,12 +228,12 @@ void ImGuiManager::OnTick()
 	{
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 		{
-			if (GetAsyncKeyState(VK_PRIOR) & 1)
+			if (GetAsyncKeyState(OurSettings.GetFlyModeUpInput()) & 1)
 			{
 				LocalPlayer->Translate(0.0f, 10.0f, 0.0f);
 			}
 
-			if (GetAsyncKeyState(VK_NEXT) & 1)
+			if (GetAsyncKeyState(OurSettings.GetFlyModeDownInput()) & 1)
 			{
 				LocalPlayer->Translate(0.0f, -10.0f, 0.0f);
 			}
