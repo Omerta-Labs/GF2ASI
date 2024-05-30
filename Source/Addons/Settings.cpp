@@ -9,22 +9,22 @@ void Settings::Init()
 	FlyModeDownInput = GetPrivateProfileInt("Keybinds", "flydown", FlyModeDownInput, path);
 }
 
-int Settings::GetShowModMenuWindowInput()
+int Settings::GetShowModMenuWindowInput() const
 {
 	return ShowModMenuWindowInput;
 }
 
-int Settings::GetShowImGuiDemoWindowInput()
+int Settings::GetShowImGuiDemoWindowInput() const
 {
 	return ShowImGuiDemoWindowInput;
 }
 
-int Settings::GetFlyModeUpInput()
+int Settings::GetFlyModeUpInput() const
 {
 	return FlyModeUpInput;
 }
 
-int Settings::GetFlyModeDownInput()
+int Settings::GetFlyModeDownInput() const
 {
 	return FlyModeDownInput;
 }
