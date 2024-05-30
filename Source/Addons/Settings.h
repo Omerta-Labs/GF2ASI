@@ -1,4 +1,5 @@
 #pragma once
+
 #include <windows.h>
 
 class Settings
@@ -6,6 +7,13 @@ class Settings
 public:
 
 	void Init();
+
+	int GetShowModMenuWindowInput();
+	int GetShowImGuiDemoWindowInput();
+	int GetFlyModeUpInput();
+	int GetFlyModeDownInput();
+
+private:
 
 	// Virtual Key to show the ImGui Demo Window
 	int ShowModMenuWindowInput = VK_F1;
