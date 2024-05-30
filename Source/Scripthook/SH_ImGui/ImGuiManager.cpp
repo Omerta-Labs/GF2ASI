@@ -213,12 +213,12 @@ void ImGuiManager::DrawTab_DemographicSettings()
 
 void ImGuiManager::OnTick()
 {
-	if (GetAsyncKeyState(OurSettings.ShowModMenuWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(OurSettings.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		bShowModMenuWindow = !bShowModMenuWindow;
 	}
 
-	if (GetAsyncKeyState(OurSettings.ShowImGuiDemoWindowInput) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(OurSettings.GetShowImGuiDemoWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		bShowImGuiDemoWindow = !bShowImGuiDemoWindow;
 	}
@@ -228,12 +228,12 @@ void ImGuiManager::OnTick()
 	{
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 		{
-			if (GetAsyncKeyState(OurSettings.FlyModeUpInput) & 1)
+			if (GetAsyncKeyState(OurSettings.GetFlyModeUpInput()) & 1)
 			{
 				LocalPlayer->Translate(0.0f, 10.0f, 0.0f);
 			}
 
-			if (GetAsyncKeyState(OurSettings.FlyModeDownInput) & 1)
+			if (GetAsyncKeyState(OurSettings.GetFlyModeDownInput()) & 1)
 			{
 				LocalPlayer->Translate(0.0f, -10.0f, 0.0f);
 			}
