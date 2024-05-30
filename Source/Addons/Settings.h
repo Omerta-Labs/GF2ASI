@@ -8,10 +8,10 @@ public:
 
 	void Init();
 
-	int GetShowModMenuWindowInput();
-	int GetShowImGuiDemoWindowInput();
-	int GetFlyModeUpInput();
-	int GetFlyModeDownInput();
+	int GetShowModMenuWindowInput() const;
+	int GetShowImGuiDemoWindowInput() const;
+	int GetFlyModeUpInput() const;
+	int GetFlyModeDownInput() const;
 
 private:
 
