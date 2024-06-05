@@ -66,4 +66,6 @@ private:
 	bool bTakeoverCursor = false;
 
 	bool bPlayerFlyModeActive = false;
+
+	bool bPlayerGodModeActive = false;
 };

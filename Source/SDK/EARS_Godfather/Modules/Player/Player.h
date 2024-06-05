@@ -26,6 +26,8 @@ namespace EARS
 {
 	namespace Modules
 	{
+		class StandardDamageComponent;
+
 		/**
 		 * The Player class for The Godfather II
 		 */
@@ -38,7 +40,9 @@ namespace EARS
 			// TODO: This should be a virtual method, once we split up the Player class to PartedAnimated, Sentient, Entity etc.
 			void Translate(const float X, const float Y, const float Z);
 
+			// Getters
 			EARS::Havok::CharacterProxy* GetCharacterProxy() { return &m_CharacterProxy; }
+			EARS::Modules::StandardDamageComponent* GetDamageComponent() const { return m_Damage; }
 
 			/**
 			 * Get the Local Player
@@ -58,12 +62,14 @@ namespace EARS
 			void* m_PartsPresetInstance = nullptr; // 0x2F0 - 0x2F4 // (EARS::Modules::PartedAnimated)
 			char m_Padding_1[0xCC];
 			EARS::Havok::CharacterProxy m_CharacterProxy;		// 0x3C0 - 0x4AC // (EARS::Modules::Sentient)
-			char m_Padding_2[0x1FE4];
+			char m_Padding_2[0x148];
+			EARS::Modules::StandardDamageComponent* m_Damage = nullptr; // 0x5F4 - 0x5F8 (EARS::Modules::Sentient)
+			char m_Padding_3[0x1E98];
 			uint32_t m_CurrentModelType = 0;		// 0x2490 - 0x2494
 			uint32_t m_PlayerID = 0;				// 0x2494 - 0x2498
 			uint32_t m_ControllerID = 0;			// 0x2498 - 0x249C
 			uint32_t m_PlayerFlags[3];				// 0x249C - 0x24A8
-			char m_Padding_3[0x460];
+			char m_Padding_4[0x460];
 			guid128_t m_ModelGUID;
 			uint32_t m_ModelStreamHandle = 0;
 			guid128_t m_PlayerRCB_GUID; 

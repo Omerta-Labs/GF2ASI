@@ -7,6 +7,7 @@
 
 // Godfather
 #include "SDK/EARS_Framework/Game_Framework/Core/Camera/CameraManager.h"
+#include "SDK/EARS_Godfather/Modules/Components/Damage/StandardDamageComponent.h"
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
@@ -148,6 +149,16 @@ void ImGuiManager::DrawTab_PlayerSettings()
 
 					bPlayerFlyModeActive = bNewFlyModeState;
 				}
+			}
+
+			bool bNewGodModeActive = bPlayerGodModeActive;
+			if (ImGui::Checkbox("God Mode", &bNewGodModeActive))
+			{
+				EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
+				EARS::Modules::StandardDamageComponent* DamageComp = LocalPlayer->GetDamageComponent();
+				DamageComp->SetInvincible(bNewGodModeActive);
+
+				bPlayerGodModeActive = bNewGodModeActive;
 			}
 		}
 		else
