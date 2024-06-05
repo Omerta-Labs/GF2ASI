@@ -49,12 +49,6 @@ private:
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 
-	// Virtual Key to show the ImGui Demo Window
-	int ShowImGuiDemoWindowInput = VK_F2;
-
-	// Virtual Key to show the Parted Model Window
-	int ShowModMenuWindowInput = VK_F1;
-
 	// Should we render the ImGui demo window
 	bool bShowImGuiDemoWindow = false;
 
