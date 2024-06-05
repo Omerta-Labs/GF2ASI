@@ -1,6 +1,7 @@
 #pragma once
 
-// RenderWare Framework
+// SDK
+#include "SDK/EARS_Common/SafePtr.h"
 #include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 
@@ -24,6 +25,8 @@ struct String
 
 namespace EARS
 {
+	namespace Vehicles { class WhiteboxCar; }
+
 	namespace Modules
 	{
 		class StandardDamageComponent;
@@ -41,6 +44,7 @@ namespace EARS
 			void Translate(const float X, const float Y, const float Z);
 
 			// Getters
+			EARS::Vehicles::WhiteboxCar* GetVehicle() const { return (EARS::Vehicles::WhiteboxCar*)(m_Vehicle.m_Obj - 0x12); }
 			EARS::Havok::CharacterProxy* GetCharacterProxy() { return &m_CharacterProxy; }
 			EARS::Modules::StandardDamageComponent* GetDamageComponent() const { return m_Damage; }
 
@@ -64,12 +68,14 @@ namespace EARS
 			EARS::Havok::CharacterProxy m_CharacterProxy;		// 0x3C0 - 0x4AC // (EARS::Modules::Sentient)
 			char m_Padding_2[0x148];
 			EARS::Modules::StandardDamageComponent* m_Damage = nullptr; // 0x5F4 - 0x5F8 (EARS::Modules::Sentient)
-			char m_Padding_3[0x1E98];
+			char m_Padding_3[0x1848];
+			SafePtr<EARS::Vehicles::WhiteboxCar> m_Vehicle;					// 0x1E40 - 0x1E48
+			char m_Padding_4[0x648];
 			uint32_t m_CurrentModelType = 0;		// 0x2490 - 0x2494
 			uint32_t m_PlayerID = 0;				// 0x2494 - 0x2498
 			uint32_t m_ControllerID = 0;			// 0x2498 - 0x249C
 			uint32_t m_PlayerFlags[3];				// 0x249C - 0x24A8
-			char m_Padding_4[0x460];
+			char m_Padding_5[0x460];
 			guid128_t m_ModelGUID;
 			uint32_t m_ModelStreamHandle = 0;
 			guid128_t m_PlayerRCB_GUID; 

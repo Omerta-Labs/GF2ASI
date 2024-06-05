@@ -1,5 +1,8 @@
 #pragma once
 
+// SDK
+#include "SDK/EARS_Common/SafePtr.h"
+
 // CPP
 #include <stdint.h>
 
@@ -10,13 +13,6 @@ struct guid128_t_2
 	uint32_t c = 0;
 	uint32_t d = 0;
 };
-
-struct SafePtrData
-{
-	const void* m_pObj; // SafeObj
-	void* m_pNext; // SafePtrBase
-};
-
 
 namespace EARS
 {
@@ -37,7 +33,7 @@ namespace EARS
 			struct sNPCFilterListData
 			{
 				guid128_t_2 m_ListGUID;
-				SafePtrData m_ListEntity; // SafePtr<EARS::Modules::WeightedFilterList> 
+				SafePtr<void*> m_ListEntity; // SafePtr<EARS::Modules::WeightedFilterList> 
 				int32_t m_MinCount = 0;
 				int32_t m_MaxCount = 0;
 				float m_MinSpacing = 0.0f;
@@ -46,7 +42,7 @@ namespace EARS
 			struct sVehicleListData
 			{
 				guid128_t_2 m_ListGUID;
-				SafePtrData m_ListEntity; // SafePtr<EARS::Modules::WhiteboxCarList>
+				SafePtr<void*> m_ListEntity; // SafePtr<EARS::Modules::WhiteboxCarList>
 				int32_t m_MinCivilianCount = 0;
 				int32_t m_MaxCivilianCount = 0;
 				int32_t m_MinParkedCount = 0;

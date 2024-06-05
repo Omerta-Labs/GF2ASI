@@ -161,6 +161,15 @@ void ImGuiManager::DrawTab_PlayerSettings()
 
 				bPlayerGodModeActive = bNewGodModeActive;
 			}
+
+			/* DOESNT WORK
+			EARS::Vehicles::WhiteboxCar* CurrentCar = LocalPlayer->GetVehicle();
+			if (CurrentCar)
+			{
+				ImGui::Text("Current Car: 0x%X", CurrentCar);
+
+			}
+			*/
 		}
 		else
 		{
