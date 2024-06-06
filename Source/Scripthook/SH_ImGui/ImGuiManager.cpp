@@ -12,6 +12,7 @@
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
+#include "SDK/EARS_Godfather/Modules/Turf/City.h"
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
@@ -238,7 +239,14 @@ void ImGuiManager::DrawTab_CitiesSettings()
 	{
 		if (EARS::Modules::CityManager* CityMgr = EARS::Modules::CityManager::GetInstance())
 		{
-			// STUB
+			if (ImGui::TreeNode("Registered Cities"))
+			{
+				CityMgr->ForEachCity([](const EARS::Modules::City& InCity) {
+					ImGui::Text("%s [%s]", InCity.GetInternalName().m_pCStr, InCity.IsKnownToPlayer() ? "VISIBLE" : "HIDDEN");
+					});
+
+				ImGui::TreePop();
+			}
 		}
 		else
 		{

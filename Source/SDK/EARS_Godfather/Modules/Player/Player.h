@@ -1,7 +1,9 @@
 #pragma once
 
 // SDK
+#include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/SafePtr.h"
+#include "SDK/EARS_Common/String.h"
 #include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 
@@ -9,19 +11,7 @@
 #include <cstdint>
 
 // TODO: Move elsewhere when we find the code file for it
-struct guid128_t
-{
-	uint32_t a, b, c, d = 0;
-};
 
-// TODO: Move elsewhere when we find the code file for it
-struct String
-{
-	const char* m_pCStr;
-	unsigned __int32 m_len;
-	unsigned __int32 m_allocLen;
-	void* m_Unk0;
-};
 
 namespace EARS
 {
@@ -76,11 +66,11 @@ namespace EARS
 			uint32_t m_ControllerID = 0;			// 0x2498 - 0x249C
 			uint32_t m_PlayerFlags[3];				// 0x249C - 0x24A8
 			char m_Padding_5[0x460];
-			guid128_t m_ModelGUID;
+			EARS::Common::guid128_t m_ModelGUID;
 			uint32_t m_ModelStreamHandle = 0;
-			guid128_t m_PlayerRCB_GUID; 
-			guid128_t m_FatherModelGUID;
-			guid128_t m_FatherRCB_GUID;
+			EARS::Common::guid128_t m_PlayerRCB_GUID;
+			EARS::Common::guid128_t m_FatherModelGUID;
+			EARS::Common::guid128_t m_FatherRCB_GUID;
 			int32_t m_PlayerDisableCount = 0;
 
 		};
