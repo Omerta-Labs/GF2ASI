@@ -46,6 +46,8 @@ private:
 
 	void DrawTab_DemographicSettings();
 
+	void DrawTab_CitiesSettings();
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 

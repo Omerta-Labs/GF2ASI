@@ -12,6 +12,7 @@
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
+#include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
@@ -231,6 +232,23 @@ void ImGuiManager::DrawTab_DemographicSettings()
 	}
 }
 
+void ImGuiManager::DrawTab_CitiesSettings()
+{
+	if (ImGui::BeginTabItem("Cities", nullptr, ImGuiTabItemFlags_None))
+	{
+		if (EARS::Modules::CityManager* CityMgr = EARS::Modules::CityManager::GetInstance())
+		{
+			// STUB
+		}
+		else
+		{
+			ImGui::Text("City Manager is missing!");
+		}
+
+		ImGui::EndTabItem();
+	}
+}
+
 void ImGuiManager::OnTick()
 {
 	if (GetAsyncKeyState(OurSettings.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
@@ -314,6 +332,8 @@ void ImGuiManager::OnTick()
 				DrawTab_TimeOfDaySettings();
 
 				DrawTab_DemographicSettings();
+
+				DrawTab_CitiesSettings();
 
 				ImGui::EndTabBar();
 			}
