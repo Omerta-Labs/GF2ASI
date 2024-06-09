@@ -48,6 +48,8 @@ private:
 
 	void DrawTab_CitiesSettings();
 
+	void DrawTab_PlayerFamilyTreeSettings();
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 

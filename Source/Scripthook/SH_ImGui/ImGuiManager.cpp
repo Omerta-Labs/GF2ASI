@@ -9,6 +9,8 @@
 // Godfather
 #include "SDK/EARS_Framework/Game_Framework/Core/Camera/CameraManager.h"
 #include "SDK/EARS_Godfather/Modules/Components/Damage/StandardDamageComponent.h"
+#include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
+#include "SDK/EARS_Godfather/Modules/FamilyTree/PlayerFamilyTree.h"
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
@@ -257,6 +259,64 @@ void ImGuiManager::DrawTab_CitiesSettings()
 	}
 }
 
+void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
+{
+	if (ImGui::BeginTabItem("Player Family Tree Settings", nullptr, ImGuiTabItemFlags_None))
+	{
+		if (EARS::Modules::PlayerFamilyTree* FamilyTreeData = EARS::Modules::PlayerFamilyTree::GetInstance())
+		{
+			if (ImGui::TreeNode("FamilyTree Data"))
+			{
+				uint32_t CurrentIdx = 0;
+				FamilyTreeData->ForEachMember([&](const EARS::Modules::PlayerFamilyMember& InMember) {
+					if (ImGui::TreeNode(&InMember, "Member[%u]", CurrentIdx))
+					{
+						ImGui::Text("SimNPC: %p", InMember.m_SimNPC);
+						ImGui::Text("Flags: %u", InMember.m_Flags.GetAllFlags());
+						ImGui::Text("Rank: %i", InMember.m_Rank);
+						ImGui::Text("Specialties: %u", InMember.m_Specialties);
+						ImGui::Text("Weapon GUID: [%p %p %p %p]", InMember.m_WeaponGUID.a, InMember.m_WeaponGUID.b, InMember.m_WeaponGUID.c, InMember.m_WeaponGUID.d);
+						
+						ImGui::TreePop();
+					}
+
+					CurrentIdx++;
+
+					});
+
+				ImGui::TreePop();
+			}
+		}
+		else
+		{
+			ImGui::Text("PlayerFamilyTree is missing!");
+		}
+
+		if (EARS::Modules::CorleoneFamilyData* FamilyData = EARS::Modules::CorleoneFamilyData::GetInstance())
+		{
+			if (ImGui::TreeNode("Honour Data"))
+			{
+				FamilyData->ForEachHonourData([](const EARS::Modules::CorleoneFamilyData::HonorData& InHonourData) {
+					if (ImGui::TreeNodeEx(&InHonourData, ImGuiTreeNodeFlags_None, "[0x%X 0x%X 0x%X 0x%X]", InHonourData.m_SimNpcGuid.a, InHonourData.m_SimNpcGuid.b, InHonourData.m_SimNpcGuid.c, InHonourData.m_SimNpcGuid.d))
+					{
+						ImGui::Text("Weapon License Level: %u", InHonourData.m_WeaponLicenseLevel);
+
+						ImGui::TreePop();
+					}
+					});
+
+				ImGui::TreePop();
+			}
+		}
+		else
+		{
+			ImGui::Text("CorleoneFamilyData is missing!");
+		}
+
+		ImGui::EndTabItem();
+	}
+}
+
 void ImGuiManager::OnTick()
 {
 	if (GetAsyncKeyState(OurSettings.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
@@ -342,6 +402,8 @@ void ImGuiManager::OnTick()
 				DrawTab_DemographicSettings();
 
 				DrawTab_CitiesSettings();
+
+				DrawTab_PlayerFamilyTreeSettings();
 
 				ImGui::EndTabBar();
 			}

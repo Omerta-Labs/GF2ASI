@@ -40,8 +40,6 @@ namespace EARS
 
 		private:
 
-
-
 			char m_Padding_0[0x5C];
 			GameTime m_BaseGameTime;
 			float m_TimeScale = 0.0f;
