@@ -20,6 +20,9 @@
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 
+// CPP
+#include <bitset>
+
 Settings OurSettings;
 
 ImGuiManager::ImGuiManager()
@@ -268,7 +271,7 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 			if (ImGui::TreeNode("FamilyTree Data"))
 			{
 				uint32_t CurrentIdx = 0;
-				FamilyTreeData->ForEachMember([&](const EARS::Modules::PlayerFamilyMember& InMember) {
+				FamilyTreeData->ForEachMember([&](EARS::Modules::PlayerFamilyMember& InMember) {
 					if (ImGui::TreeNode(&InMember, "Member[%u]", CurrentIdx))
 					{
 						ImGui::Text("SimNPC: %p", InMember.m_SimNPC);
@@ -279,6 +282,26 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 
 						if (ImGui::TreeNode("Specialties"))
 						{
+							std::bitset<32> SpecialityBits = InMember.m_Specialties;
+
+							auto RenderCheckBox = [&SpecialityBits](const std::string& Name, const uint8_t Index)
+								{
+									bool bValue = SpecialityBits[Index];
+									if (ImGui::Checkbox(Name.data(), &bValue))
+									{
+										SpecialityBits[Index].flip();
+									}
+								};
+
+							RenderCheckBox("Demolitions", 3);
+							RenderCheckBox("Arsonist", 4);
+							RenderCheckBox("Safecracker", 5);
+							RenderCheckBox("Engineer", 6);
+							RenderCheckBox("Medic", 7);
+							RenderCheckBox("Brute", 8);
+
+							InMember.m_Specialties = (uint32_t)SpecialityBits.to_ulong();
+
 							ImGui::TreePop();
 						}
 						
