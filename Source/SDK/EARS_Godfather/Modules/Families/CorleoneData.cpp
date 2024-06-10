@@ -1,10 +1,10 @@
 #include "CorleoneData.h"
 
-void EARS::Modules::CorleoneFamilyData::ForEachHonourData(const TVisitHonorDataFunctor& InFunction) const
+void EARS::Modules::CorleoneFamilyData::ForEachHonourData(const TVisitHonorDataFunctor& InFunction)
 {
 	for (uint32_t i = 0; i < m_Honors.Size(); i++)
 	{
-		const CorleoneFamilyData::HonorData& HonourData = m_Honors[i];
+		CorleoneFamilyData::HonorData& HonourData = m_Honors[i];
 		InFunction(HonourData);
 	}
 }

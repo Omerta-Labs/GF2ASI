@@ -30,6 +30,16 @@ namespace EARS
 			SentientRank_MAX_VALUE = 0x8,
 		};
 
+		enum class Specialties : int32_t
+		{
+			SPECIALITY_DEMO = 4,
+			SPECIALITY_ARSONIST = 8,
+			SPECIALITY_SAFECRACKER = 0x10,
+			SPECIALITY_ENGINEER = 0x20,
+			SPECIALITY_MEDIC = 0x40,
+			SPECIALITY_BRUTE = 0x80
+		};
+
 		/**
 		 * Stores the meta information of an NPC.
 		 * This does not appear to consist of the actual rendered NPC.
@@ -71,8 +81,8 @@ namespace EARS
 			 * All headers pass-by-ref, so none of them should be nullptr.
 			 * Function does not exist in GF2 exe, merely utility header for us to use.
 			 */
-			typedef std::function<void(const EARS::Modules::PlayerFamilyMember&)> TVisitFamilyMemberFunctor;
-			void ForEachMember(const TVisitFamilyMemberFunctor& InFunction) const;
+			typedef std::function<void(EARS::Modules::PlayerFamilyMember&)> TVisitFamilyMemberFunctor;
+			void ForEachMember(const TVisitFamilyMemberFunctor& InFunction);
 
 			/** Access the CorleoneFamilyData instance */
 			static PlayerFamilyTree* GetInstance();

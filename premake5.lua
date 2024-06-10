@@ -13,7 +13,8 @@ project "GF2ASI"
    characterset "MBCS"
    targetextension ".asi"
    targetdir "E:/Games/Godfather 2/The Godfather II/scripts"
-   debugcommand "E:/Games/Godfather 2/The Godfather II//godfather.exe"
+   debugcommand "E:/Games/Godfather 2/The Godfather II/godfather2.exe"
+   debugdir "E:/Games/Godfather 2/The Godfather II/"
    includedirs { 
    "$(ProjectDir)" ,
    "$(ProjectDir)Source",

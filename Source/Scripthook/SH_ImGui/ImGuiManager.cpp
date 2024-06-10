@@ -276,6 +276,11 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 						ImGui::Text("Rank: %i", InMember.m_Rank);
 						ImGui::Text("Specialties: %u", InMember.m_Specialties);
 						ImGui::Text("Weapon GUID: [%p %p %p %p]", InMember.m_WeaponGUID.a, InMember.m_WeaponGUID.b, InMember.m_WeaponGUID.c, InMember.m_WeaponGUID.d);
+
+						if (ImGui::TreeNode("Specialties"))
+						{
+							ImGui::TreePop();
+						}
 						
 						ImGui::TreePop();
 					}
@@ -296,10 +301,11 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 		{
 			if (ImGui::TreeNode("Honour Data"))
 			{
-				FamilyData->ForEachHonourData([](const EARS::Modules::CorleoneFamilyData::HonorData& InHonourData) {
+				FamilyData->ForEachHonourData([](EARS::Modules::CorleoneFamilyData::HonorData& InHonourData) {
 					if (ImGui::TreeNodeEx(&InHonourData, ImGuiTreeNodeFlags_None, "[0x%X 0x%X 0x%X 0x%X]", InHonourData.m_SimNpcGuid.a, InHonourData.m_SimNpcGuid.b, InHonourData.m_SimNpcGuid.c, InHonourData.m_SimNpcGuid.d))
 					{
-						ImGui::Text("Weapon License Level: %u", InHonourData.m_WeaponLicenseLevel);
+						// Weapon license, must ensure it is restricted between 1 and 4
+						ImGui::SliderScalar("Weapon License", ImGuiDataType_U8, &InHonourData.m_WeaponLicenseLevel, &EARS::Modules::CorleoneFamilyData::MIN_WEAPON_LICENSE, &EARS::Modules::CorleoneFamilyData::MAX_WEAPON_LICENSE);
 
 						ImGui::TreePop();
 					}

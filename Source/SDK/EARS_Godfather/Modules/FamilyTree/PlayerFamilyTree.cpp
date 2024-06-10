@@ -1,6 +1,6 @@
 #include "PlayerFamilyTree.h"
 
-void EARS::Modules::PlayerFamilyTree::ForEachMember(const TVisitFamilyMemberFunctor& InFunction) const
+void EARS::Modules::PlayerFamilyTree::ForEachMember(const TVisitFamilyMemberFunctor& InFunction)
 {
 	for (uint32_t i = 0; i < 7; i++)
 	{

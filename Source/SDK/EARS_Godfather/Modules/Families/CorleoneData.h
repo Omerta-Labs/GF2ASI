@@ -20,6 +20,9 @@ namespace EARS
 		{
 		public:
 
+			static const uint8_t MIN_WEAPON_LICENSE = 1;
+			static const uint8_t MAX_WEAPON_LICENSE = 4;
+
 			struct HonorData
 			{
 				uint16_t m_HonorTotals[12];
@@ -34,8 +37,8 @@ namespace EARS
 			 * All headers pass-by-ref, so none of them should be nullptr.
 			 * Function does not exist in GF2 exe, merely utility header for us to use.
 			 */
-			typedef std::function<void(const CorleoneFamilyData::HonorData&)> TVisitHonorDataFunctor;
-			void ForEachHonourData(const TVisitHonorDataFunctor& InFunction) const;
+			typedef std::function<void(CorleoneFamilyData::HonorData&)> TVisitHonorDataFunctor;
+			void ForEachHonourData(const TVisitHonorDataFunctor& InFunction);
 
 			/** Access the CorleoneFamilyData instance */
 			static CorleoneFamilyData* GetInstance();
