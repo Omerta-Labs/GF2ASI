@@ -18,6 +18,7 @@
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
+#include "SDK/EARS_Godfather/Modules/UI/UIHud.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 
 // CPP
@@ -343,6 +344,33 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 	}
 }
 
+void ImGuiManager::DrawTab_UIHUDSettings()
+{
+	if (ImGui::BeginTabItem("UI Hud", nullptr, ImGuiTabItemFlags_None))
+	{
+		if (EARS::Apt::UIHUD* UIHudManager = EARS::Apt::UIHUD::GetInstance())
+		{
+			if (ImGui::Checkbox("Hide HUD", &bWantsUISuppressed))
+			{
+				if (bWantsUISuppressed)
+				{
+					UIHudManager->Suppress();
+				}
+				else
+				{
+					UIHudManager->Unsuppress();
+				}
+			}
+		}
+		else
+		{
+			ImGui::Text("City Manager is missing!");
+		}
+
+		ImGui::EndTabItem();
+	}
+}
+
 void ImGuiManager::OnTick()
 {
 	if (GetAsyncKeyState(OurSettings.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
@@ -430,6 +458,8 @@ void ImGuiManager::OnTick()
 				DrawTab_CitiesSettings();
 
 				DrawTab_PlayerFamilyTreeSettings();
+
+				DrawTab_UIHUDSettings();
 
 				ImGui::EndTabBar();
 			}

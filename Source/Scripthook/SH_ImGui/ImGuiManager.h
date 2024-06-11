@@ -50,6 +50,8 @@ private:
 
 	void DrawTab_PlayerFamilyTreeSettings();
 
+	void DrawTab_UIHUDSettings();
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 
@@ -66,4 +68,6 @@ private:
 	bool bPlayerFlyModeActive = false;
 
 	bool bPlayerGodModeActive = false;
+
+	bool bWantsUISuppressed = false;
 };
