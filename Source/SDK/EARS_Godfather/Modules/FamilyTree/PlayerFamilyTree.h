@@ -84,7 +84,7 @@ namespace EARS
 			// Getters
 			Flags32 GetFlags() const { return m_Flags; }
 			EARS::Modules::SentientRank GetRank() const { return m_Rank; }
-			EARS::Modules::SimNPC* GetSimNPC() const { return nullptr; /* m_SimNPC.m_Obj; */ }
+			EARS::Modules::SimNPC* GetSimNPC() const { return m_SimNPC.GetPtr(); }
 			EARS::Common::guid128_t GetWeaponGUID() const { return m_WeaponGUID; }
 
 		private:

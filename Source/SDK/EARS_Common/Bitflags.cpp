@@ -44,5 +44,5 @@ void Flags32::SetAllFlags(const uint32_t NewFlags)
 
 bool Flags32::Test(const uint32_t Flag) const
 {
-	return (m_Flags & Flag) == 0;
+	return (m_Flags & Flag) == Flag;
 }

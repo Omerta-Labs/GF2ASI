@@ -34,7 +34,7 @@ namespace EARS
 			void Translate(const float X, const float Y, const float Z);
 
 			// Getters
-			EARS::Vehicles::WhiteboxCar* GetVehicle() const { return (EARS::Vehicles::WhiteboxCar*)(m_Vehicle.m_Obj - 0x12); }
+			EARS::Vehicles::WhiteboxCar* GetVehicle() const { return m_Vehicle.GetPtr(); }
 			EARS::Havok::CharacterProxy* GetCharacterProxy() { return &m_CharacterProxy; }
 			EARS::Modules::StandardDamageComponent* GetDamageComponent() const { return m_Damage; }
 

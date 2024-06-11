@@ -1,5 +1,8 @@
 #include "PlayerFamilyTree.h"
 
+// Hooks
+#include "Addons/Hook.h"
+
 // CPP
 #include <bitset>
 
@@ -56,4 +59,6 @@ void EARS::Modules::PlayerFamilyMember::OnSpecialitiesUpdated()
 	// TODO: CrewComponent - Update Settings
 	// TODO: Update HUD
 	// TODO: If Medic, Init medic data
+
+	MemUtils::CallClassMethod<void, EARS::Modules::PlayerFamilyMember*, uint32_t>(0x090A610, this, m_Specialties);
 }

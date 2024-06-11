@@ -170,14 +170,12 @@ void ImGuiManager::DrawTab_PlayerSettings()
 				bPlayerGodModeActive = bNewGodModeActive;
 			}
 
-			/* DOESNT WORK
 			EARS::Vehicles::WhiteboxCar* CurrentCar = LocalPlayer->GetVehicle();
 			if (CurrentCar)
 			{
 				ImGui::Text("Current Car: 0x%X", CurrentCar);
 
 			}
-			*/
 		}
 		else
 		{
@@ -255,13 +253,13 @@ void ImGuiManager::DrawTab_CitiesSettings()
 						{
 							if (bIsVisible)
 							{
-								// Switch to hidden
-								InCity.HideFromPlayer();
+								// Switch to visible
+								InCity.RevealToPlayer();
 							}
 							else
 							{
-								// switch to revealed
-								InCity.RevealToPlayer();
+								// switch to hidden
+								InCity.HideFromPlayer();
 							}
 						}
 
