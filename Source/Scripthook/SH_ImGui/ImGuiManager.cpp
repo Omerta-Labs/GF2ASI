@@ -18,6 +18,7 @@
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
+#include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
 #include "SDK/EARS_Godfather/Modules/UI/UIHud.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/Behaviours/WhiteboxCar/WhiteboxCar.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/VehicleDamageComponent.h"
@@ -304,7 +305,15 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 			{
 				uint32_t CurrentIdx = 0;
 				FamilyTreeData->ForEachMember([&](EARS::Modules::PlayerFamilyMember& InMember) {
-					if (ImGui::TreeNode(&InMember, "Member[%u]", CurrentIdx))
+
+					const char* Name = "Unknown";
+					if (EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC())
+					{
+						String* NPC_Name = MadeManNPC->GetName();
+						Name = NPC_Name->m_pCStr;
+					}
+
+					if (ImGui::TreeNode(&InMember, "Member[%u] -> '%s'", CurrentIdx, Name))
 					{
 						ImGui::Text("SimNPC: %p", InMember.GetSimNPC());
 						ImGui::Text("Flags: %u", InMember.GetFlags().GetAllFlags());
@@ -333,6 +342,8 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 
 							ImGui::TreePop();
 						}
+
+
 						
 						ImGui::TreePop();
 					}

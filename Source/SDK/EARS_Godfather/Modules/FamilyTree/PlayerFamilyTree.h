@@ -13,6 +13,8 @@ namespace EARS
 {
 	namespace Modules
 	{
+		class SimNPC;
+
 		/**
 		 * Rank for Sentient types
 		 */
@@ -38,15 +40,6 @@ namespace EARS
 			SPECIALITY_ENGINEER = 5,		// 0x20
 			SPECIALITY_MEDIC = 6,			// 0x40
 			SPECIALITY_BRUISER = 7			// 0x80
-		};
-
-		/**
-		 * Stores the meta information of an NPC.
-		 * This does not appear to consist of the actual rendered NPC.
-		 */
-		class SimNPC
-		{
-
 		};
 
 		/**

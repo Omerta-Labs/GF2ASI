@@ -12,7 +12,7 @@ namespace EARS
 	namespace Modules
 	{
 		class SimNPC;
-
+		class NPC;
 	}
 
 	namespace Vehicles
@@ -26,11 +26,32 @@ namespace EARS
 template<>
 inline EARS::Modules::SimNPC* SafePtr<EARS::Modules::SimNPC>::GetPtr() const
 {
-	return (EARS::Modules::SimNPC*)(m_Obj - 0x9);
+	if (m_Obj)
+	{
+		return (EARS::Modules::SimNPC*)(m_Obj - 0x9);
+	}
+
+	return nullptr;
+}
+
+template<>
+inline EARS::Modules::NPC* SafePtr<EARS::Modules::NPC>::GetPtr() const
+{
+	if (m_Obj)
+	{
+		return (EARS::Modules::NPC*)(m_Obj - 0x9);
+	}
+
+	return nullptr;
 }
 
 template<>
 inline EARS::Vehicles::WhiteboxCar* SafePtr<EARS::Vehicles::WhiteboxCar>::GetPtr() const
 {
-	return (EARS::Vehicles::WhiteboxCar*)(m_Obj - 0x9);
+	if (m_Obj)
+	{
+		return (EARS::Vehicles::WhiteboxCar*)(m_Obj - 0x9);
+	}
+
+	return nullptr;
 }
