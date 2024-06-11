@@ -21,7 +21,7 @@
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 
 // CPP
-#include <bitset>
+#include <string>
 
 Settings OurSettings;
 
@@ -274,33 +274,30 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 				FamilyTreeData->ForEachMember([&](EARS::Modules::PlayerFamilyMember& InMember) {
 					if (ImGui::TreeNode(&InMember, "Member[%u]", CurrentIdx))
 					{
-						ImGui::Text("SimNPC: %p", InMember.m_SimNPC);
-						ImGui::Text("Flags: %u", InMember.m_Flags.GetAllFlags());
-						ImGui::Text("Rank: %i", InMember.m_Rank);
-						ImGui::Text("Specialties: %u", InMember.m_Specialties);
-						ImGui::Text("Weapon GUID: [%p %p %p %p]", InMember.m_WeaponGUID.a, InMember.m_WeaponGUID.b, InMember.m_WeaponGUID.c, InMember.m_WeaponGUID.d);
+						ImGui::Text("SimNPC: %p", InMember.GetSimNPC());
+						ImGui::Text("Flags: %u", InMember.GetFlags().GetAllFlags());
+						ImGui::Text("Rank: %i", InMember.GetRank());
+
+						const EARS::Common::guid128_t WeaponGUID = InMember.GetWeaponGUID();
+						ImGui::Text("Weapon GUID: [%p %p %p %p]", WeaponGUID.a, WeaponGUID.b, WeaponGUID.c, WeaponGUID.d);
 
 						if (ImGui::TreeNode("Specialties"))
 						{
-							std::bitset<32> SpecialityBits = InMember.m_Specialties;
-
-							auto RenderCheckBox = [&SpecialityBits](const std::string& Name, const uint8_t Index)
+							auto RenderCheckBox = [&InMember](const std::string& Name, const EARS::Modules::Specialties Index)
 								{
-									bool bValue = SpecialityBits[Index];
+									bool bValue = InMember.HasSpecialty(Index);
 									if (ImGui::Checkbox(Name.data(), &bValue))
 									{
-										SpecialityBits[Index].flip();
+										InMember.ToggleSpecialty(Index);
 									}
 								};
 
-							RenderCheckBox("Demolitions", 3);
-							RenderCheckBox("Arsonist", 4);
-							RenderCheckBox("Safecracker", 5);
-							RenderCheckBox("Engineer", 6);
-							RenderCheckBox("Medic", 7);
-							RenderCheckBox("Brute", 8);
-
-							InMember.m_Specialties = (uint32_t)SpecialityBits.to_ulong();
+							RenderCheckBox("Demolitions", EARS::Modules::Specialties::SPECIALITY_DEMO);
+							RenderCheckBox("Arsonist", EARS::Modules::Specialties::SPECIALITY_ARSONIST);
+							RenderCheckBox("Safecracker", EARS::Modules::Specialties::SPECIALITY_SAFECRACKER);
+							RenderCheckBox("Engineer", EARS::Modules::Specialties::SPECIALITY_ENGINEER);
+							RenderCheckBox("Medic", EARS::Modules::Specialties::SPECIALITY_MEDIC);
+							RenderCheckBox("Bruiser", EARS::Modules::Specialties::SPECIALITY_BRUISER);
 
 							ImGui::TreePop();
 						}

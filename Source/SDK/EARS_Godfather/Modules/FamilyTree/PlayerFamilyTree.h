@@ -16,7 +16,7 @@ namespace EARS
 		/**
 		 * Rank for Sentient types
 		 */
-		enum class SentientRank : int32_t
+		enum class SentientRank : uint32_t
 		{
 			SentientRank_REF = 0xFFFFFFFF,
 			RANK_CIVILIAN = 0x0,
@@ -30,14 +30,14 @@ namespace EARS
 			SentientRank_MAX_VALUE = 0x8,
 		};
 
-		enum class Specialties : int32_t
+		enum class Specialties : uint32_t
 		{
-			SPECIALITY_DEMO = 4,
-			SPECIALITY_ARSONIST = 8,
-			SPECIALITY_SAFECRACKER = 0x10,
-			SPECIALITY_ENGINEER = 0x20,
-			SPECIALITY_MEDIC = 0x40,
-			SPECIALITY_BRUTE = 0x80
+			SPECIALITY_DEMO = 2,			// 0x4
+			SPECIALITY_ARSONIST = 3,		// 0x8
+			SPECIALITY_SAFECRACKER = 4,		// 0x10
+			SPECIALITY_ENGINEER = 5,		// 0x20
+			SPECIALITY_MEDIC = 6,			// 0x40
+			SPECIALITY_BRUISER = 7			// 0x80
 		};
 
 		/**
@@ -54,12 +54,43 @@ namespace EARS
 		 */
 		struct PlayerFamilyMember
 		{
+		public:
+
 			enum class Flags : uint32_t
 			{
 				FLAG_FAMILYMEMBER_SLOT_UNLOCKED = 0x1,
 				FLAG_FAMILYMEMBER_SLOT_FILLED = 0x2,
 				FLAG_FAMILYMEMBER_SELECTED_FOR_ACTION = 0x4,
 			};
+
+			// Specialty API.
+			bool HasSpecialty(const EARS::Modules::Specialties NewSpeciality) const;
+
+			// Add a Specialty to the Family Member.
+			// Should automatically update the hud if the SimNPC is present
+			// (TODO: Ensure that the HUD and crew system is updated to reflect addition)
+			void AddSpecialty(const EARS::Modules::Specialties NewSpeciality);
+
+			// Toggle a specific Specialty to the Family Member.
+			// Should automatically update the hud if the SimNPC is present
+			// (TODO: Ensure that the HUD and crew system is updated to reflect addition)
+			void ToggleSpecialty(const EARS::Modules::Specialties NewSpeciality);
+
+			// Add a Specialty from the Family Member.
+			// Should automatically update the hud if the SimNPC is present
+			// (TODO: Ensure that the HUD and crew system is updated to reflect addition)
+			void RemoveSpecialty(const EARS::Modules::Specialties Speciality);
+
+			// Getters
+			Flags32 GetFlags() const { return m_Flags; }
+			EARS::Modules::SentientRank GetRank() const { return m_Rank; }
+			EARS::Modules::SimNPC* GetSimNPC() const { return nullptr; /* m_SimNPC.m_Obj; */ }
+			EARS::Common::guid128_t GetWeaponGUID() const { return m_WeaponGUID; }
+
+		private:
+
+			// React to this Family Member's Specialties updating
+			void OnSpecialitiesUpdated();
 
 			Flags32 m_Flags;
 			EARS::Modules::SentientRank m_Rank = SentientRank::SentientRank_REF;
