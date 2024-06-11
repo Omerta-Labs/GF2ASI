@@ -19,6 +19,8 @@
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
 #include "SDK/EARS_Godfather/Modules/UI/UIHud.h"
+#include "SDK/EARS_Godfather/Modules/Vehicles/Behaviours/WhiteboxCar/WhiteboxCar.h"
+#include "SDK/EARS_Godfather/Modules/Vehicles/VehicleDamageComponent.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 
 // CPP
@@ -175,6 +177,14 @@ void ImGuiManager::DrawTab_PlayerSettings()
 			{
 				ImGui::Text("Current Car: 0x%X", CurrentCar);
 
+				bool bNewVehicleGodModeActive = bPlayerVehicleGodModeActive;
+				if (ImGui::Checkbox("Vehicle God Mode", &bNewVehicleGodModeActive))
+				{
+					EARS::Modules::StandardDamageComponent* DamageComp = CurrentCar->GetDamageComponent();
+					DamageComp->SetInvincible(bNewVehicleGodModeActive);
+
+					bPlayerVehicleGodModeActive = bNewVehicleGodModeActive;
+				}
 			}
 		}
 		else

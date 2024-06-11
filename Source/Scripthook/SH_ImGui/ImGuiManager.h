@@ -69,5 +69,7 @@ private:
 
 	bool bPlayerGodModeActive = false;
 
+	bool bPlayerVehicleGodModeActive = false;
+
 	bool bWantsUISuppressed = false;
 };
