@@ -45,6 +45,12 @@ namespace EARS
 			 */
 			void RevealToPlayer();
 
+			/**
+			 * Teleport to this City.
+			 * (Implemented using engine code)
+			 */
+			void RequestTeleport() const;
+
 			// Getters
 			uint32_t GetCityID() const { return m_CityID; }
 			String GetInternalName() const { return m_InternalName; }
@@ -57,7 +63,7 @@ namespace EARS
 			Flags32 m_Flags;
 			String m_InternalName;
 			String m_DisplayName;
-			RWS::CEventId m_TeleportMsg;
+			mutable RWS::CEventId m_TeleportMsg;
 			EARS::Common::guid128_t m_WorldGraphPartitionGuidMap;
 			Array<void*> m_Buildings;
 			float m_MapMinPosX = 0.0f;

@@ -39,8 +39,8 @@ namespace EARS
 			 * All headers pass-by-ref, so none of them should be nullptr.
 			 * Function does not exist in GF2 exe, merely utility header for us to use.
 			 */
-			typedef std::function<void(const City&)> TVisitCityFunctor;
-			void ForEachCity(const TVisitCityFunctor& InFunction) const;
+			typedef std::function<void(City&)> TVisitCityFunctor;
+			void ForEachCity(const TVisitCityFunctor& InFunction);
 
 			// Get the CityManager instance
 			static CityManager* GetInstance();

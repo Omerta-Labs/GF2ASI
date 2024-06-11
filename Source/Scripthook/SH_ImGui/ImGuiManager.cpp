@@ -247,8 +247,31 @@ void ImGuiManager::DrawTab_CitiesSettings()
 		{
 			if (ImGui::TreeNode("Registered Cities"))
 			{
-				CityMgr->ForEachCity([](const EARS::Modules::City& InCity) {
-					ImGui::Text("%s [%s]", InCity.GetInternalName().m_pCStr, InCity.IsKnownToPlayer() ? "VISIBLE" : "HIDDEN");
+				CityMgr->ForEachCity([](EARS::Modules::City& InCity) {
+					if (ImGui::TreeNodeEx((void*)InCity.GetCityID(), ImGuiTreeNodeFlags_DefaultOpen, "%s", InCity.GetInternalName().m_pCStr))
+					{
+						bool bIsVisible = InCity.IsKnownToPlayer();
+						if (ImGui::Checkbox("Is Visible To Player", &bIsVisible))
+						{
+							if (bIsVisible)
+							{
+								// Switch to hidden
+								InCity.HideFromPlayer();
+							}
+							else
+							{
+								// switch to revealed
+								InCity.RevealToPlayer();
+							}
+						}
+
+						if (ImGui::Button("Travel To City"))
+						{
+							InCity.RequestTeleport();
+						}
+
+						ImGui::TreePop();
+					}
 					});
 
 				ImGui::TreePop();
