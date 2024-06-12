@@ -34,6 +34,8 @@ struct SafePtr : public SafePtrBase
 		assert(false && "This must be explicitly defined, otherwise you'll crash");
 		return nullptr;
 	}
+
+	bool IsValid() const { return m_Obj != nullptr; }
 };
 
 #include "SafePtr.inl"

@@ -39,6 +39,8 @@ namespace EARS
 			 */
 			void InitMedic();
 
+			bool IsHiredCrew() const;
+
 		private:
 
 			char m_Padding0[0x1C];
