@@ -5,6 +5,7 @@
 
 // SDK
 #include "SDK/EARS_Godfather/Modules/Components/NPC/NPCCrewComponent.h"
+#include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
 
 // CPP

@@ -114,7 +114,7 @@ void ImGuiManager::DrawTab_PlayerModelSwap()
 						{
 							if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 							{
-								LocalPlayer->TrySwapPlayerModel(ThisAssembly.m_AssemblyName, ThisPreset.m_PresetName);
+								LocalPlayer->TrySwapModel(ThisAssembly.m_AssemblyName, ThisPreset.m_PresetName);
 							}
 						}
 						ImGui::SameLine();

@@ -18,15 +18,6 @@ namespace EARS
 {
 	namespace Modules
 	{
-		class NPCCrewComponent;
-
-		class NPC
-		{
-		public:
-
-			EARS::Modules::NPCCrewComponent* GetCrewComponent() const;
-		};
-
 		/**
 		 * Stores the meta information of an NPC.
 		 * This does not appear to consist of the actual rendered NPC.
