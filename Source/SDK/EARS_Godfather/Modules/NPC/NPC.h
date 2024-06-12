@@ -14,6 +14,7 @@ namespace EARS
 	namespace Modules
 	{
 		class NPCCrewComponent;
+		class NPCUpgradeComponent;
 
 		/**
 		 * The NPC class for The Godfather II
@@ -24,6 +25,7 @@ namespace EARS
 
 			// Getters
 			EARS::Modules::NPCCrewComponent* GetCrewComponent() const;
+			EARS::Modules::NPCUpgradeComponent* GetUpgradeComponent() const;
 
 		private:
 

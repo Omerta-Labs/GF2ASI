@@ -8,8 +8,7 @@ namespace EARS
 	namespace Modules
 	{
 		/**
-		 * A component which provides the ability to associates upgrades
-		 * to a given entity.
+		 *  An Upgrade component primarily used by the NPC class
 		 */
 		class NPCUpgradeComponent : public EARS::Modules::UpgradeComponent
 		{

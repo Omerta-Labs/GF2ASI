@@ -13,12 +13,17 @@ namespace EARS
 {
 	namespace Modules
 	{
+		class PlayerUpgradeComponent;
+
 		/**
 		 * The Player class for The Godfather II
 		 */
 		class Player : public Sentient
 		{
 		public:
+
+			// Getters
+			EARS::Modules::PlayerUpgradeComponent* GetUpgradeComponent() const;
 
 			/**
 			 * Get the Local Player
