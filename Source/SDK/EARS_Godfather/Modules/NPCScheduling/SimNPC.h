@@ -18,9 +18,13 @@ namespace EARS
 {
 	namespace Modules
 	{
+		class NPCCrewComponent;
+
 		class NPC
 		{
+		public:
 
+			EARS::Modules::NPCCrewComponent* GetCrewComponent() const;
 		};
 
 		/**
@@ -31,8 +35,13 @@ namespace EARS
 		{
 		public:
 
+			/**
+			 * Fetch the localised name of the SimNPC.
+			 * Once localized, it remains cached in this instance.
+			 */
 			String* GetName();
 
+			// Fetch the NPC associated with this SimNPC.
 			EARS::Modules::NPC* GetNPC() const { return m_NPC.GetPtr(); }
 
 		private:

@@ -3,6 +3,10 @@
 // Hooks
 #include "Addons/Hook.h"
 
+// SDK
+#include "SDK/EARS_Godfather/Modules/Components/NPC/NPCCrewComponent.h"
+#include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
+
 // CPP
 #include <bitset>
 
@@ -61,4 +65,14 @@ void EARS::Modules::PlayerFamilyMember::OnSpecialitiesUpdated()
 	// TODO: If Medic, Init medic data
 
 	MemUtils::CallClassMethod<void, EARS::Modules::PlayerFamilyMember*, uint32_t>(0x090A610, this, m_Specialties);
+
+	if(EARS::Modules::SimNPC* FamilySimNPC = GetSimNPC())
+	{
+		if (EARS::Modules::NPC* FamilyNPC = FamilySimNPC->GetNPC())
+		{
+			// TODO: Does not work
+			EARS::Modules::NPCCrewComponent* CrewComponent = FamilyNPC->GetCrewComponent();
+			//CrewComponent->AddNewCrewSpecialty(m_Specialties);
+		}
+	}
 }

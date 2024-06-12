@@ -13,6 +13,11 @@ void EARS::Apt::UIHUD::Unsuppress()
 	MemUtils::CallClassMethod<void, EARS::Apt::UIHUD*>(0x093A2F0, this);
 }
 
+void EARS::Apt::UIHUD::AddCrewSpecialty(EARS::Modules::NPC* CrewNPC, uint32_t NewSpecialty)
+{
+	MemUtils::CallClassMethod<void, EARS::Apt::UIHUD*, EARS::Modules::NPC*, uint32_t>(0x09398E0, this, CrewNPC, NewSpecialty);
+}
+
 EARS::Apt::UIHUD* EARS::Apt::UIHUD::GetInstance()
 {
 	return *(EARS::Apt::UIHUD**)0x1129C4C;

@@ -1,7 +1,15 @@
 #pragma once
 
+// CPP
+#include <stdint.h>
+
 namespace EARS
 {
+	namespace Modules
+	{
+		class NPC;
+	}
+
 	namespace Apt
 	{
 		/**
@@ -18,6 +26,12 @@ namespace EARS
 			// Decrement the 'suppress' counter
 			// If Suppress == 0, show hud
 			void Unsuppress();
+
+			/**
+			 * Update a Crew Members specialties on the HUD.
+			 * (Part of Engine code)
+			 */
+			void AddCrewSpecialty(EARS::Modules::NPC* CrewNPC, uint32_t NewSpecialty);
 
 			// Get the instance of this object
 			static EARS::Apt::UIHUD* GetInstance();
