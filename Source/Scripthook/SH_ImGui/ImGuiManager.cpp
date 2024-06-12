@@ -8,6 +8,7 @@
 
 // Godfather
 #include "SDK/EARS_Framework/Game_Framework/Core/Camera/CameraManager.h"
+#include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Components/Damage/StandardDamageComponent.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
 #include "SDK/EARS_Godfather/Modules/FamilyTree/PlayerFamilyTree.h"
@@ -171,6 +172,19 @@ void ImGuiManager::DrawTab_PlayerSettings()
 				DamageComp->SetInvincible(bNewGodModeActive);
 
 				bPlayerGodModeActive = bNewGodModeActive;
+			}
+
+			if (EARS::Modules::PlayerUpgradeComponent* PlayerUpgradeComp = LocalPlayer->GetUpgradeComponent())
+			{
+				if (ImGui::Button("Hide Upgrade Parts"))
+				{
+					PlayerUpgradeComp->ModifyAllUpgradeParts(false);
+				}
+
+				if (ImGui::Button("Show Upgrade Parts"))
+				{
+					PlayerUpgradeComp->ModifyAllUpgradeParts(true);
+				}
 			}
 
 			EARS::Vehicles::WhiteboxCar* CurrentCar = LocalPlayer->GetVehicle();
