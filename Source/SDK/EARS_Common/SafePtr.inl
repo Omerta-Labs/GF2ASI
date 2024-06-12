@@ -11,6 +11,7 @@ namespace EARS
 {
 	namespace Modules
 	{
+		class Family;
 		class SimNPC;
 		class NPC;
 	}
@@ -51,6 +52,17 @@ inline EARS::Vehicles::WhiteboxCar* SafePtr<EARS::Vehicles::WhiteboxCar>::GetPtr
 	if (m_Obj)
 	{
 		return (EARS::Vehicles::WhiteboxCar*)(m_Obj - 0x9);
+	}
+
+	return nullptr;
+}
+
+template<>
+inline EARS::Modules::Family* SafePtr<EARS::Modules::Family>::GetPtr() const
+{
+	if (m_Obj)
+	{
+		return (EARS::Modules::Family*)(m_Obj - 0x9);
 	}
 
 	return nullptr;

@@ -29,7 +29,7 @@ namespace EARS
 
 		private:
 
-			char m_Padding_4[0x648];
+			char m_Padding_4[0x5B0];
 			uint32_t m_CurrentModelType = 0;		// 0x2490 - 0x2494
 			uint32_t m_PlayerID = 0;				// 0x2494 - 0x2498
 			uint32_t m_ControllerID = 0;			// 0x2498 - 0x249C
