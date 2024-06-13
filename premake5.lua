@@ -21,7 +21,6 @@ project "GF2ASI"
    "$(ProjectDir)Source/Packages",
    "vendors/detours",
    "vendors/polyhook/include",
-   "vendors/discord/include"
    }
 
    libdirs {

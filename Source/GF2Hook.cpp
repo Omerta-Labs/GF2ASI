@@ -13,7 +13,7 @@
 
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 
-#include <discord_game_sdk.h>
+#include "Addons/discord/discord.h"
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
@@ -241,20 +241,6 @@ void GF2Hook::Init()
 {
 	C_Logger::Create("GF2_Hook.txt");
 
-	DiscordCreateParams Params;
-	DiscordCreateParamsSetDefault(&Params);
-
-	IDiscordCore* Core = nullptr;
-	EDiscordResult Result = DiscordCreate(DISCORD_VERSION, &Params, &Core);
-	if (Result == DiscordResult_Ok)
-	{
-		DiscordActivity InitActivity = {};
-		InitActivity.application_id = 556346460850094100;
-
-		IDiscordActivityManager* ActivityMgr = Core->get_activity_manager(Core);
-		ActivityMgr->update_activity(ActivityMgr, &InitActivity, nullptr, nullptr);
-	}
-
 	OurImGuiManager = ImGuiManager();
 	OurImGuiManager.Open();
 
@@ -317,4 +303,40 @@ void GF2Hook::Init()
 	detour172.hook();
 
 	EARS::Modules::DemographicRegion::StaticApplyHooks();
+}
+
+void Log(discord::LogLevel level, const char* message) {
+	C_Logger::Printf("[%u] %s", level, message);
+}
+
+void GF2Hook::Tick()
+{
+	/** discord is shite and this does not work */
+	static discord::Core* core = nullptr;
+	static bool bSubmittedActivity = false;
+	if (core == nullptr)
+	{
+		discord::Core::Create(1250772991474925569, DiscordCreateFlags_Default, &core);
+
+		core->SetLogHook(discord::LogLevel::Debug, Log);
+		core->SetLogHook(discord::LogLevel::Info, Log);
+		core->SetLogHook(discord::LogLevel::Warn, Log);
+		core->SetLogHook(discord::LogLevel::Error, Log);
+	}
+
+	// only trigger this once, otherwise causes a major memory leak
+	if (core && bSubmittedActivity == false)
+	{
+		discord::Activity activity{};
+		activity.SetApplicationId(1250772991474925569);
+		activity.SetName("Godfather Test");
+		activity.SetState("Testing");
+		activity.SetDetails("Fruit Loops");
+		core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
+			C_Logger::Printf("Updated Activity: %u", result);
+			bSubmittedActivity = false;
+			});
+
+		bSubmittedActivity = true;
+	}
 }
