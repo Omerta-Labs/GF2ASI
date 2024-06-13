@@ -13,6 +13,8 @@
 
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 
+#include <discord_game_sdk.h>
+
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
@@ -238,6 +240,20 @@ void HOOK_SetCursorPos(int x, int y)
 void GF2Hook::Init()
 {
 	C_Logger::Create("GF2_Hook.txt");
+
+	DiscordCreateParams Params;
+	DiscordCreateParamsSetDefault(&Params);
+
+	IDiscordCore* Core = nullptr;
+	EDiscordResult Result = DiscordCreate(DISCORD_VERSION, &Params, &Core);
+	if (Result == DiscordResult_Ok)
+	{
+		DiscordActivity InitActivity = {};
+		InitActivity.application_id = 556346460850094100;
+
+		IDiscordActivityManager* ActivityMgr = Core->get_activity_manager(Core);
+		ActivityMgr->update_activity(ActivityMgr, &InitActivity, nullptr, nullptr);
+	}
 
 	OurImGuiManager = ImGuiManager();
 	OurImGuiManager.Open();
