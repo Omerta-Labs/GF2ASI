@@ -247,8 +247,8 @@ void GF2Hook::Init()
 
 	auto result = discord::Core::Create(1250772991474925569, DiscordCreateFlags_Default, &core);
 	discord::Activity activity{};
-	activity.SetState("Testing");
-	activity.SetDetails("I love greavesy");
+	activity.SetState("Playing Godfather II");
+	activity.SetDetails("Thinking like a don");
 	core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
 
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
