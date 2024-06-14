@@ -20,6 +20,7 @@
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
 
 ImGuiManager OurImGuiManager;
+discord::Core* core{};
 
 #if ENABLE_GF2_MULTIPLAYER
 struct ConnectionParams
@@ -244,6 +245,12 @@ void GF2Hook::Init()
 	OurImGuiManager = ImGuiManager();
 	OurImGuiManager.Open();
 
+	auto result = discord::Core::Create(1250772991474925569, DiscordCreateFlags_Default, &core);
+	discord::Activity activity{};
+	activity.SetState("Testing");
+	activity.SetDetails("I love greavesy");
+	core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
+
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
 
 #if ENABLE_GF2_MULTIPLAYER
@@ -311,32 +318,5 @@ void Log(discord::LogLevel level, const char* message) {
 
 void GF2Hook::Tick()
 {
-	/** discord is shite and this does not work */
-	static discord::Core* core = nullptr;
-	static bool bSubmittedActivity = false;
-	if (core == nullptr)
-	{
-		discord::Core::Create(1250772991474925569, DiscordCreateFlags_Default, &core);
-
-		core->SetLogHook(discord::LogLevel::Debug, Log);
-		core->SetLogHook(discord::LogLevel::Info, Log);
-		core->SetLogHook(discord::LogLevel::Warn, Log);
-		core->SetLogHook(discord::LogLevel::Error, Log);
-	}
-
-	// only trigger this once, otherwise causes a major memory leak
-	if (core && bSubmittedActivity == false)
-	{
-		discord::Activity activity{};
-		activity.SetApplicationId(1250772991474925569);
-		activity.SetName("Godfather Test");
-		activity.SetState("Testing");
-		activity.SetDetails("Fruit Loops");
-		core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
-			C_Logger::Printf("Updated Activity: %u", result);
-			bSubmittedActivity = false;
-			});
-
-		bSubmittedActivity = true;
-	}
+	::core->RunCallbacks();
 }
