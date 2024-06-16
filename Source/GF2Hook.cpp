@@ -245,11 +245,11 @@ void GF2Hook::Init()
 	OurImGuiManager = ImGuiManager();
 	OurImGuiManager.Open();
 
-	auto result = discord::Core::Create(1250772991474925569, DiscordCreateFlags_NoRequireDiscord, &core);
+	auto result = discord::Core::Create(556346460850094100, DiscordCreateFlags_NoRequireDiscord, &core);
 	discord::Activity activity{};
 	activity.SetState("Playing Godfather II");
 	activity.SetDetails("Thinking like a don");
-	//activity.GetAssets().SetLargeImage("");
+	activity.GetAssets().SetLargeImage("main");
 	activity.GetTimestamps().SetStart(discord::Timestamp(std::time(0)));
 	core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
 
