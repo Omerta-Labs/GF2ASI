@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ctime>
+
 class GF2Hook
 {
 public:
