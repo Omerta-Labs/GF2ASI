@@ -49,7 +49,7 @@ void DiscordManager::OnTick()
 			uCurrentCityID = NewCityID;
 			if (String* DisplayName = CityMgr->GetDisplayName(NewCityID))
 			{
-				std::string Sentence = "Living in ";
+				std::string Sentence = "Freeroaming ";
 				const char* CityName = DisplayName->m_pCStr;
 				Sentence += CityName;
 				activity.SetState(Sentence.c_str());
