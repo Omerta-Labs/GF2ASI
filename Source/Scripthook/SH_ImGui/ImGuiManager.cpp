@@ -270,7 +270,7 @@ void ImGuiManager::DrawTab_CitiesSettings()
 		{
 			const uint32_t CurrentCityID = CityMgr->GetCurrentCity();
 			const String* CurrentCityName = CityMgr->GetDisplayName(CurrentCityID);
-			ImGui::Text("Current City: %s", CurrentCityName->m_pCStr);
+			ImGui::Text("Current City: %s", (CurrentCityName ? CurrentCityName->m_pCStr : "None"));
 
 			if (ImGui::TreeNode("Registered Cities"))
 			{
