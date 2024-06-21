@@ -52,6 +52,8 @@ private:
 
 	void DrawTab_UIHUDSettings();
 
+	void DrawTab_Support();
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 

@@ -427,6 +427,48 @@ void ImGuiManager::DrawTab_UIHUDSettings()
 	}
 }
 
+void ImGuiManager::DrawTab_Support()
+{
+	auto AddUnderLine = [](ImColor col_)
+		{
+			ImVec2 min = ImGui::GetItemRectMin();
+			ImVec2 max = ImGui::GetItemRectMax();
+			min.y = max.y;
+			ImGui::GetWindowDrawList()->AddLine(min, max, col_, 1.0f);
+		};
+
+	auto TextURL = [&AddUnderLine](const char* Name, const char* URL)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered]);
+			ImGui::Text(Name);
+			ImGui::PopStyleColor();
+			if (ImGui::IsItemHovered())
+			{
+				if (ImGui::IsMouseClicked(0))
+				{
+					ShellExecuteA(0, 0, URL, 0, 0, SW_SHOW);
+				}
+
+				AddUnderLine(ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered]);
+				ImGui::SetTooltip("Open in browser\n\t %s", URL);
+			}
+			else
+			{
+				AddUnderLine(ImGui::GetStyle().Colors[ImGuiCol_Button]);
+			}
+		};
+	// shamelessly plug donations
+	if (ImGui::BeginTabItem("Support", nullptr, ImGuiTabItemFlags_None))
+	{
+		ImGui::TextWrapped("If you want to support the development of this project, please consider donating! Donations with accompanying feature requests will be considered for upcoming versions.");
+		TextURL("Patreon", "https://www.patreon.com/Greavesy");
+		TextURL("Ko-fi", "https://ko-fi.com/greavesy");
+		TextURL("Boosty", "https://boosty.to/greavesy/donate");
+
+		ImGui::EndTabItem();
+	}
+}
+
 void ImGuiManager::OnTick()
 {
 	if (GetAsyncKeyState(OurSettings.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
@@ -516,6 +558,8 @@ void ImGuiManager::OnTick()
 				DrawTab_PlayerFamilyTreeSettings();
 
 				DrawTab_UIHUDSettings();
+
+				DrawTab_Support();
 
 				ImGui::EndTabBar();
 			}
