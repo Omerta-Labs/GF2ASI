@@ -75,7 +75,7 @@ void DiscordManager::OnTick()
 			if (const String* DisplayName = CityMgr->GetDisplayName(NewCityID))
 			{
 				// update state to represent new city
-				const std::string NewState = std::format("Freeroaming {}", DisplayName->m_pCStr);
+				const std::string NewState = std::format("Visiting {}", DisplayName->m_pCStr);
 				activity.SetState(NewState.data());
 				activity.GetAssets().SetSmallImage(Precense::GetSmallImageFromCityID(uCurrentCityID));
 
