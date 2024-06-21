@@ -82,10 +82,9 @@ void DiscordManager::OnTick()
 				// push new activity
 				core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
 					});
-
-				// triggered update request
-				::core->RunCallbacks();
 			}
 		}
 	}
+
+	::core->RunCallbacks();
 }
