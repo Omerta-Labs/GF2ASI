@@ -14,21 +14,6 @@
 discord::Core* core{};
 discord::Activity activity{};
 
-DiscordManager::DiscordManager()
-	: CEventHandler()
-{
-
-}
-
-void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
-{
-	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
-	if (MsgEvent.IsEvent(RunningTickEvent))
-	{
-		OnTick();
-	}
-}
-
 void DiscordManager::Open()
 {
 	auto result = discord::Core::Create(556346460850094100, DiscordCreateFlags_NoRequireDiscord, &core);
