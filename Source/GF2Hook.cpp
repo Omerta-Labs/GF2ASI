@@ -160,6 +160,7 @@ void __fastcall HOOK_GodfatherBaseServices_HandleEvents(void* pThis, void* ecx, 
 	// Piggy back of the Godfather base services, 
 	// for some reason we cant create our own event handler as of yet
 	OurImGuiManager.HandleEvents(MsgEvent);
+	OurDiscordManager.HandleEvents(MsgEvent);
 }
 
 #if ENABLE_GF2_DISPL_BEGINSCENE_HOOK
@@ -310,5 +311,5 @@ void GF2Hook::Init()
 
 void GF2Hook::Tick()
 {
-	OurDiscordManager.OnTick();
+	//Nothing
 }
