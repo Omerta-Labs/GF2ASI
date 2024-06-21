@@ -10,17 +10,16 @@
 #include "Addons/imgui/backends/imgui_impl_dx9.h"
 
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
+#include "Scripthook/SH_Discord/DiscordManager.h"
 
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
-
-#include "Addons/discord/discord.h"
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
 
 ImGuiManager OurImGuiManager;
-discord::Core* core{};
+DiscordManager OurDiscordManager;
 
 #if ENABLE_GF2_MULTIPLAYER
 struct ConnectionParams
@@ -161,6 +160,7 @@ void __fastcall HOOK_GodfatherBaseServices_HandleEvents(void* pThis, void* ecx, 
 	// Piggy back of the Godfather base services, 
 	// for some reason we cant create our own event handler as of yet
 	OurImGuiManager.HandleEvents(MsgEvent);
+	OurDiscordManager.HandleEvents(MsgEvent);
 }
 
 #if ENABLE_GF2_DISPL_BEGINSCENE_HOOK
@@ -245,13 +245,8 @@ void GF2Hook::Init()
 	OurImGuiManager = ImGuiManager();
 	OurImGuiManager.Open();
 
-	auto result = discord::Core::Create(556346460850094100, DiscordCreateFlags_NoRequireDiscord, &core);
-	discord::Activity activity{};
-	activity.SetState("Playing Godfather II");
-	activity.SetDetails("Thinking like a don");
-	activity.GetAssets().SetLargeImage("main");
-	activity.GetTimestamps().SetStart(discord::Timestamp(std::time(0)));
-	core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
+	OurDiscordManager = DiscordManager();
+	OurDiscordManager.Open();
 
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
 
@@ -314,11 +309,7 @@ void GF2Hook::Init()
 	EARS::Modules::DemographicRegion::StaticApplyHooks();
 }
 
-void Log(discord::LogLevel level, const char* message) {
-	C_Logger::Printf("[%u] %s", level, message);
-}
-
 void GF2Hook::Tick()
 {
-	::core->RunCallbacks();
+	//What now?
 }
