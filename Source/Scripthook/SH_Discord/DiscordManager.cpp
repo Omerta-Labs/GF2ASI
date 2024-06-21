@@ -32,7 +32,7 @@ namespace Precense
 	{
 		if (CityIDToImageAsset.contains(CityID))
 		{
-			return CityIDToImageAsset[CityID];
+			return CityIDToImageAsset.at(CityID);
 		}
 
 		return nullptr;
