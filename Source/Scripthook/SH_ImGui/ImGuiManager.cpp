@@ -268,10 +268,14 @@ void ImGuiManager::DrawTab_CitiesSettings()
 	{
 		if (EARS::Modules::CityManager* CityMgr = EARS::Modules::CityManager::GetInstance())
 		{
+			const uint32_t CurrentCityID = CityMgr->GetCurrentCity();
+			const String* CurrentCityName = CityMgr->GetDisplayName(CurrentCityID);
+			ImGui::Text("Current City: %s", CurrentCityName->m_pCStr);
+
 			if (ImGui::TreeNode("Registered Cities"))
 			{
 				CityMgr->ForEachCity([](EARS::Modules::City& InCity) {
-					if (ImGui::TreeNodeEx((void*)InCity.GetCityID(), ImGuiTreeNodeFlags_DefaultOpen, "%s", InCity.GetInternalName().m_pCStr))
+					if (ImGui::TreeNodeEx((void*)InCity.GetCityID(), ImGuiTreeNodeFlags_DefaultOpen, "%s", InCity.GetDisplayName()->m_pCStr))
 					{
 						bool bIsVisible = InCity.IsKnownToPlayer();
 						if (ImGui::Checkbox("Is Visible To Player", &bIsVisible))

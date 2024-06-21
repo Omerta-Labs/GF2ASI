@@ -51,6 +51,13 @@ namespace EARS
 			 */
 			void RequestTeleport() const;
 
+			/**
+			 * Fetch the Display Name of the City.
+			 * Will be cached on first call.
+			 * Consecutive calls will use cached value.
+			 */
+			String* GetDisplayName();
+
 			// Getters
 			uint32_t GetCityID() const { return m_CityID; }
 			String GetInternalName() const { return m_InternalName; }

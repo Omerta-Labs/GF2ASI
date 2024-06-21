@@ -26,3 +26,8 @@ void EARS::Modules::City::RequestTeleport() const
 	// RWS::SendMsg
 	MemUtils::CallCdeclMethod<void, RWS::CEventId*, bool>(0x0402050, &m_TeleportMsg, false);
 }
+
+String* EARS::Modules::City::GetDisplayName()
+{
+	return MemUtils::CallClassMethod<String*, City*>(0x0849530, this);
+}
