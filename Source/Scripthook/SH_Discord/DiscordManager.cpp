@@ -9,10 +9,35 @@
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
 
 // CPP
+#include <format>
 #include <string>
+#include <map>
 
 discord::Core* core{};
 discord::Activity activity{};
+
+namespace Precense
+{
+	// Hardcoded list for image icons
+	// We could probably eventually switch this to include venues too.
+	static const std::map<uint32_t, const char*> CityIDToImageAsset =
+	{
+		{ 0x8DA8826F, "new_york"},
+		{ 0xF72A95D, "florida"},
+		{ 0x3821E851, "cuba"}
+	};
+
+	// A utility function to fetch the image based on CityID. 
+	const char* GetSmallImageFromCityID(const uint32_t CityID)
+	{
+		if (CityIDToImageAsset.contains(CityID))
+		{
+			return CityIDToImageAsset[CityID];
+		}
+
+		return nullptr;
+	}
+}
 
 DiscordManager::DiscordManager()
 	: CEventHandler()
@@ -41,21 +66,26 @@ void DiscordManager::Open()
 
 void DiscordManager::OnTick()
 {
-	if (EARS::Modules::CityManager* CityMgr = EARS::Modules::CityManager::GetInstance())
+	if (const EARS::Modules::CityManager* const CityMgr = EARS::Modules::CityManager::GetInstance())
 	{
 		const uint32_t NewCityID = CityMgr->GetCurrentCity();
 		if (uCurrentCityID != NewCityID)
 		{
 			uCurrentCityID = NewCityID;
-			if (String* DisplayName = CityMgr->GetDisplayName(NewCityID))
+			if (const String* DisplayName = CityMgr->GetDisplayName(NewCityID))
 			{
-				std::string Sentence = "Freeroaming ";
-				const char* CityName = DisplayName->m_pCStr;
-				Sentence += CityName;
-				activity.SetState(Sentence.c_str());
-				core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
+				// update state to represent new city
+				const std::string NewState = std::format("Freeroaming {}", DisplayName->m_pCStr);
+				activity.SetState(NewState.data());
+				activity.GetAssets().SetSmallImage(Precense::GetSmallImageFromCityID(uCurrentCityID));
+
+				// push new activity
+				core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
+					});
+
+				// triggered update request
+				::core->RunCallbacks();
 			}
 		}
 	}
-	::core->RunCallbacks();
 }
