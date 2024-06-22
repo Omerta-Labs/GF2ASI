@@ -9,7 +9,6 @@ public:
 	void Init();
 
 	int GetShowModMenuWindowInput() const;
-	int GetShowImGuiDemoWindowInput() const;
 	int GetFlyModeUpInput() const;
 	int GetFlyModeDownInput() const;
 
@@ -17,9 +16,6 @@ private:
 
 	// Virtual Key to show the ImGui Demo Window
 	int ShowModMenuWindowInput = VK_F1;
-
-	// Virtual Key to show the Parted Model Window
-	int ShowImGuiDemoWindowInput = VK_F2;
 
 	// Virtual Key to get up in fly mode
 	int FlyModeUpInput = VK_PRIOR;

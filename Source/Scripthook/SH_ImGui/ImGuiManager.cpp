@@ -480,12 +480,6 @@ void ImGuiManager::OnTick()
 		bShowModMenuWindow = !bShowModMenuWindow;
 	}
 
-	if (GetAsyncKeyState(OurSettings.GetShowImGuiDemoWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
-	{
-		bShowImGuiDemoWindow = !bShowImGuiDemoWindow;
-	}
-
-
 	if (bPlayerFlyModeActive)
 	{
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
@@ -505,7 +499,7 @@ void ImGuiManager::OnTick()
 	// Update cursor visibility
 	// Should only really be present when any ImGui windows are open - 
 	// The ingame cursor (for menus) is expected to be powered by Apt.
-	const bool bCursorVisibilityThisFrame = bShowImGuiDemoWindow || bShowModMenuWindow;
+	const bool bCursorVisibilityThisFrame = bShowModMenuWindow;
 	if (bCursorVisibilityThisFrame != bTakeoverCursor)
 	{
 		bTakeoverCursor = bCursorVisibilityThisFrame;
@@ -537,11 +531,6 @@ void ImGuiManager::OnTick()
 	ImGui_ImplWin32_NewFrame();
 
 	ImGui::NewFrame();
-
-	if (bShowImGuiDemoWindow)
-	{
-		ImGui::ShowDemoWindow(&bShowImGuiDemoWindow);
-	}
 
 	if (bShowModMenuWindow)
 	{

@@ -57,9 +57,6 @@ private:
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 
-	// Should we render the ImGui demo window
-	bool bShowImGuiDemoWindow = false;
-
 	// Should we render the Parted Model window
 	bool bShowModMenuWindow = false;
 
