@@ -28,6 +28,12 @@
 // CPP
 #include <string>
 
+#if DEBUG
+#define SHOW_DEMOGRAPHICS_TAB 1
+#else
+#define SHOW_DEMOGRAPHICS_TAB 0
+#endif // DEBUG
+
 Settings OurSettings;
 
 ImGuiManager::ImGuiManager()
@@ -237,6 +243,7 @@ void ImGuiManager::DrawTab_TimeOfDaySettings()
 
 void ImGuiManager::DrawTab_DemographicSettings()
 {
+#if SHOW_DEMOGRAPHICS_TAB
 	if (ImGui::BeginTabItem("Demographic Regions", nullptr, ImGuiTabItemFlags_None))
 	{
 		EARS::Modules::DemographicRegionManager* DRMgr = EARS::Modules::DemographicRegionManager::GetInstance();
@@ -260,6 +267,7 @@ void ImGuiManager::DrawTab_DemographicSettings()
 
 		ImGui::EndTabItem();
 	}
+#endif // SHOW_DEMOGRAPHICS_TAB
 }
 
 void ImGuiManager::DrawTab_CitiesSettings()
