@@ -2,6 +2,7 @@
 
 // Addons
 #include "Addons/Hook.h"
+#include "Addons/tLog.h"
 #include "Addons/discord/discord.h"
 
 // Godfather
@@ -47,6 +48,13 @@ DiscordManager::DiscordManager()
 
 void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
 {
+	if (bHasInitialised == false)
+	{
+		// Not initialised!
+		// Do not accept any event
+		return;
+	}
+
 	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
 	if (MsgEvent.IsEvent(RunningTickEvent))
 	{
@@ -57,11 +65,24 @@ void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
 void DiscordManager::Open()
 {
 	auto result = discord::Core::Create(556346460850094100, DiscordCreateFlags_NoRequireDiscord, &core);
+	if (result != discord::Result::Ok || core == nullptr)
+	{
+		C_Logger::Printf("Failed to initialise Discord. Error Code: %u", result);
+		return;
+	}
+
+	// We should be okay to try and submit initial activity
 	activity.SetState("Playing Godfather II");
 	activity.SetDetails("Thinking like a don");
 	activity.GetAssets().SetLargeImage("main");
 	activity.GetTimestamps().SetStart(discord::Timestamp(std::time(0)));
+
 	core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
+
+	// Initialised too, we can accept tick
+	bHasInitialised = true;
+
+	C_Logger::Printf("Discord Initialised Successfully!");
 }
 
 void DiscordManager::OnTick()

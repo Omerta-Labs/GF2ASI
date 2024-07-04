@@ -30,4 +30,6 @@ private:
 	void OnTick();
 
 	uint32_t uCurrentCityID = 0;
+
+	bool bHasInitialised = false;
 };
