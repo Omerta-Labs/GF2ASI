@@ -21,6 +21,39 @@ namespace EARS
 		{
 		public:
 
+			/**
+			 * Update current number of this item in the slot.
+			 * Automatically clamps between 0 and m_ItemMax
+			 */
+			void SetItemCount(uint32_t InItemCount);
+
+			/**
+			 * Update maximum number of this item in the slot.
+			 * Automatically clamps between 0 and m_ItemMax
+			 */
+			void SetItemMax(uint32_t InItemMax);
+
+			/**
+			 * Increment the current count by 1.
+			 * Automatically clamps between 0 and m_ItemMax
+			 */
+			void IncrementItemCount();
+
+			/**
+			 * Decrement the current count by 1.
+			 * Automatically clamps between 0 and m_ItemMax
+			 */
+			void DecrementItemCount();
+
+			// TODO: (we don't have EARS::Modules::Item support yet)
+			// SetItem(SafePtr<EARS::Modules::Item>);
+			// SafePtr<EARS::Modules::Item> GetItem();
+
+			// getters
+			inline uint32_t GetItemCount() const { return m_ItemCount; }
+			inline uint32_t GetItemMax() const { return m_ItemMax; }
+			inline bool IsSlotFull() const { return m_ItemCount >= m_ItemMax; }
+
 		private:
 
 			void* VTABLE = nullptr;
