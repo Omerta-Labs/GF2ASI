@@ -11,6 +11,7 @@ namespace EARS
 {
 	namespace Modules
 	{
+		class Item;
 		class Inventory;
 		class Player;
 
@@ -57,7 +58,7 @@ namespace EARS
 		private:
 
 			void* VTABLE = nullptr;
-			SafePtr<void*> m_Item; // EARS::Modules::Item
+			SafePtr<EARS::Modules::Item> m_Item; // EARS::Modules::Item
 			uint32_t m_ItemCount = 0;
 			uint32_t m_ItemMax = 0;
 		};
@@ -70,11 +71,6 @@ namespace EARS
 		class InventoryManager /* RWS::CEventHandler, IPersistable */
 		{
 		public:
-
-			// Not Part of GF2
-			void GiveUnlimitedAmmo();
-
-		private:
 
 			enum Defines : int32_t
 			{
@@ -97,6 +93,27 @@ namespace EARS
 				WEAPONSLOT_EQUIPPABLE_END = 0xA,
 			};
 
+			// Not Part of GF2
+			void GiveUnlimitedAmmo();
+
+			/**
+			 * Modify the current slot count for a specific index.
+			 * NB: Only SLOT_BOMB, SLOT_MOLOTOV and SLOT_DYNAMITE is supported!
+			 */
+			void SetItemSlotCount(uint32_t SlotIdx, uint32_t InCount);
+
+			/**
+			 * Modify the maximum slot count for a specific index.
+			 * NB: Only SLOT_BOMB, SLOT_MOLOTOV and SLOT_DYNAMITE is supported!
+			 */
+			void SetItemSlotMax(uint32_t SlotIdx, uint32_t InMax);
+
+			// Getters for a specific slot. All types are supported
+			uint32_t GetItemSlotCount(uint32_t SlotIdx);
+			uint32_t GetItemSlotMax(uint32_t SlotIdx);
+
+		private:
+
 			char m_Padding[0x10]; // (EventHandler and Persistable)
 			EARS::Modules::Inventory* m_Inventory = nullptr;
 			EARS::Modules::InventorySlot m_Slots[Defines::SLOT_COUNT];
@@ -104,8 +121,8 @@ namespace EARS
 			bool m_bPlayerHasInfiniteAmmo = false;
 			uint32_t m_CurrentSlot = 0; // Maybe
 			bool m_bWaitingOnInput = false;
-			SafePtr<void*> m_OldItem; // EARS::Modules::Item
-			SafePtr<void*> m_NewItem; // EARS::Modules::Item
+			SafePtr<EARS::Modules::Item> m_OldItem;
+			SafePtr<EARS::Modules::Item> m_NewItem;
 
 			// TODO: This is the remaining part of InventoryManager
 			// Need to figure out whether it matches the memory layout

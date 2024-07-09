@@ -12,6 +12,7 @@ namespace EARS
 	namespace Modules
 	{
 		class Family;
+		class Item;
 		class SimNPC;
 		class NPC;
 	}
@@ -63,6 +64,17 @@ inline EARS::Modules::Family* SafePtr<EARS::Modules::Family>::GetPtr() const
 	if (m_Obj)
 	{
 		return (EARS::Modules::Family*)(m_Obj - 0x9);
+	}
+
+	return nullptr;
+}
+
+template<>
+inline EARS::Modules::Item* SafePtr<EARS::Modules::Item>::GetPtr() const
+{
+	if (m_Obj)
+	{
+		return (EARS::Modules::Item*)(m_Obj - 0x9);
 	}
 
 	return nullptr;
