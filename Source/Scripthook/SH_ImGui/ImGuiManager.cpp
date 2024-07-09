@@ -12,6 +12,7 @@
 #include "SDK/EARS_Godfather/Modules/Components/Damage/StandardDamageComponent.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
 #include "SDK/EARS_Godfather/Modules/FamilyTree/PlayerFamilyTree.h"
+#include "SDK/EARS_Godfather/Modules/Item/InventoryManager.h"
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
@@ -144,8 +145,7 @@ void ImGuiManager::DrawTab_PlayerSettings()
 {
 	if (ImGui::BeginTabItem("Player", nullptr, ImGuiTabItemFlags_None))
 	{
-		EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
-		if (LocalPlayer)
+		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 		{
 			bool bNewFlyModeState = bPlayerFlyModeActive;
 			if (ImGui::Checkbox("Fly Mode", &bNewFlyModeState))
@@ -190,6 +190,14 @@ void ImGuiManager::DrawTab_PlayerSettings()
 				if (ImGui::Button("Show Upgrade Parts"))
 				{
 					PlayerUpgradeComp->ModifyAllUpgradeParts(true);
+				}
+			}
+
+			if (EARS::Modules::InventoryManager* PlayerInventoryMgr = LocalPlayer->GetInventoryManager())
+			{
+				if (ImGui::Button("Give Unlimited Ammo"))
+				{
+					PlayerInventoryMgr->GiveUnlimitedAmmo();
 				}
 			}
 

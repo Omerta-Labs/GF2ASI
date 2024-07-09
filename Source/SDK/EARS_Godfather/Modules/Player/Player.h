@@ -13,6 +13,7 @@ namespace EARS
 {
 	namespace Modules
 	{
+		class InventoryManager;
 		class PlayerUpgradeComponent;
 
 		/**
@@ -23,6 +24,7 @@ namespace EARS
 		public:
 
 			// Getters
+			EARS::Modules::InventoryManager* GetInventoryManager() const { return m_InventoryManager; }
 			EARS::Modules::PlayerUpgradeComponent* GetUpgradeComponent() const;
 
 			/**
@@ -39,7 +41,8 @@ namespace EARS
 			uint32_t m_PlayerID = 0;				// 0x2494 - 0x2498
 			uint32_t m_ControllerID = 0;			// 0x2498 - 0x249C
 			uint32_t m_PlayerFlags[3];				// 0x249C - 0x24A8
-			char m_Padding_5[0x460];
+			EARS::Modules::InventoryManager* m_InventoryManager = nullptr;
+			char m_Padding_5[0x45C];
 			EARS::Common::guid128_t m_ModelGUID;
 			uint32_t m_ModelStreamHandle = 0;
 			EARS::Common::guid128_t m_PlayerRCB_GUID;
