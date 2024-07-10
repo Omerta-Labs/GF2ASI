@@ -2,9 +2,8 @@
 
 void EARS::Modules::DemographicRegionManager::ForEachDemographicRegion(const TVisitDemographicRegionFunctor& InFunction) const
 {
-	for (uint32_t i = 0; i < m_RegisteredRegions.Size(); i++)
+	for (const EARS::Modules::DemographicRegion* Region : m_RegisteredRegions)
 	{
-		const DemographicRegion* Region = m_RegisteredRegions[i];
 		InFunction(*Region);
 	}
 }

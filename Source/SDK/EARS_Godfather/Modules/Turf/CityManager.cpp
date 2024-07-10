@@ -5,7 +5,7 @@
 
 int32_t EARS::Modules::CityManager::FindCityIndex(const uint32_t InCityID) const
 {
-	for (uint32_t i = 0; i < m_Cities.m_Size; i++)
+	for (uint32_t i = 0; i < m_Cities.Size(); i++)
 	{
 		EARS::Modules::City* CurrentCity = m_Cities[i];
 		if (CurrentCity->GetCityID() == InCityID)
@@ -30,9 +30,8 @@ String* EARS::Modules::CityManager::GetDisplayName(const uint32_t CityID) const
 
 void EARS::Modules::CityManager::ForEachCity(const TVisitCityFunctor& InFunction)
 {
-	for (uint32_t i = 0; i < m_Cities.Size(); i++)
+	for (EARS::Modules::City* CurrentCity : m_Cities)
 	{
-		EARS::Modules::City* CurrentCity = m_Cities[i];
 		InFunction(*CurrentCity);
 	}
 }
