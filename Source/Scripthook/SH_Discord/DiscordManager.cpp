@@ -3,7 +3,6 @@
 // Addons
 #include "Addons/Hook.h"
 #include "Addons/tLog.h"
-#include "Addons/discord/discord.h"
 
 // Godfather
 #include "SDK/EARS_Godfather/Modules/Turf/City.h"
@@ -13,9 +12,6 @@
 #include <format>
 #include <string>
 #include <map>
-
-discord::Core* core{};
-discord::Activity activity{};
 
 namespace Precense
 {
@@ -43,17 +39,19 @@ namespace Precense
 DiscordManager::DiscordManager()
 	: CEventHandler()
 {
+}
 
+DiscordManager::~DiscordManager()
+{
+	delete m_Core;
+
+	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
+	UnlinkMsg(&RunningTickEvent);
 }
 
 void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
 {
-	if (bHasInitialised == false)
-	{
-		// Not initialised!
-		// Do not accept any event
-		return;
-	}
+	RWS::CEventHandler::HandleEvents(MsgEvent);
 
 	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
 	if (MsgEvent.IsEvent(RunningTickEvent))
@@ -64,23 +62,24 @@ void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
 
 void DiscordManager::Open()
 {
-	auto result = discord::Core::Create(556346460850094100, DiscordCreateFlags_NoRequireDiscord, &core);
-	if (result != discord::Result::Ok || core == nullptr)
+	auto result = discord::Core::Create(556346460850094100, DiscordCreateFlags_NoRequireDiscord, &m_Core);
+	if (result != discord::Result::Ok || m_Core == nullptr)
 	{
 		C_Logger::Printf("Failed to initialise Discord. Error Code: %u", result);
 		return;
 	}
 
 	// We should be okay to try and submit initial activity
-	activity.SetState("Playing Godfather II");
-	activity.SetDetails("Thinking like a don");
-	activity.GetAssets().SetLargeImage("main");
-	activity.GetTimestamps().SetStart(discord::Timestamp(std::time(0)));
+	m_CurrentActivity.SetState("Playing Godfather II");
+	m_CurrentActivity.SetDetails("Thinking like a don");
+	m_CurrentActivity.GetAssets().SetLargeImage("main");
+	m_CurrentActivity.GetTimestamps().SetStart(discord::Timestamp(std::time(0)));
 
-	core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
+	m_Core->ActivityManager().UpdateActivity(m_CurrentActivity, [](discord::Result result) {});
 
 	// Initialised too, we can accept tick
-	bHasInitialised = true;
+	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
+	LinkMsg(&RunningTickEvent, 0x8000);
 
 	C_Logger::Printf("Discord Initialised Successfully!");
 }
@@ -97,15 +96,15 @@ void DiscordManager::OnTick()
 			{
 				// update state to represent new city
 				const std::string NewState = std::format("Visiting {}", DisplayName->m_pCStr);
-				activity.SetState(NewState.data());
-				activity.GetAssets().SetSmallImage(Precense::GetSmallImageFromCityID(uCurrentCityID));
+				m_CurrentActivity.SetState(NewState.data());
+				m_CurrentActivity.GetAssets().SetSmallImage(Precense::GetSmallImageFromCityID(uCurrentCityID));
 
 				// push new activity
-				core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
+				m_Core->ActivityManager().UpdateActivity(m_CurrentActivity, [](discord::Result result) {
 					});
 			}
 		}
 	}
 
-	::core->RunCallbacks();
+	m_Core->RunCallbacks();
 }

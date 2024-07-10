@@ -15,6 +15,7 @@ class ImGuiManager : public RWS::CEventHandler
 public:
 
 	ImGuiManager();
+	virtual ~ImGuiManager();
 
 	//~ Begin RWS::CEventHandler Interface
 	virtual void HandleEvents(const RWS::CMsg& MsgEvent) override;

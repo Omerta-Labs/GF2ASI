@@ -7,6 +7,7 @@
 #include "Addons/imgui/backends/imgui_impl_win32.h"
 
 // Godfather
+#include "SDK/EARS_Framework/Game_Framework/Core/AttributeHandler/CAttributeHandler.h"
 #include "SDK/EARS_Framework/Game_Framework/Core/Camera/CameraManager.h"
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Components/Damage/StandardDamageComponent.h"
@@ -37,16 +38,59 @@
 #define SHOW_DEMOGRAPHICS_TAB 0
 #endif // DEBUG
 
+class NPCManager
+{
+public:
+
+	void* Create(const EARS::Common::guid128_t& InGuid, uint32_t InPriority, void* InOwner, uint32_t InHStream)
+	{
+		return MemUtils::CallClassMethod<void*, NPCManager*, const EARS::Common::guid128_t&, uint32_t, void*, uint32_t>(
+			0x08F0BB0, this, InGuid, InPriority, InOwner, InHStream);
+	}
+
+	static NPCManager* GetInstance()
+	{
+		// 
+		return *(NPCManager**)0x112FDD4;
+	}
+};
+
+class SimManager
+{
+public:
+
+	void* GetAttributePacket(const EARS::Common::guid128_t* InGuid, int bMaskStream)
+	{
+		return MemUtils::CallClassMethod<void*, SimManager*, const EARS::Common::guid128_t*, int>(
+			0x04461C0, this, InGuid, bMaskStream);
+	}
+
+	static SimManager* GetInstance()
+	{
+		// 
+		return *(SimManager**)0x1223410;
+	}
+};
+
 Settings OurSettings;
 
 ImGuiManager::ImGuiManager()
 	: CEventHandler()
 {
+	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
+	LinkMsg(&RunningTickEvent, 0x8000);
+}
 
+ImGuiManager::~ImGuiManager()
+{
+	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
+	UnlinkMsg(&RunningTickEvent);
 }
 
 void ImGuiManager::HandleEvents(const RWS::CMsg& MsgEvent)
 {
+	RWS::CEventHandler::HandleEvents(MsgEvent);
+
 	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
 	if (MsgEvent.IsEvent(RunningTickEvent))
 	{
@@ -149,6 +193,23 @@ void ImGuiManager::DrawTab_PlayerSettings()
 	{
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 		{
+			if (ImGui::Button("NPC TEST")) {
+				NPCManager* NPCMgr = NPCManager::GetInstance();
+				SimManager* SimMgr = SimManager::GetInstance();
+
+				EARS::Common::guid128_t NPCGuid;
+				//NPCGuid.a = 0x8e9ac836;
+				//NPCGuid.b = 0x16ed9a97;
+				//NPCGuid.c = 0x50455252;
+				//NPCGuid.d = 0x59363338;
+				NPCGuid.a = 818489951;
+				NPCGuid.b = 716795200;
+				NPCGuid.c = 1330468164;
+				NPCGuid.d = 926372942;
+				void* AttribPacket = SimMgr->GetAttributePacket(&NPCGuid, 0);
+				NPCMgr->Create(NPCGuid, 4, LocalPlayer, 0);
+			}
+
 			bool bNewFlyModeState = bPlayerFlyModeActive;
 			if (ImGui::Checkbox("Fly Mode", &bNewFlyModeState))
 			{

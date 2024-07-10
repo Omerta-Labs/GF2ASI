@@ -3,6 +3,9 @@
 // RenderWare Framework
 #include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
 
+// Addons
+#include "Addons/discord/discord.h"
+
 // CPP
 #include <ctime>
 
@@ -14,6 +17,7 @@ class DiscordManager : public RWS::CEventHandler
 public:
 
 	DiscordManager();
+	virtual ~DiscordManager();
 
 	//~ Begin RWS::CEventHandler Interface
 	virtual void HandleEvents(const RWS::CMsg& MsgEvent) override;
@@ -31,5 +35,6 @@ private:
 
 	uint32_t uCurrentCityID = 0;
 
-	bool bHasInitialised = false;
+	discord::Core* m_Core = nullptr;
+	discord::Activity m_CurrentActivity;
 };

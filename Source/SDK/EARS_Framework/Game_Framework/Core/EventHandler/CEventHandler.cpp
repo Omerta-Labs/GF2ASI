@@ -29,9 +29,9 @@ void RWS::CEventHandler::EnableMessages()
 	m_EventHandlerFlags |= 1;
 }
 
-void RWS::CEventHandler::LinkMsg(CEventId* Msg)
+void RWS::CEventHandler::LinkMsg(CEventId* Msg, uint32_t Priority)
 {
-	MemUtils::CallClassMethod<void, RWS::CEventHandler*, CEventId*>(0x0408900, this, Msg);
+	MemUtils::CallCdeclMethod<void, RWS::CEventHandler*, CEventId*, uint32_t>(0x0408900, this, Msg, Priority);
 }
 
 void RWS::CEventHandler::UnlinkMsg(CEventId* Msg)

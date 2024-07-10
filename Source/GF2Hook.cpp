@@ -12,14 +12,16 @@
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
 #include "Scripthook/SH_Discord/DiscordManager.h"
 
+#include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
+#define ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK 0
 
-ImGuiManager OurImGuiManager;
-DiscordManager OurDiscordManager;
+ImGuiManager* OurImGuiManager = nullptr;
+DiscordManager* OurDiscordManager = nullptr;
 
 #if ENABLE_GF2_MULTIPLAYER
 struct ConnectionParams
@@ -145,6 +147,7 @@ void* __fastcall HOOK_StreamManager_Load(void* pThis, void* ecx, const char* a1,
 	return value;
 }
 
+#if ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK
 /**
  * Hook to allow our systems to receive a tick
  * Good example is ImGui, so we can trigger bespoke behaviour.
@@ -159,9 +162,10 @@ void __fastcall HOOK_GodfatherBaseServices_HandleEvents(void* pThis, void* ecx, 
 
 	// Piggy back of the Godfather base services, 
 	// for some reason we cant create our own event handler as of yet
-	OurImGuiManager.HandleEvents(MsgEvent);
-	OurDiscordManager.HandleEvents(MsgEvent);
+	//OurImGuiManager.HandleEvents(MsgEvent);
+	//OurDiscordManager.HandleEvents(MsgEvent);
 }
+#endif // ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK
 
 #if ENABLE_GF2_DISPL_BEGINSCENE_HOOK
 /**
@@ -181,7 +185,10 @@ void __cdecl HOOK_Displ_BeginScene()
 uint64_t Displ_EndScene_Old;
 void __cdecl HOOK_Displ_EndScene()
 {
-	OurImGuiManager.OnEndScene();
+	if (OurImGuiManager)
+	{
+		OurImGuiManager->OnEndScene();
+	}
 
 	PLH::FnCast(Displ_EndScene_Old, &HOOK_Displ_EndScene)();
 }
@@ -228,7 +235,7 @@ int __stdcall WndProc_GF2(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 uint64_t SetCursorPos_old;
 void HOOK_SetCursorPos(int x, int y)
 {
-	if (OurImGuiManager.HasCursorControl())
+	if (OurImGuiManager && OurImGuiManager->HasCursorControl())
 	{
 		// TODO: We can do better than this
 		// avoid the game from forcing the mouse to the centre
@@ -238,15 +245,39 @@ void HOOK_SetCursorPos(int x, int y)
 	PLH::FnCast(SetCursorPos_old, &HOOK_SetCursorPos)(x, y);
 }
 
+uint64_t SimManager_GetAttributePacket_Old;
+typedef void* (__thiscall* SimManager_GetAttributePacket)(void*, EARS::Common::guid128_t&, int);
+void* __fastcall HOOK_SimManager_GetAttributePacket(void* pThis, void* ecx, EARS::Common::guid128_t& InGuid, int InMask)
+{
+	SimManager_GetAttributePacket funcCast = (SimManager_GetAttributePacket)SimManager_GetAttributePacket_Old;
+	auto value = funcCast(pThis, InGuid, InMask);
+	return value;
+}
+
+uint64_t NPCManager_Create_Old;
+typedef void* (__thiscall* NPCManager_Create)(void*, const EARS::Common::guid128_t& InGuid, uint32_t InPriority, void* InOwner, uint32_t InHStream);
+void* __fastcall HOOK_NPCManager_Create(void* pThis, void* ecx, const EARS::Common::guid128_t& InGuid, uint32_t InPriority, void* InOwner, uint32_t InHStream)
+{
+	NPCManager_Create funcCast = (NPCManager_Create)SimManager_GetAttributePacket_Old;
+	auto value = funcCast(pThis, InGuid, InPriority, InOwner, InHStream);
+	return value;
+}
+
+uint64_t RWS_MainLoop_Old;
+void __cdecl HOOK_MainLoop()
+{
+	PLH::FnCast(RWS_MainLoop_Old, &HOOK_MainLoop)();
+
+	OurImGuiManager = new ImGuiManager();
+	OurImGuiManager->Open();
+
+	OurDiscordManager = new DiscordManager();
+	OurDiscordManager->Open();
+}
+
 void GF2Hook::Init()
 {
 	C_Logger::Create("GF2_Hook.txt");
-
-	OurImGuiManager = ImGuiManager();
-	OurImGuiManager.Open();
-
-	OurDiscordManager = DiscordManager();
-	OurDiscordManager.Open();
 
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
 
@@ -297,14 +328,25 @@ void GF2Hook::Init()
 	PLH::x86Detour detour157((char*)0x0403A50, (char*)&HOOK_StreamManager_Load, &StreamManager_Load_Old, dis);
 	detour157.hook();
 
+#if ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK
 	PLH::x86Detour detour17343((char*)0x8F6CE0, (char*)&HOOK_GodfatherBaseServices_HandleEvents, &GodfatherBaseServices_HandleEvents_Old, dis);
 	detour17343.hook();
+#endif // ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK
 
 	PLH::x86Detour detour159((char*)0x69DE10, (char*)&WndProc_GF2, &WinProc_GF2_Old, dis);
 	detour159.hook();
 
 	PLH::x86Detour detour172((char*)0x69E840, (char*)&HOOK_SetCursorPos, &SetCursorPos_old, dis);
 	detour172.hook();
+
+	PLH::x86Detour detour175((char*)0x04461C0, (char*)&HOOK_SimManager_GetAttributePacket, &SimManager_GetAttributePacket_Old, dis);
+	detour175.hook();
+
+	PLH::x86Detour detour178((char*)0x06817C0, (char*)&HOOK_MainLoop, &RWS_MainLoop_Old, dis);
+	detour178.hook();
+
+	//PLH::x86Detour detour177((char*)0x08F0BB0, (char*)&HOOK_NPCManager_Create, &NPCManager_Create_Old, dis);
+	//detour177.hook();
 
 	EARS::Modules::DemographicRegion::StaticApplyHooks();
 }

@@ -56,7 +56,7 @@ namespace RWS
 		virtual void DisableMessages();
 		virtual void EnableMessages();
 
-		void LinkMsg(CEventId* Msg);
+		void LinkMsg(CEventId* Msg, uint32_t Priority);
 		void UnlinkMsg(CEventId* Msg);
 
 	private:
