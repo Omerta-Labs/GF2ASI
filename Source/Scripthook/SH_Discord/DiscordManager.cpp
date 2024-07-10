@@ -72,7 +72,7 @@ void DiscordManager::Open()
 	// We should be okay to try and submit initial activity
 	m_CurrentActivity.SetState("Playing Godfather II");
 	m_CurrentActivity.SetDetails("Thinking like a don");
-	m_CurrentActivity.GetAssets().SetLargeImage("main");
+	m_CurrentActivity.GetAssets().SetSmallImage("main");
 	m_CurrentActivity.GetTimestamps().SetStart(discord::Timestamp(std::time(0)));
 
 	m_Core->ActivityManager().UpdateActivity(m_CurrentActivity, [](discord::Result result) {});
@@ -97,7 +97,7 @@ void DiscordManager::OnTick()
 				// update state to represent new city
 				const std::string NewState = std::format("Visiting {}", DisplayName->m_pCStr);
 				m_CurrentActivity.SetState(NewState.data());
-				m_CurrentActivity.GetAssets().SetSmallImage(Precense::GetSmallImageFromCityID(uCurrentCityID));
+				m_CurrentActivity.GetAssets().SetLargeImage(Precense::GetSmallImageFromCityID(uCurrentCityID));
 
 				// push new activity
 				m_Core->ActivityManager().UpdateActivity(m_CurrentActivity, [](discord::Result result) {
