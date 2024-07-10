@@ -36,5 +36,5 @@ private:
 	uint32_t uCurrentCityID = 0;
 
 	discord::Core* m_Core = nullptr;
-	discord::Activity m_CurrentActivity;
+	discord::Activity m_CurrentActivity{};
 };
