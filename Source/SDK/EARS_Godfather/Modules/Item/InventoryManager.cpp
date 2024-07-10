@@ -35,6 +35,11 @@ void EARS::Modules::InventorySlot::DecrementItemCount()
 	m_ItemCount = std::clamp<uint32_t>(--m_ItemCount, 0, m_ItemMax);
 }
 
+void EARS::Modules::InventorySlot::SetItem(EARS::Modules::Item* InItem)
+{
+	// TODO
+}
+
 void EARS::Modules::InventoryManager::GiveUnlimitedAmmo()
 {
 	hook::Type<RWS::CEventId> iMsgInfiniteAmmoUnlocked = hook::Type<RWS::CEventId>(0x112AB34);
@@ -65,4 +70,9 @@ uint32_t EARS::Modules::InventoryManager::GetItemSlotCount(uint32_t SlotIdx)
 uint32_t EARS::Modules::InventoryManager::GetItemSlotMax(uint32_t SlotIdx)
 {
 	return m_Slots[SlotIdx].GetItemMax();
+}
+
+EARS::Modules::Item* EARS::Modules::InventoryManager::GetItemInSlot(uint32_t SlotIdx) const
+{
+	return m_Slots[SlotIdx].GetItem();
 }

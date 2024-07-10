@@ -1,10 +1,14 @@
 #pragma once
 
-#include "SDK/EARS_Godfather/Modules/Sentient/Sentient.h"
-
-// SDK
+// SDK Common
 #include "SDK/EARS_Common/Guid.h"
+
+// SDK Framework
 #include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
+
+// SDK Modules
+#include "SDK/EARS_Godfather/Modules/Player/PlayerDefines.h"
+#include "SDK/EARS_Godfather/Modules/Sentient/Sentient.h"
 
 // CPP
 #include <cstdint>
@@ -49,7 +53,8 @@ namespace EARS
 			EARS::Common::guid128_t m_FatherModelGUID;
 			EARS::Common::guid128_t m_FatherRCB_GUID;
 			int32_t m_PlayerDisableCount = 0;
-
+			uint32_t m_EventHashNames[EARS::Modules::PlayerActionEvents::kEvent_NumEvents];
+			uint32_t m_VibrationHashNames[EARS::Modules::PlayerVibrationEvents::kVib_NumEvents];
 		};
 	} // Modules
 } // EARS

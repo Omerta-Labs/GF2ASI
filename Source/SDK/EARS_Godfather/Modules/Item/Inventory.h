@@ -11,6 +11,8 @@ namespace EARS
 {
 	namespace Modules
 	{
+		class Item;
+
 		/**
 		 * Inventory for both Player and Sentients
 		 */
@@ -18,14 +20,23 @@ namespace EARS
 		{
 		public:
 
-			struct Entry
-			{
-				SafePtr<void*> m_Item; // EARS::Modules::Item
-			};
+			// getters
+			inline uint32_t CountItems() const { return m_Entries.Size(); }
 
 		private:
 
-			void* VTABLE = nullptr;
+			struct Entry
+			{
+			public:
+
+				// getters
+				EARS::Modules::Item* GetItem() const { return m_Item.GetPtr(); }
+
+			private:
+
+				SafePtr<EARS::Modules::Item> m_Item;
+			};
+
 			Array<EARS::Modules::Inventory::Entry> m_Entries;
 		};
 	}

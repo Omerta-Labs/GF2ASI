@@ -46,14 +46,16 @@ namespace EARS
 			 */
 			void DecrementItemCount();
 
-			// TODO: (we don't have EARS::Modules::Item support yet)
-			// SetItem(SafePtr<EARS::Modules::Item>);
-			// SafePtr<EARS::Modules::Item> GetItem();
+			/**
+			 * Assign a new item to the Inventory Slot.
+			 */
+			void SetItem(EARS::Modules::Item* InItem);
 
 			// getters
 			inline uint32_t GetItemCount() const { return m_ItemCount; }
 			inline uint32_t GetItemMax() const { return m_ItemMax; }
 			inline bool IsSlotFull() const { return m_ItemCount >= m_ItemMax; }
+			inline EARS::Modules::Item* GetItem() const { return m_Item.GetPtr(); }
 
 		private:
 
@@ -111,6 +113,7 @@ namespace EARS
 			// Getters for a specific slot. All types are supported
 			uint32_t GetItemSlotCount(uint32_t SlotIdx);
 			uint32_t GetItemSlotMax(uint32_t SlotIdx);
+			EARS::Modules::Item* GetItemInSlot(uint32_t SlotIdx) const;
 
 		private:
 
