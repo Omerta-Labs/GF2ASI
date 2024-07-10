@@ -115,6 +115,9 @@ namespace EARS
 			uint32_t GetItemSlotMax(uint32_t SlotIdx);
 			EARS::Modules::Item* GetItemInSlot(uint32_t SlotIdx) const;
 
+			// getters
+			EARS::Modules::Inventory* GetInventory() const { return m_Inventory; }
+
 		private:
 
 			char m_Padding[0x10]; // (EventHandler and Persistable)

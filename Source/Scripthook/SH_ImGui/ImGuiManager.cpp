@@ -12,6 +12,7 @@
 #include "SDK/EARS_Godfather/Modules/Components/Damage/StandardDamageComponent.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
 #include "SDK/EARS_Godfather/Modules/FamilyTree/PlayerFamilyTree.h"
+#include "SDK/EARS_Godfather/Modules/Item/Inventory.h"
 #include "SDK/EARS_Godfather/Modules/Item/InventoryManager.h"
 #include "SDK/EARS_Godfather/Modules/Item/Item.h"
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
@@ -199,12 +200,6 @@ void ImGuiManager::DrawTab_PlayerSettings()
 				if (ImGui::Button("Give Unlimited Ammo"))
 				{
 					PlayerInventoryMgr->GiveUnlimitedAmmo();
-				}
-
-				for (uint32_t i = 0; i < EARS::Modules::InventoryManager::Defines::SLOT_COUNT; i++)
-				{
-					EARS::Modules::Item* CurrentItem = PlayerInventoryMgr->GetItemInSlot(i);
-					int z = 0;
 				}
 			}
 

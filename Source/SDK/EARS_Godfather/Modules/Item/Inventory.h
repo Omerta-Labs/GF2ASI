@@ -20,6 +20,12 @@ namespace EARS
 		{
 		public:
 
+			/**
+			 * Fetch the Item stored within an Inventory slot.
+			 */
+			EARS::Modules::Item* GetItemByIndex(const uint32_t Index);
+			EARS::Modules::Item* GetItemByIndex(const uint32_t Index) const;
+
 			// getters
 			inline uint32_t CountItems() const { return m_Entries.Size(); }
 
