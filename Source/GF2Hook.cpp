@@ -263,16 +263,34 @@ void* __fastcall HOOK_NPCManager_Create(void* pThis, void* ecx, const EARS::Comm
 	return value;
 }
 
-uint64_t RWS_MainLoop_Old;
-void __cdecl HOOK_MainLoop()
+uint64_t OpenLevelServices_Old;
+void __cdecl Hook_OpenLevelServices()
 {
-	PLH::FnCast(RWS_MainLoop_Old, &HOOK_MainLoop)();
+	PLH::FnCast(OpenLevelServices_Old, &Hook_OpenLevelServices)();
 
 	OurImGuiManager = new ImGuiManager();
 	OurImGuiManager->Open();
 
 	OurDiscordManager = new DiscordManager();
 	OurDiscordManager->Open();
+}
+
+uint64_t CloseLevelServices_Old;
+void __cdecl Hook_CloseLevelServices()
+{
+	PLH::FnCast(CloseLevelServices_Old, &Hook_CloseLevelServices)();
+
+	if (OurImGuiManager)
+	{
+		delete OurImGuiManager;
+		OurImGuiManager = nullptr;
+	}
+
+	if (OurDiscordManager)
+	{
+		delete OurDiscordManager;
+		OurDiscordManager = nullptr;
+	}
 }
 
 void GF2Hook::Init()
@@ -342,8 +360,11 @@ void GF2Hook::Init()
 	PLH::x86Detour detour175((char*)0x04461C0, (char*)&HOOK_SimManager_GetAttributePacket, &SimManager_GetAttributePacket_Old, dis);
 	detour175.hook();
 
-	PLH::x86Detour detour178((char*)0x06817C0, (char*)&HOOK_MainLoop, &RWS_MainLoop_Old, dis);
+	PLH::x86Detour detour178((char*)0x06817C0, (char*)&Hook_OpenLevelServices, &OpenLevelServices_Old, dis);
 	detour178.hook();
+
+	PLH::x86Detour detour221((char*)0x0682860, (char*)&Hook_CloseLevelServices, &CloseLevelServices_Old, dis);
+	detour221.hook();
 
 	//PLH::x86Detour detour177((char*)0x08F0BB0, (char*)&HOOK_NPCManager_Create, &NPCManager_Create_Old, dis);
 	//detour177.hook();
