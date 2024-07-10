@@ -19,6 +19,7 @@
 #define ENABLE_GF2_MULTIPLAYER 0
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
 #define ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK 0
+#define ENABLE_GF2_SPAWN_ENTITY_HOOKS 0
 
 ImGuiManager* OurImGuiManager = nullptr;
 DiscordManager* OurDiscordManager = nullptr;
@@ -245,6 +246,7 @@ void HOOK_SetCursorPos(int x, int y)
 	PLH::FnCast(SetCursorPos_old, &HOOK_SetCursorPos)(x, y);
 }
 
+#if ENABLE_GF2_SPAWN_ENTITY_HOOKS
 uint64_t SimManager_GetAttributePacket_Old;
 typedef void* (__thiscall* SimManager_GetAttributePacket)(void*, EARS::Common::guid128_t&, int);
 void* __fastcall HOOK_SimManager_GetAttributePacket(void* pThis, void* ecx, EARS::Common::guid128_t& InGuid, int InMask)
@@ -262,6 +264,7 @@ void* __fastcall HOOK_NPCManager_Create(void* pThis, void* ecx, const EARS::Comm
 	auto value = funcCast(pThis, InGuid, InPriority, InOwner, InHStream);
 	return value;
 }
+#endif // ENABLE_GF2_SPAWN_ENTITY_HOOKS
 
 uint64_t OpenLevelServices_Old;
 void __cdecl Hook_OpenLevelServices()
@@ -357,17 +360,19 @@ void GF2Hook::Init()
 	PLH::x86Detour detour172((char*)0x69E840, (char*)&HOOK_SetCursorPos, &SetCursorPos_old, dis);
 	detour172.hook();
 
+#if ENABLE_GF2_SPAWN_ENTITY_HOOKS
 	PLH::x86Detour detour175((char*)0x04461C0, (char*)&HOOK_SimManager_GetAttributePacket, &SimManager_GetAttributePacket_Old, dis);
 	detour175.hook();
+
+	PLH::x86Detour detour177((char*)0x08F0BB0, (char*)&HOOK_NPCManager_Create, &NPCManager_Create_Old, dis);
+	detour177.hook();
+#endif // ENABLE_GF2_SPAWN_ENTITY_HOOKS
 
 	PLH::x86Detour detour178((char*)0x06817C0, (char*)&Hook_OpenLevelServices, &OpenLevelServices_Old, dis);
 	detour178.hook();
 
 	PLH::x86Detour detour221((char*)0x0682860, (char*)&Hook_CloseLevelServices, &CloseLevelServices_Old, dis);
 	detour221.hook();
-
-	//PLH::x86Detour detour177((char*)0x08F0BB0, (char*)&HOOK_NPCManager_Create, &NPCManager_Create_Old, dis);
-	//detour177.hook();
 
 	EARS::Modules::DemographicRegion::StaticApplyHooks();
 }

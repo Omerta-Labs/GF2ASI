@@ -32,11 +32,32 @@
 // CPP
 #include <string>
 
+#define ENABLE_ENTITY_SPAWN_DEBUG 0
+
 #if DEBUG
 #define SHOW_DEMOGRAPHICS_TAB 1
 #else
 #define SHOW_DEMOGRAPHICS_TAB 0
 #endif // DEBUG
+
+#if ENABLE_ENTITY_SPAWN_DEBUG
+class CAttributePacket : DoubleLinkedListNodeMixin2<CAttributePacket>
+{
+public:
+
+	inline uint32_t GetStreamHandle() const { return m_hStream; }
+
+private:
+
+	unsigned int m_hStream;
+	CAttributePacket* m_pPrevSibling;
+	CAttributePacket* m_pNextSibling;
+	void* m_EntityList = nullptr;
+	CAttributePacket* m_pHashNext;
+	unsigned __int8 m_flags;
+	unsigned __int8 m_pad[3];
+	//RWS::__Internal::CAttributeDataChunk firstChunk_;
+};
 
 class NPCManager
 {
@@ -59,10 +80,22 @@ class SimManager
 {
 public:
 
-	void* GetAttributePacket(const EARS::Common::guid128_t* InGuid, int bMaskStream)
+	CAttributePacket* GetAttributePacket(const EARS::Common::guid128_t* InGuid, int bMaskStream)
+	{
+		return MemUtils::CallClassMethod<CAttributePacket*, SimManager*, const EARS::Common::guid128_t*, int>(
+			0x04461C0, this, InGuid, bMaskStream);
+	}
+
+	void* SpawnEntity(const EARS::Common::guid128_t* InGuid, int SpawnFlags)
 	{
 		return MemUtils::CallClassMethod<void*, SimManager*, const EARS::Common::guid128_t*, int>(
-			0x04461C0, this, InGuid, bMaskStream);
+			0x0446130, this, InGuid, SpawnFlags);
+	}
+
+	void* SpawnEntity(CAttributePacket* Packet, uint32_t StreamHandle, bool bSkipPostInit)
+	{
+		return MemUtils::CallClassMethod<void*, SimManager*, CAttributePacket*, uint32_t, bool>(
+			0x0446340, this, Packet, StreamHandle, bSkipPostInit);		
 	}
 
 	static SimManager* GetInstance()
@@ -71,6 +104,7 @@ public:
 		return *(SimManager**)0x1223410;
 	}
 };
+#endif // ENABLE_ENTITY_SPAWN_DEBUG
 
 Settings OurSettings;
 
@@ -193,23 +227,6 @@ void ImGuiManager::DrawTab_PlayerSettings()
 	{
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 		{
-			if (ImGui::Button("NPC TEST")) {
-				NPCManager* NPCMgr = NPCManager::GetInstance();
-				SimManager* SimMgr = SimManager::GetInstance();
-
-				EARS::Common::guid128_t NPCGuid;
-				//NPCGuid.a = 0x8e9ac836;
-				//NPCGuid.b = 0x16ed9a97;
-				//NPCGuid.c = 0x50455252;
-				//NPCGuid.d = 0x59363338;
-				NPCGuid.a = 818489951;
-				NPCGuid.b = 716795200;
-				NPCGuid.c = 1330468164;
-				NPCGuid.d = 926372942;
-				void* AttribPacket = SimMgr->GetAttributePacket(&NPCGuid, 0);
-				NPCMgr->Create(NPCGuid, 4, LocalPlayer, 0);
-			}
-
 			bool bNewFlyModeState = bPlayerFlyModeActive;
 			if (ImGui::Checkbox("Fly Mode", &bNewFlyModeState))
 			{
