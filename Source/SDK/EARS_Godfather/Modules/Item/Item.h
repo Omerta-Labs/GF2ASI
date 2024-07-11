@@ -14,6 +14,8 @@ namespace EARS
 		{
 		public:
 
+			virtual ~Item();
+
 			enum Categories : __int32
 			{
 				CATEGORY_UNDEF = 0x0,
@@ -93,7 +95,7 @@ namespace EARS
 
 		private:
 
-			char m_Padding[0x1A8];
+			char m_Padding[0x1A4];
 			uint8_t m_ItemCategory = 0;
 			uint8_t m_CombatAnimType = 0;
 			uint8_t m_ItemHandUse = 0;

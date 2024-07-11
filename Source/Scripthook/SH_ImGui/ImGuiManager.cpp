@@ -275,7 +275,8 @@ void ImGuiManager::DrawTab_PlayerSettings()
 
 			if (EARS::Modules::InventoryManager* PlayerInventoryMgr = LocalPlayer->GetInventoryManager())
 			{
-				if (ImGui::Button("Give Unlimited Ammo"))
+				const char* Label = PlayerInventoryMgr->HasPlayerInfiniteAmmo() ? "Remove Unlimited Ammo" : "Give Unlimited Ammo";
+				if (ImGui::Button(Label))
 				{
 					PlayerInventoryMgr->GiveUnlimitedAmmo();
 				}

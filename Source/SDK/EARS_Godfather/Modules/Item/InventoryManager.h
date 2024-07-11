@@ -95,8 +95,15 @@ namespace EARS
 				WEAPONSLOT_EQUIPPABLE_END = 0xA,
 			};
 
-			// Not Part of GF2
-			void GiveUnlimitedAmmo();
+			// Not Part of GF2, but uses GF functions
+			void ToggleUnlimitedAmmo();
+
+			/**
+			 * Apply infinite ammo to all weapons.
+			 * Does not include throwables.
+			 * Part of GF2, and typically called after the event has been detected
+			 */
+			void SetAllGunsInfiniteAmmo(bool bInfinite);
 
 			/**
 			 * Modify the current slot count for a specific index.
@@ -118,13 +125,16 @@ namespace EARS
 			// getters
 			EARS::Modules::Inventory* GetInventory() const { return m_Inventory; }
 
+			// query util functions
+			bool HasPlayerInfiniteAmmo() const { return m_PlayerHasInfiniteAmmo == true; }
+
 		private:
 
 			char m_Padding[0x10]; // (EventHandler and Persistable)
 			EARS::Modules::Inventory* m_Inventory = nullptr;
 			EARS::Modules::InventorySlot m_Slots[Defines::SLOT_COUNT];
 			EARS::Modules::Player* m_Player = nullptr;
-			bool m_bPlayerHasInfiniteAmmo = false;
+			bool m_PlayerHasInfiniteAmmo = false;
 			uint32_t m_CurrentSlot = 0; // Maybe
 			bool m_bWaitingOnInput = false;
 			SafePtr<EARS::Modules::Item> m_OldItem;
