@@ -6,9 +6,17 @@
 // CPP
 #include <windows.h>
 
+// Forward declarations
+namespace EARS
+{
+	namespace Vehicles
+	{
+		class WhiteboxCar;
+	}
+}
+
 /**
  * ImGui Manager for the Scripthook
- * (TOOD: Eventually this is going to register to tick, render etc)
  */
 class ImGuiManager : public RWS::CEventHandler
 {
@@ -54,6 +62,8 @@ private:
 	void DrawTab_UIHUDSettings();
 
 	void DrawTab_Support();
+
+	bool SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, bool bGodModeActive) const;
 
 	// Called when iMsgRunningTick event is detected
 	void OnTick();

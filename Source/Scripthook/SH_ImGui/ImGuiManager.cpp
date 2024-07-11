@@ -2,6 +2,7 @@
 
 // Addons
 #include "Addons/Hook.h"
+#include "Addons/tLog.h"
 #include "Addons/Settings.h"
 #include "Addons/imgui/backends/imgui_impl_dx9.h"
 #include "Addons/imgui/backends/imgui_impl_win32.h"
@@ -108,27 +109,58 @@ public:
 
 Settings OurSettings;
 
+namespace DefinedEvents
+{
+	static hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
+	hook::Type<RWS::CEventId> PlayerAsDriverEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E030);
+	hook::Type<RWS::CEventId> PlayerAsPassengerEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E11C);
+	hook::Type<RWS::CEventId> PlayerExitVehicleEvent = hook::Type<RWS::CEventId>(0x112E018);
+}
+
 ImGuiManager::ImGuiManager()
 	: CEventHandler()
 {
-	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
-	LinkMsg(&RunningTickEvent, 0x8000);
+	LinkMsg(&DefinedEvents::RunningTickEvent, 0x8000);
 }
 
 ImGuiManager::~ImGuiManager()
 {
-	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
-	UnlinkMsg(&RunningTickEvent);
+	UnlinkMsg(&DefinedEvents::RunningTickEvent);
+	UnlinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent);
+	UnlinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent);
+	UnlinkMsg(&DefinedEvents::PlayerExitVehicleEvent);
 }
 
 void ImGuiManager::HandleEvents(const RWS::CMsg& MsgEvent)
 {
 	RWS::CEventHandler::HandleEvents(MsgEvent);
 
-	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
-	if (MsgEvent.IsEvent(RunningTickEvent))
+	if (MsgEvent.IsEvent(DefinedEvents::RunningTickEvent))
 	{
 		OnTick();
+	}
+
+	if (MsgEvent.IsEvent(DefinedEvents::PlayerAsDriverEnterVehicleEvent))
+	{
+		// On Vehicle entered
+	}
+
+	if (MsgEvent.IsEvent(DefinedEvents::PlayerAsPassengerEnterVehicleEvent))
+	{
+		// On Vehicle entered
+	}
+
+	if (MsgEvent.IsEvent(DefinedEvents::PlayerExitVehicleEvent))
+	{
+		if (bPlayerVehicleGodModeActive)
+		{
+			// try and disable god mode
+			if (const EARS::Modules::Player* const LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
+			{
+				SetVehicleGodMode(LocalPlayer->GetVehicle(), false);
+				bPlayerVehicleGodModeActive = false;
+			}
+		}
 	}
 }
 
@@ -148,6 +180,11 @@ void ImGuiManager::Open()
 	ImGui_ImplDX9_Init(Dx9Device);
 
 	OurSettings.Init();
+
+	// apply more events
+	LinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent, 0x8000);
+	LinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent, 0x8000);
+	LinkMsg(&DefinedEvents::PlayerExitVehicleEvent, 0x8000);
 }
 
 void ImGuiManager::OnEndScene()
@@ -278,7 +315,7 @@ void ImGuiManager::DrawTab_PlayerSettings()
 				const char* Label = PlayerInventoryMgr->HasPlayerInfiniteAmmo() ? "Remove Unlimited Ammo" : "Give Unlimited Ammo";
 				if (ImGui::Button(Label))
 				{
-					PlayerInventoryMgr->GiveUnlimitedAmmo();
+					PlayerInventoryMgr->ToggleUnlimitedAmmo();
 				}
 			}
 
@@ -290,9 +327,7 @@ void ImGuiManager::DrawTab_PlayerSettings()
 				bool bNewVehicleGodModeActive = bPlayerVehicleGodModeActive;
 				if (ImGui::Checkbox("Vehicle God Mode", &bNewVehicleGodModeActive))
 				{
-					EARS::Modules::StandardDamageComponent* DamageComp = CurrentCar->GetDamageComponent();
-					DamageComp->SetInvincible(bNewVehicleGodModeActive);
-
+					SetVehicleGodMode(CurrentCar, bNewVehicleGodModeActive);
 					bPlayerVehicleGodModeActive = bNewVehicleGodModeActive;
 				}
 			}
@@ -660,4 +695,24 @@ void ImGuiManager::OnTick()
 
 	ImGui::EndFrame();
 	ImGui::Render();
+}
+
+bool ImGuiManager::SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, bool bGodModeActive) const
+{
+	if (InVehicle)
+	{
+		EARS::Modules::StandardDamageComponent* DamageComp = InVehicle->GetDamageComponent();
+		if (!DamageComp)
+		{
+			C_Logger::Printf("Missing StandardDamageComponent on %x, cannot apply GodMode!", InVehicle);
+			return false;
+		}
+
+		// Apply!
+		DamageComp->SetInvincible(bGodModeActive);
+
+		return true;
+	}
+
+	return false;
 }

@@ -43,12 +43,12 @@ void EARS::Modules::InventorySlot::SetItem(EARS::Modules::Item* InItem)
 	// TODO
 }
 
-void EARS::Modules::InventoryManager::GiveUnlimitedAmmo()
+void EARS::Modules::InventoryManager::ToggleUnlimitedAmmo()
 {
 	//hook::Type<RWS::CEventId> iMsgInfiniteAmmoUnlocked = hook::Type<RWS::CEventId>(0x112AB34);
 	//MemUtils::CallCdeclMethod<void, RWS::CEventId&, bool>(0x0408A00, iMsgInfiniteAmmoUnlocked, false);
 
-	SetAllGunsInfiniteAmmo(!m_bPlayerHasInfiniteAmmo);
+	SetAllGunsInfiniteAmmo(!m_PlayerHasInfiniteAmmo);
 }
 
 void EARS::Modules::InventoryManager::SetItemSlotCount(uint32_t SlotIdx, uint32_t InCount)
@@ -84,7 +84,7 @@ EARS::Modules::Item* EARS::Modules::InventoryManager::GetItemInSlot(uint32_t Slo
 
 void EARS::Modules::InventoryManager::SetAllGunsInfiniteAmmo(bool bInfinite)
 {
-	m_bPlayerHasInfiniteAmmo = bInfinite;
+	m_PlayerHasInfiniteAmmo = bInfinite;
 
 	for (uint32_t i = 0; i < 6; i++)
 	{
