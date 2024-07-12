@@ -1,7 +1,10 @@
 #pragma once
 
-// SDK
+// SDK (Common)
 #include "SDK/EARS_Common/Array.h"
+
+// SDK (Framework)
+#include "SDK/EARS_Framework/Game_Framework/Core/Persistence/PersistenceRegistry.h"
 
 // CPP
 #include <functional>
@@ -31,7 +34,7 @@ namespace EARS
 		 * A Manager consisting of all the Cities the Player can visit
 		 * during gameplay.
 		 */
-		class CityManager : public Singleton<CityManager>
+		class CityManager : public Singleton<CityManager>, public EARS::Framework::IPersistable
 		{
 		public:
 
@@ -67,7 +70,6 @@ namespace EARS
 			 */
 			int32_t FindCityIndex(const uint32_t InCityID) const;
 
-			void* VTABLE2 = nullptr;
 			uint32_t m_CurrCityID = 0;
 			uint32_t m_PrevCityID = 0;
 			Array<EARS::Modules::City*> m_Cities;

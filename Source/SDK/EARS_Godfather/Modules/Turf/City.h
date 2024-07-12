@@ -1,10 +1,13 @@
 #pragma once
 
-// SDK
+// SDK (Common)
 #include "SDK/EARS_Common/Array.h"
 #include "SDK/EARS_Common/Bitflags.h"
 #include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/String.h"
+
+// SDK (Framework)
+#include "SDK/EARS_Framework/Game_Framework/Core/Base/Base.h"
 #include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
 
 // CPP
@@ -20,7 +23,7 @@ namespace EARS
 			CITY_IS_HIDDEN_FROM_PLAYER = 0x1,
 		};
 
-		class City
+		class City : public EARS::Framework::Base
 		{
 		public:
 
@@ -63,8 +66,7 @@ namespace EARS
 			String GetInternalName() const { return m_InternalName; }
 
 		private:
-
-			char m_Padding9[0x50]; // assuming padding is 0x50
+			
 			uint32_t m_CityID = 0;
 			uint32_t m_DisplayNameHashID = 0;
 			Flags32 m_Flags;

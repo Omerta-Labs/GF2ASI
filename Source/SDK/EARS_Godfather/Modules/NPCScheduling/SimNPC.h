@@ -1,11 +1,14 @@
 #pragma once
 
-// SDK
+// SDK Common
 #include "SDK/EARS_Common/Array.h"
 #include "SDK/EARS_Common/Bitflags.h"
 #include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/SafePtr.h"
 #include "SDK/EARS_Common/String.h"
+
+// SDK Framework
+#include "SDK/EARS_Framework/Game_Framework/Core/Base/Base.h"
 
 struct Vector3_Temp
 {
@@ -22,7 +25,7 @@ namespace EARS
 		 * Stores the meta information of an NPC.
 		 * This does not appear to consist of the actual rendered NPC.
 		 */
-		class SimNPC
+		class SimNPC : EARS::Framework::Base
 		{
 		public:
 
@@ -37,7 +40,6 @@ namespace EARS
 
 		private:
 
-			char m_Padding_Base[0x50];
 			Vector3_Temp m_CurrentPosition;
 			Flags32 m_Flags;
 			String m_Name;

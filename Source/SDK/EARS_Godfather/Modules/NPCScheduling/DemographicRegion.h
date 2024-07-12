@@ -1,24 +1,22 @@
 #pragma once
 
-// SDK
+// Common
+#include "SDK/EARS_Common/Array.h"
+#include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/SafePtr.h"
+
+// Framework
+#include "SDK/EARS_Framework/Game_Framework/Core/Base/Base.h"
 
 // CPP
 #include <stdint.h>
 
-struct guid128_t_2
-{
-	uint32_t a = 0;
-	uint32_t b = 0;
-	uint32_t c = 0;
-	uint32_t d = 0;
-};
 
 namespace EARS
 {
 	namespace Modules
 	{
-		class DemographicRegion
+		class DemographicRegion : EARS::Framework::Base
 		{
 		public:
 
@@ -28,11 +26,9 @@ namespace EARS
 
 		private:
 
-			void* m_VTABLE = nullptr;
-
 			struct sNPCFilterListData
 			{
-				guid128_t_2 m_ListGUID;
+				EARS::Common::guid128_t m_ListGUID;
 				SafePtr<void*> m_ListEntity; // SafePtr<EARS::Modules::WeightedFilterList> 
 				int32_t m_MinCount = 0;
 				int32_t m_MaxCount = 0;
@@ -41,7 +37,7 @@ namespace EARS
 
 			struct sVehicleListData
 			{
-				guid128_t_2 m_ListGUID;
+				EARS::Common::guid128_t m_ListGUID;
 				SafePtr<void*> m_ListEntity; // SafePtr<EARS::Modules::WhiteboxCarList>
 				int32_t m_MinCivilianCount = 0;
 				int32_t m_MaxCivilianCount = 0;
@@ -53,7 +49,7 @@ namespace EARS
 				float m_DirtMax = 0.0f;
 			};
 
-			char m_Padding0[0x58];
+			Array<SafePtr<void>> m_Volumes; // DemographicVolume
 			sNPCFilterListData m_NPCFilters[3];
 			sVehicleListData m_VehicleFilters[3];
 		};
