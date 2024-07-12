@@ -12,6 +12,8 @@
 #include "SDK/EARS_Framework/Game_Framework/Core/Camera/CameraManager.h"
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Components/Damage/StandardDamageComponent.h"
+#include "SDK/EARS_Godfather/Modules/Families/Family.h"
+#include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
 #include "SDK/EARS_Godfather/Modules/FamilyTree/PlayerFamilyTree.h"
 #include "SDK/EARS_Godfather/Modules/Item/Inventory.h"
@@ -260,6 +262,9 @@ void ImGuiManager::DrawTab_PlayerModelSwap()
 
 void ImGuiManager::DrawTab_PlayerSettings()
 {
+	EARS::Modules::FamilyManager* FamilyMgr = EARS::Modules::FamilyManager::GetInstance();
+	FamilyMgr->Test();
+
 	if (ImGui::BeginTabItem("Player", nullptr, ImGuiTabItemFlags_None))
 	{
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
