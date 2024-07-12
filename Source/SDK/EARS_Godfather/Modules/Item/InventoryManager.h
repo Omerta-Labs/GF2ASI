@@ -4,6 +4,10 @@
 #include "SDK/EARS_Common/Array.h"
 #include "SDK/EARS_Common/SafePtr.h"
 
+// Framework
+#include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/EARS_Framework/Game_Framework/Core/Persistence/PersistenceRegistry.h"
+
 // CPP
 #include <stdint.h>
 
@@ -21,6 +25,8 @@ namespace EARS
 		class InventorySlot
 		{
 		public:
+
+			virtual ~InventorySlot() { /* defined in engine */ }
 
 			/**
 			 * Update current number of this item in the slot.
@@ -59,7 +65,6 @@ namespace EARS
 
 		private:
 
-			void* VTABLE = nullptr;
 			SafePtr<EARS::Modules::Item> m_Item; // EARS::Modules::Item
 			uint32_t m_ItemCount = 0;
 			uint32_t m_ItemMax = 0;
@@ -70,7 +75,7 @@ namespace EARS
 		 * Wraps weapon slots and inventory for the Player.
 		 * Also includes stuff for swapping weapons.
 		 */
-		class InventoryManager /* RWS::CEventHandler, IPersistable */
+		class InventoryManager : public RWS::CEventHandler, public EARS::Framework::IPersistable
 		{
 		public:
 
@@ -126,11 +131,11 @@ namespace EARS
 			EARS::Modules::Inventory* GetInventory() const { return m_Inventory; }
 
 			// query util functions
-			bool HasPlayerInfiniteAmmo() const { return m_PlayerHasInfiniteAmmo == true; }
+			inline bool HasPlayerInfiniteAmmo() const { return m_PlayerHasInfiniteAmmo == true; }
+			inline bool IsGunSlot(const uint32_t SlotIndex) const { return SlotIndex < Defines::SLOT_GUN_LAST; }
 
 		private:
 
-			char m_Padding[0x10]; // (EventHandler and Persistable)
 			EARS::Modules::Inventory* m_Inventory = nullptr;
 			EARS::Modules::InventorySlot m_Slots[Defines::SLOT_COUNT];
 			EARS::Modules::Player* m_Player = nullptr;

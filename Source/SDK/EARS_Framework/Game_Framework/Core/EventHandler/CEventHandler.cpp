@@ -9,7 +9,7 @@ bool RWS::CMsg::IsEvent(const RWS::CEventId& Event) const
 
 RWS::CEventHandler::CEventHandler()
 	: m_EventHandlerFlags(1)
-	, m_SomeShit(nullptr)
+	, m_SomeMsgUnion(nullptr)
 {
 	//m_SomeShit = MemUtils::CallCdeclMethod<void*>(0x409510);
 }

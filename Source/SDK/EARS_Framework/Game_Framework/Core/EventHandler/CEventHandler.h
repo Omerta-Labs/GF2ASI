@@ -62,8 +62,6 @@ namespace RWS
 	private:
 
 		uint32_t m_EventHandlerFlags = 0;
-		void* m_SomeShit = nullptr;
-		void* m_SomeShit2 = nullptr;
-		void* m_SomeShit3 = nullptr;
+		void* m_SomeMsgUnion = nullptr; // $E7351B6BD7FB17CEB617F301D13C7028
 	};
 } // RWS
