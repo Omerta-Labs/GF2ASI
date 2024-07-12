@@ -8,6 +8,7 @@
 
 // CPP
 #include <ctime>
+#include <string>
 
 /**
  * Discord Manager for the Scripthook
@@ -30,10 +31,12 @@ public:
 
 private:
 
+	void UpdatePresence(std::string);
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 
-	uint32_t uCurrentCityID = 0;
+	std::string currentCity = "New York";
 
 	discord::Core* m_Core = nullptr;
 	discord::Activity m_CurrentActivity{};
