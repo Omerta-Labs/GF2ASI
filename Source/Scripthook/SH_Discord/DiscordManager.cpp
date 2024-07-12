@@ -10,8 +10,15 @@
 
 // CPP
 #include <format>
-#include <string>
 #include <map>
+
+namespace Events
+{
+	static hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
+	hook::Type<RWS::CEventId> PlayerAsDriverEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E030);
+	hook::Type<RWS::CEventId> PlayerExitVehicleEvent = hook::Type<RWS::CEventId>(0x112E018);
+	hook::Type<RWS::CEventId> CityChangedEvent = hook::Type<RWS::CEventId>(0x112DCF4);
+}
 
 namespace Precense
 {
@@ -45,18 +52,43 @@ DiscordManager::~DiscordManager()
 {
 	delete m_Core;
 
-	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
-	UnlinkMsg(&RunningTickEvent);
+	UnlinkMsg(&Events::RunningTickEvent);
+	UnlinkMsg(&Events::PlayerAsDriverEnterVehicleEvent);
+	UnlinkMsg(&Events::PlayerExitVehicleEvent);
+	UnlinkMsg(&Events::CityChangedEvent);
 }
 
 void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
 {
 	RWS::CEventHandler::HandleEvents(MsgEvent);
 
-	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
-	if (MsgEvent.IsEvent(RunningTickEvent))
+	if (MsgEvent.IsEvent(Events::RunningTickEvent))
 	{
 		OnTick();
+	}
+
+	if (MsgEvent.IsEvent(Events::PlayerAsDriverEnterVehicleEvent))
+	{
+		UpdatePresence("Cruising around");
+	}
+
+	if (MsgEvent.IsEvent(Events::PlayerExitVehicleEvent))
+	{
+		UpdatePresence("Walking around");
+	}
+
+	if (MsgEvent.IsEvent(Events::CityChangedEvent))
+	{
+		if (const EARS::Modules::CityManager* const CityMgr = EARS::Modules::CityManager::GetInstance())
+		{
+			const uint32_t CurrentCityID = CityMgr->GetCurrentCity();
+			if (const String* DisplayName = CityMgr->GetDisplayName(CurrentCityID))
+			{
+				currentCity = DisplayName->m_pCStr;
+				m_CurrentActivity.GetAssets().SetLargeImage(Precense::GetSmallImageFromCityID(CurrentCityID));
+				UpdatePresence("Walking around");
+			}
+		}
 	}
 }
 
@@ -77,34 +109,22 @@ void DiscordManager::Open()
 
 	m_Core->ActivityManager().UpdateActivity(m_CurrentActivity, [](discord::Result result) {});
 
-	// Initialised too, we can accept tick
-	hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
-	LinkMsg(&RunningTickEvent, 0x8000);
+	LinkMsg(&Events::RunningTickEvent, 0x8000);
+	LinkMsg(&Events::PlayerAsDriverEnterVehicleEvent, 0x8000);
+	LinkMsg(&Events::PlayerExitVehicleEvent, 0x8000);
+	LinkMsg(&Events::CityChangedEvent, 0x8000);
 
 	C_Logger::Printf("Discord Initialised Successfully!");
 }
 
+void DiscordManager::UpdatePresence(std::string text)
+{
+	const std::string NewState = std::format("{} {}", text, currentCity);
+	m_CurrentActivity.SetState(NewState.data());
+	m_Core->ActivityManager().UpdateActivity(m_CurrentActivity, [](discord::Result result) {});
+}
+
 void DiscordManager::OnTick()
 {
-	if (const EARS::Modules::CityManager* const CityMgr = EARS::Modules::CityManager::GetInstance())
-	{
-		const uint32_t NewCityID = CityMgr->GetCurrentCity();
-		if (uCurrentCityID != NewCityID)
-		{
-			uCurrentCityID = NewCityID;
-			if (const String* DisplayName = CityMgr->GetDisplayName(NewCityID))
-			{
-				// update state to represent new city
-				const std::string NewState = std::format("Visiting {}", DisplayName->m_pCStr);
-				m_CurrentActivity.SetState(NewState.data());
-				m_CurrentActivity.GetAssets().SetLargeImage(Precense::GetSmallImageFromCityID(uCurrentCityID));
-
-				// push new activity
-				m_Core->ActivityManager().UpdateActivity(m_CurrentActivity, [](discord::Result result) {
-					});
-			}
-		}
-	}
-
 	m_Core->RunCallbacks();
 }
