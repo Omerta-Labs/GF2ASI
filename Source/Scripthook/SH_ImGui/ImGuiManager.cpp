@@ -127,6 +127,9 @@ ImGuiManager::ImGuiManager()
 
 ImGuiManager::~ImGuiManager()
 {
+	ImGui_ImplWin32_Shutdown();
+	ImGui_ImplDX9_Shutdown();
+
 	UnlinkMsg(&DefinedEvents::RunningTickEvent);
 	UnlinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent);
 	UnlinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent);
@@ -202,6 +205,12 @@ bool ImGuiManager::HasCursorControl() const
 	return bTakeoverCursor;
 }
 
+LRESULT ImGuiManager::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+}
+
 void ImGuiManager::DrawTab_PlayerModelSwap()
 {
 	if (ImGui::BeginTabItem("Player Model Swap", nullptr, ImGuiTabItemFlags_None))
@@ -262,9 +271,6 @@ void ImGuiManager::DrawTab_PlayerModelSwap()
 
 void ImGuiManager::DrawTab_PlayerSettings()
 {
-	EARS::Modules::FamilyManager* FamilyMgr = EARS::Modules::FamilyManager::GetInstance();
-	FamilyMgr->Test();
-
 	if (ImGui::BeginTabItem("Player", nullptr, ImGuiTabItemFlags_None))
 	{
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())

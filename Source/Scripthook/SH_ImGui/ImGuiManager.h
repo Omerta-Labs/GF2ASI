@@ -45,6 +45,12 @@ public:
 	 */
 	bool HasCursorControl() const;
 
+	/**
+	 * API for ImGui to listen for Windows messages
+	 * Do not call outside of a WndProc function handler!
+	 */
+	LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 private:
 
 	void DrawTab_PlayerModelSwap();

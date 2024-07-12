@@ -219,10 +219,8 @@ bool __cdecl HOOK_Displ_ResetDevice(int a1)
 uint64_t WinProc_GF2_Old;
 int __stdcall WndProc_GF2(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	// Let ImGui add inputs
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam))
+	if (OurImGuiManager && OurImGuiManager->WndProc(hWnd, Msg, wParam, lParam))
 	{
 		return true;
 	}
@@ -281,8 +279,6 @@ void __cdecl Hook_OpenLevelServices()
 uint64_t CloseLevelServices_Old;
 void __cdecl Hook_CloseLevelServices()
 {
-	PLH::FnCast(CloseLevelServices_Old, &Hook_CloseLevelServices)();
-
 	if (OurImGuiManager)
 	{
 		delete OurImGuiManager;
@@ -294,6 +290,8 @@ void __cdecl Hook_CloseLevelServices()
 		delete OurDiscordManager;
 		OurDiscordManager = nullptr;
 	}
+
+	PLH::FnCast(CloseLevelServices_Old, &Hook_CloseLevelServices)();
 }
 
 void GF2Hook::Init()
