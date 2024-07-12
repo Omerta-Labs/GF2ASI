@@ -213,6 +213,9 @@ LRESULT ImGuiManager::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void ImGuiManager::DrawTab_PlayerModelSwap()
 {
+	EARS::Modules::FamilyManager* FamMgr = EARS::Modules::FamilyManager::GetInstance();
+	FamMgr->Test();
+
 	if (ImGui::BeginTabItem("Player Model Swap", nullptr, ImGuiTabItemFlags_None))
 	{
 		ImGui::BeginChild("parted_model_list");

@@ -1,5 +1,8 @@
 #pragma once
 
+// SDK Framework
+#include "SDK/EARS_Framework/Game_Framework/Core/Base/Base.h"
+
 // SDK Common
 #include "SDK/EARS_Common/Bitflags.h"
 #include "SDK/EARS_Common/Guid.h"
@@ -24,7 +27,7 @@ namespace EARS
 		/**
 		 * An instance of a Family for Godfather II
 		 */
-		class Family
+		class Family : public EARS::Framework::Base
 		{
 		public:
 
@@ -37,7 +40,6 @@ namespace EARS
 
 		private:
 
-			char m_Padding_Family0[0x50]; // RWS::Base probably
 			EARS::Modules::FamilyCategory m_Category = FamilyCategory::FamilyCategory_REF;
 			uint32_t m_FamilyID = 0;
 			uint32_t m_FamilyAllyID[3];
