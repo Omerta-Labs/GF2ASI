@@ -8,6 +8,10 @@
 #include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/String.h"
 
+// SDK Godfather
+#include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
+#include "SDK/EARS_Godfather/Modules/Scoring/MoneyLedger.h"
+
 namespace EARS
 {
 	namespace Modules
@@ -38,7 +42,38 @@ namespace EARS
 			 */
 			void AddMedic(EARS::Modules::Sentient* NewMedic);
 
+			/**
+			 * Adjust the balance of a specific LedgerType in the Money Ledger, 
+			 * only works if the Family has a concept of Money and balance
+			 * (not all of them do)
+			 * @param Modifier - The amount to adjust the Ledger value
+			 * @param LedgerType - The associated type of Ledger to adjust
+			 * @return float - Balance added together?
+			 */
+			float ModifyBalance(const float Modifier, const LedgerItemType LedgerType);
+
+			// getters
+			inline uint32_t GetFamilyID() const { return m_FamilyID; }
+
 		private:
+
+			enum Action : int32_t
+			{
+				ACTION_INVALID = 0x0,
+				ACTION_VENUE_ATTACK = 0x1,
+				ACTION_VENUE_BOMB = 0x2,
+				ACTION_RESPONDER_MOVE = 0x4,
+				ACTIONS_OFFENSIVE = 0x3,
+			};
+
+			struct Decision
+			{
+				float m_Weight = 0.0f;
+				EARS::Modules::Family::Action m_Action = Action::ACTION_INVALID;
+				void* m_pVenueOfInterest; // EARS::Modules::BuildingStore
+				bool m_IsPlayerInferred = false;
+				Array<EARS::Modules::SimNPC*> m_RespondersToUse;
+			};
 
 			EARS::Modules::FamilyCategory m_Category = FamilyCategory::FamilyCategory_REF;
 			uint32_t m_FamilyID = 0;
@@ -61,22 +96,22 @@ namespace EARS
 			uint32_t m_FamilyMemberDefeatedScoreEvent = 0;
 			uint32_t m_BuildingTintColor = 0; // RwRGBATag
 			uint32_t m_SelectedBuildingTintColor = 0; // RwRGBATag
-			float m_Balance = 0;
-			float m_Income = 0;
-			//Array<EARS::Modules::BuildingStore*> m_apOwnedRackets;
-			//Array<EARS::Modules::BuildingStore*> m_apOwnedFronts;
-			//unsigned int m_uNumPeakOwnedVenues;
-			//Array<unsigned int> m_auCurrentMonopolyUpgrades;
-			//Array<EARS::Modules::Family::Decision> m_aDecisions;
-			//unsigned int m_uNumGuards;
-			//unsigned int m_uNumGuardSlots;
-			//float m_fGuardTransitTime;
-			//float m_fMinTurnInterval;
-			//float m_fMaxTurnInterval;
-			//float m_fResponseDelay;
-			//float m_fTimeSinceLastAction;
-			//float m_fTimeSinceLastActedUpon;
-			//bool m_bDesiresToRespond;
+			//float m_Balance = 0;
+			//float m_Income = 0;
+			//Array<void*> m_OwnedRackets; // EARS::Modules::BuildingStore
+			//Array<void*> m_OwnedFronts; // EARS::Modules::BuildingStore
+			//uint32_t m_NumPeakOwnedVenues = 0;
+			//Array<uint32_t> m_CurrentMonopolyUpgrades;
+			//Array<EARS::Modules::Family::Decision> m_Decisions; // EARS::Modules::Family::Decision
+			//uint32_t m_NumGuards = 0;
+			//uint32_t m_NumGuardSlots = 0;
+			//float m_GuardTransitTime = 0.0f;
+			//float m_MinTurnInterval = 0.0f;
+			//float m_MaxTurnInterval = 0.0f;
+			//float m_ResponseDelay = 0.0f;
+			//float m_TimeSinceLastAction = 0.0f;
+			//float m_TimeSinceLastActedUpon = 0.0f;
+			//bool m_DesiresToRespond = 0.0f;
 			//EARS::Modules::Family::Bonuses m_bonuses;
 			//Array<EARS::Modules::Family::OmertaEntry> m_aOmertaTable;
 			//float m_fMaxOmerta;
@@ -99,8 +134,8 @@ namespace EARS
 			//RWS::CEventId m_gainedMonopolyMsg;
 			//RWS::CEventId m_lostMonopolyMsg;
 			//unsigned int m_uCompoundVenueID;
-			//EARS::Modules::MoneyLedger* m_pMoneyLedger;
-
+			char m_FamilyPadding[0x130];
+			EARS::Modules::MoneyLedger* m_MoneyLedger = nullptr;
 		};
 	}
 }

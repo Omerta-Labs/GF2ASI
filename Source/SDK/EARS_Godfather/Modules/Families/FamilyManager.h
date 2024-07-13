@@ -3,6 +3,9 @@
 // SDK
 #include "SDK/EARS_Common/Array.h"
 
+// CPP
+#include <stdint.h>
+
 namespace EARS
 {
 	namespace Modules
@@ -18,6 +21,8 @@ namespace EARS
 
 			// TEMP -> Debug only
 			void Test();
+
+			const EARS::Modules::Family* GetFamily(const uint32_t FamilyID) const;
 
 			// Fetch the instance of the Family Manager
 			static FamilyManager* GetInstance();

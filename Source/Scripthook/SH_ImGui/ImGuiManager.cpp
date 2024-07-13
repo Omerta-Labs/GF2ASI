@@ -278,71 +278,117 @@ void ImGuiManager::DrawTab_PlayerSettings()
 	{
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 		{
-			bool bNewFlyModeState = bPlayerFlyModeActive;
-			if (ImGui::Checkbox("Fly Mode", &bNewFlyModeState))
+			if (ImGui::CollapsingHeader("Players State", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				// only change state if updated
-				if (bPlayerFlyModeActive != bNewFlyModeState)
+				ImGui::TextWrapped("Toggle settings such as NoClip and GodMode");
+
+				bool bNewFlyModeState = bPlayerFlyModeActive;
+				if (ImGui::Checkbox("Fly Mode", &bNewFlyModeState))
 				{
-					if (bNewFlyModeState)
+					// only change state if updated
+					if (bPlayerFlyModeActive != bNewFlyModeState)
 					{
-						EARS::Havok::CharacterProxy* PlayerProxy = LocalPlayer->GetCharacterProxy();
-						PlayerProxy->EnableGravity(false);
-						PlayerProxy->SetCollisionState(EARS::Havok::CharacterProxy::CollisionState::CS_ALL_DISABLED);
+						if (bNewFlyModeState)
+						{
+							EARS::Havok::CharacterProxy* PlayerProxy = LocalPlayer->GetCharacterProxy();
+							PlayerProxy->EnableGravity(false);
+							PlayerProxy->SetCollisionState(EARS::Havok::CharacterProxy::CollisionState::CS_ALL_DISABLED);
+						}
+						else
+						{
+							EARS::Havok::CharacterProxy* PlayerProxy = LocalPlayer->GetCharacterProxy();
+							PlayerProxy->EnableGravity(true);
+							PlayerProxy->SetCollisionState(EARS::Havok::CharacterProxy::CollisionState::CS_ENABLED);
+						}
+
+						bPlayerFlyModeActive = bNewFlyModeState;
 					}
-					else
+				}
+
+				bool bNewGodModeActive = bPlayerGodModeActive;
+				if (ImGui::Checkbox("God Mode", &bNewGodModeActive))
+				{
+					EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
+					EARS::Modules::StandardDamageComponent* DamageComp = LocalPlayer->GetDamageComponent();
+					DamageComp->SetInvincible(bNewGodModeActive);
+
+					bPlayerGodModeActive = bNewGodModeActive;
+				}
+			}
+
+			if (ImGui::CollapsingHeader("Players Appearance", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::TextWrapped("Adjust Players Appearance (Such as Bulletproof Vest, Ammo Belt)");
+
+				if (EARS::Modules::PlayerUpgradeComponent* PlayerUpgradeComp = LocalPlayer->GetUpgradeComponent())
+				{
+					if (ImGui::Button("Hide Upgrade Parts"))
 					{
-						EARS::Havok::CharacterProxy* PlayerProxy = LocalPlayer->GetCharacterProxy();
-						PlayerProxy->EnableGravity(true);
-						PlayerProxy->SetCollisionState(EARS::Havok::CharacterProxy::CollisionState::CS_ENABLED);
+						PlayerUpgradeComp->ModifyAllUpgradeParts(false);
 					}
 
-					bPlayerFlyModeActive = bNewFlyModeState;
+					if (ImGui::Button("Show Upgrade Parts"))
+					{
+						PlayerUpgradeComp->ModifyAllUpgradeParts(true);
+					}
 				}
 			}
 
-			bool bNewGodModeActive = bPlayerGodModeActive;
-			if (ImGui::Checkbox("God Mode", &bNewGodModeActive))
+			if (ImGui::CollapsingHeader("Players Inventory", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
-				EARS::Modules::StandardDamageComponent* DamageComp = LocalPlayer->GetDamageComponent();
-				DamageComp->SetInvincible(bNewGodModeActive);
+				ImGui::TextWrapped("Modify Players Inventory (Unlimited Ammo, swapping weapons (TODO))");
 
-				bPlayerGodModeActive = bNewGodModeActive;
-			}
-
-			if (EARS::Modules::PlayerUpgradeComponent* PlayerUpgradeComp = LocalPlayer->GetUpgradeComponent())
-			{
-				if (ImGui::Button("Hide Upgrade Parts"))
+				if (EARS::Modules::InventoryManager* PlayerInventoryMgr = LocalPlayer->GetInventoryManager())
 				{
-					PlayerUpgradeComp->ModifyAllUpgradeParts(false);
-				}
-
-				if (ImGui::Button("Show Upgrade Parts"))
-				{
-					PlayerUpgradeComp->ModifyAllUpgradeParts(true);
+					const char* Label = PlayerInventoryMgr->HasPlayerInfiniteAmmo() ? "Remove Unlimited Ammo" : "Give Unlimited Ammo";
+					if (ImGui::Button(Label))
+					{
+						PlayerInventoryMgr->ToggleUnlimitedAmmo();
+					}
 				}
 			}
 
-			if (EARS::Modules::InventoryManager* PlayerInventoryMgr = LocalPlayer->GetInventoryManager())
+			if (ImGui::CollapsingHeader("Players Family", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				const char* Label = PlayerInventoryMgr->HasPlayerInfiniteAmmo() ? "Remove Unlimited Ammo" : "Give Unlimited Ammo";
-				if (ImGui::Button(Label))
+				ImGui::TextWrapped("Modify any characteristics of the Family the Player is part of");
+
+				if (EARS::Modules::Family* PlayersFamily = LocalPlayer->GetFamily())
 				{
-					PlayerInventoryMgr->ToggleUnlimitedAmmo();
+					static float DesiredMoney = 0.0f;
+
+					// button
+					if (ImGui::Button("Modify Balance"))
+					{
+						PlayersFamily->ModifyBalance(DesiredMoney, EARS::Modules::LedgerItemType::LEDGERITEMTYPE_REVENUE_OTHER);
+					}
+
+					ImGui::SameLine();
+
+					// entry box
+					ImGui::PushItemWidth(-1.0f);
+					ImGui::InputFloat("###modify_balance", &DesiredMoney);
+					ImGui::PopItemWidth();
 				}
 			}
-
-			EARS::Vehicles::WhiteboxCar* CurrentCar = LocalPlayer->GetVehicle();
-			if (CurrentCar)
+		
+			if (ImGui::CollapsingHeader("Players Vehicle", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ImGui::Text("Current Car: 0x%X", CurrentCar);
+				ImGui::TextWrapped("Modify any characteristics of the Vehicle the Player occupies");
 
-				bool bNewVehicleGodModeActive = bPlayerVehicleGodModeActive;
-				if (ImGui::Checkbox("Vehicle God Mode", &bNewVehicleGodModeActive))
+				if (EARS::Vehicles::WhiteboxCar* CurrentCar = LocalPlayer->GetVehicle())
 				{
-					SetVehicleGodMode(CurrentCar, bNewVehicleGodModeActive);
-					bPlayerVehicleGodModeActive = bNewVehicleGodModeActive;
+					ImGui::Text("Current Car: 0x%X", CurrentCar);
+
+					bool bNewVehicleGodModeActive = bPlayerVehicleGodModeActive;
+					if (ImGui::Checkbox("Vehicle God Mode", &bNewVehicleGodModeActive))
+					{
+						SetVehicleGodMode(CurrentCar, bNewVehicleGodModeActive);
+						bPlayerVehicleGodModeActive = bNewVehicleGodModeActive;
+					}
+				}
+				else
+				{
+					ImGui::TextColored({ 255, 0, 0, 255 }, "Player is not in a car, cannot show options");
 				}
 			}
 		}
