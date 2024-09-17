@@ -2,6 +2,7 @@
 
 // SDK
 #include "SDK/EARS_Common/String.h"
+#include "SDK/EARS_Framework/Game_Framework/Core/Animated/Animated.h"
 
 namespace EARS
 {
@@ -18,7 +19,7 @@ namespace EARS
 		 * model using the Parted Model Manager system
 		 * to visualise the mesh
 		 */
-		class PartedAnimated
+		class PartedAnimated : public EARS::Framework::Animated
 		{
 		public:
 
@@ -37,7 +38,7 @@ namespace EARS
 		protected:
 
 			void* VTABLE = nullptr; // vtable
-			char m_Padding_0[0x2AC];
+			char m_Padding_0[0x25C];
 			String m_PartsPresetName; // 0x2B0 // (EARS::Modules::PartedAnimated)
 			String m_PartsThemeName; // 0x2C0 // (EARS::Modules::PartedAnimated)
 			String m_PartsSwapSetName; // 0x2D0 // (EARS::Modules::PartedAnimated)
