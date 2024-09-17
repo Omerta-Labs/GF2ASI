@@ -6,6 +6,9 @@ namespace EARS
 
 	namespace Vehicles
 	{
+		/**
+		 * A Car in the world of Godfather II.
+		 */
 		class WhiteboxCar
 		{
 		public:
