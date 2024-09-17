@@ -25,11 +25,31 @@ namespace EARS
 
 			struct HonorData
 			{
+			public:
+
+				HonorData();
+				HonorData(const HonorData& OtherData);
+				HonorData(const EARS::Common::guid128_t& InSimNPC, const uint8_t InWeaponLicenseLevel);
+
 				uint16_t m_HonorTotals[12];
 				EARS::Common::guid128_t m_SimNpcGuid;
 				uint8_t m_WeaponLicenseLevel = 0;
 				uint8_t m_Unused = 0;
 			};
+
+			/**
+			 * Fetch the Weapon License of a specific SimNPC.
+			 * Use the GUID to query the weapon license.
+			 * If the SimNPC is not find, then we assume they have MIN_WEAPON_LICENSE
+			 */
+			uint8_t GetWeaponLicense(const EARS::Common::guid128_t& SimNpcGuid) const;
+
+			/**
+			 * Set a specific Weapon License for a specific SimNPC.
+			 * Must be within MIN_WEAPON_LICENSE and MAX_WEAPON_LICENSE
+			 * TODO: Ensure that new SimNPCs are added to the data
+			 */
+			void SetWeaponLicense(const EARS::Common::guid128_t& SimNPCGuid, const uint8_t NewWeaponLevel);
 
 			/**
 			 * Utility function to iterate through all loaded Cities
@@ -44,6 +64,11 @@ namespace EARS
 			static CorleoneFamilyData* GetInstance();
 
 		private:
+
+			// Search for Honour Data associated with a specific SimNPC.
+			// Return value is an index within the array.
+			// Use the public API to fetch correct data
+			int32_t FindHonourData(const EARS::Common::guid128_t& SimNpcGuid) const;
 
 			void* vtbl;
 			void* vtbl2;

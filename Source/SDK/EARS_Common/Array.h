@@ -5,22 +5,19 @@ struct Array
 {
 public:
 
-	void Add(TType Object)
+	void Add(const TType& Object)
 	{
 		// Make sure we've got enough capacity
 		if (m_Size == m_Capacity)
 		{
-			unsigned int NextCapacity = (m_Capacity ? 2 * m_Capacity : 1);
-			Reserve(NextCapacity);
+			UpsizePwr2();
 		}
 
 		// Extend array and add new object
-		const unsigned int Size = m_Size;
-		TType* Slot = &m_Items[Size];
-		m_Size++;
+		TType* Slot = &m_Items[m_Size++];
 		if (Slot)
 		{
-			*Slot = *Object;
+			Slot = new TType(Object);
 		}
 	}
 
@@ -46,6 +43,7 @@ public:
 
 	inline unsigned int Capacity() const { return m_Capacity; }
 	inline unsigned int Size() const { return m_Size; }
+	inline bool IsEmpty() const { return (Size() == 0); }
 
 	TType& operator[](unsigned int idx) { return m_Items[idx]; }
 	const TType& operator[](unsigned int idx) const { return m_Items[idx]; }
@@ -61,6 +59,12 @@ public:
 	inline RangedForConstIteratorType end() const { return &m_Items[0] + m_Size; }
 
 private:
+
+	void UpsizePwr2()
+	{
+		const unsigned int NextCapacity = (m_Capacity ? 2 * m_Capacity : 1);
+		Reserve(NextCapacity);
+	}
 
 	TType* m_Items;
 	unsigned int m_Size;

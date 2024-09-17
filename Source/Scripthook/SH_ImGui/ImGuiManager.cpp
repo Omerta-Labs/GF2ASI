@@ -509,87 +509,97 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 {
 	if (ImGui::BeginTabItem("Player Family Tree Settings", nullptr, ImGuiTabItemFlags_None))
 	{
-		if (EARS::Modules::PlayerFamilyTree* FamilyTreeData = EARS::Modules::PlayerFamilyTree::GetInstance())
+		EARS::Modules::CorleoneFamilyData* FamilyData = EARS::Modules::CorleoneFamilyData::GetInstance();
+		if (!FamilyData)
 		{
-			if (ImGui::TreeNode("FamilyTree Data"))
-			{
-				uint32_t CurrentIdx = 0;
-				FamilyTreeData->ForEachMember([&](EARS::Modules::PlayerFamilyMember& InMember) {
+			ImGui::Text("ERROR: Missing CorleoneFamilyData instance");
+		}
 
-					const char* Name = "Unknown";
-					if (EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC())
+		EARS::Modules::PlayerFamilyTree* FamilyTreeData = EARS::Modules::PlayerFamilyTree::GetInstance();
+		if (!FamilyTreeData)
+		{
+			ImGui::Text("ERROR: Missing PlayerFamilyTree instance");
+		}
+
+		if (!FamilyData || !FamilyTreeData)
+		{
+			ImGui::EndTabItem();
+			return;
+		}
+
+		// we've got everything we need, we can continue
+		if (ImGui::TreeNode("FamilyTree Data"))
+		{
+			uint32_t CurrentIdx = 0;
+			FamilyTreeData->ForEachMember([&](EARS::Modules::PlayerFamilyMember& InMember) {
+
+				const char* Name = "Unknown";
+				if (EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC())
+				{
+					String* NPC_Name = MadeManNPC->GetName();
+					Name = NPC_Name->m_pCStr;
+				}
+
+				if (ImGui::TreeNode(&InMember, "Member[%u] -> '%s'", CurrentIdx, Name))
+				{
+					ImGui::Text("SimNPC: %p", InMember.GetSimNPC());
+					ImGui::Text("Flags: %u", InMember.GetFlags().GetAllFlags());
+					ImGui::Text("Rank: %i", InMember.GetRank());
+
+					const EARS::Common::guid128_t WeaponGUID = InMember.GetWeaponGUID();
+					ImGui::Text("Weapon GUID: [%p %p %p %p]", WeaponGUID.a, WeaponGUID.b, WeaponGUID.c, WeaponGUID.d);
+
+					if (ImGui::TreeNode("Specialties"))
 					{
-						String* NPC_Name = MadeManNPC->GetName();
-						Name = NPC_Name->m_pCStr;
+						auto RenderCheckBox = [&InMember](const std::string& Name, const EARS::Modules::Specialties Index)
+							{
+								bool bValue = InMember.HasSpecialty(Index);
+								if (ImGui::Checkbox(Name.data(), &bValue))
+								{
+									InMember.ToggleSpecialty(Index);
+								}
+							};
+
+						RenderCheckBox("Demolitions", EARS::Modules::Specialties::SPECIALITY_DEMO);
+						RenderCheckBox("Arsonist", EARS::Modules::Specialties::SPECIALITY_ARSONIST);
+						RenderCheckBox("Safecracker", EARS::Modules::Specialties::SPECIALITY_SAFECRACKER);
+						RenderCheckBox("Engineer", EARS::Modules::Specialties::SPECIALITY_ENGINEER);
+						RenderCheckBox("Medic", EARS::Modules::Specialties::SPECIALITY_MEDIC);
+						RenderCheckBox("Bruiser", EARS::Modules::Specialties::SPECIALITY_BRUISER);
+
+						ImGui::TreePop();
 					}
 
-					if (ImGui::TreeNode(&InMember, "Member[%u] -> '%s'", CurrentIdx, Name))
+					if (ImGui::TreeNode("Honour Data"))
 					{
-						ImGui::Text("SimNPC: %p", InMember.GetSimNPC());
-						ImGui::Text("Flags: %u", InMember.GetFlags().GetAllFlags());
-						ImGui::Text("Rank: %i", InMember.GetRank());
-
-						const EARS::Common::guid128_t WeaponGUID = InMember.GetWeaponGUID();
-						ImGui::Text("Weapon GUID: [%p %p %p %p]", WeaponGUID.a, WeaponGUID.b, WeaponGUID.c, WeaponGUID.d);
-
-						if (ImGui::TreeNode("Specialties"))
+						if (EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC())
 						{
-							auto RenderCheckBox = [&InMember](const std::string& Name, const EARS::Modules::Specialties Index)
-								{
-									bool bValue = InMember.HasSpecialty(Index);
-									if (ImGui::Checkbox(Name.data(), &bValue))
-									{
-										InMember.ToggleSpecialty(Index);
-									}
-								};
-
-							RenderCheckBox("Demolitions", EARS::Modules::Specialties::SPECIALITY_DEMO);
-							RenderCheckBox("Arsonist", EARS::Modules::Specialties::SPECIALITY_ARSONIST);
-							RenderCheckBox("Safecracker", EARS::Modules::Specialties::SPECIALITY_SAFECRACKER);
-							RenderCheckBox("Engineer", EARS::Modules::Specialties::SPECIALITY_ENGINEER);
-							RenderCheckBox("Medic", EARS::Modules::Specialties::SPECIALITY_MEDIC);
-							RenderCheckBox("Bruiser", EARS::Modules::Specialties::SPECIALITY_BRUISER);
-
-							ImGui::TreePop();
+							// Provide the option to change weapon license for this character
+							const EARS::Common::guid128_t SimNPCID = MadeManNPC->InqInstanceID();
+							uint8_t WeaponLicense = FamilyData->GetWeaponLicense(SimNPCID);
+							if (ImGui::SliderScalar("Weapon License", ImGuiDataType_U8, &WeaponLicense, &EARS::Modules::CorleoneFamilyData::MIN_WEAPON_LICENSE, &EARS::Modules::CorleoneFamilyData::MAX_WEAPON_LICENSE))
+							{
+								FamilyData->SetWeaponLicense(SimNPCID, WeaponLicense);
+							}
+						}
+						else
+						{
+							ImGui::Text("Missing SimNPC, cannot show data");
 						}
 
-
-						
 						ImGui::TreePop();
 					}
 
-					CurrentIdx++;
 
-					});
 
-				ImGui::TreePop();
-			}
-		}
-		else
-		{
-			ImGui::Text("PlayerFamilyTree is missing!");
-		}
+					ImGui::TreePop();
+				}
 
-		if (EARS::Modules::CorleoneFamilyData* FamilyData = EARS::Modules::CorleoneFamilyData::GetInstance())
-		{
-			if (ImGui::TreeNode("Honour Data"))
-			{
-				FamilyData->ForEachHonourData([](EARS::Modules::CorleoneFamilyData::HonorData& InHonourData) {
-					if (ImGui::TreeNodeEx(&InHonourData, ImGuiTreeNodeFlags_None, "[0x%X 0x%X 0x%X 0x%X]", InHonourData.m_SimNpcGuid.a, InHonourData.m_SimNpcGuid.b, InHonourData.m_SimNpcGuid.c, InHonourData.m_SimNpcGuid.d))
-					{
-						// Weapon license, must ensure it is restricted between 1 and 4
-						ImGui::SliderScalar("Weapon License", ImGuiDataType_U8, &InHonourData.m_WeaponLicenseLevel, &EARS::Modules::CorleoneFamilyData::MIN_WEAPON_LICENSE, &EARS::Modules::CorleoneFamilyData::MAX_WEAPON_LICENSE);
+				CurrentIdx++;
 
-						ImGui::TreePop();
-					}
-					});
+				});
 
-				ImGui::TreePop();
-			}
-		}
-		else
-		{
-			ImGui::Text("CorleoneFamilyData is missing!");
+			ImGui::TreePop();
 		}
 
 		ImGui::EndTabItem();
