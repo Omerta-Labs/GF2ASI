@@ -3,6 +3,7 @@
 // SDK
 #include "SDK/EARS_Common/RwMaths.h"
 #include "SDK/EARS_Framework/Game_Framework/Core/Base/Base.h"
+#include "SDK/EARS_RT_LLRender/include/LLTransform.h"
 
 namespace EARS
 {
@@ -20,15 +21,15 @@ namespace EARS
 			virtual void GetMatrixNoScale(RwMatrixTag& OutMatrix) = 0;
 			virtual void GetAABBMinsMaxs() = 0; // TODO
 			virtual void GetAABBMinsMaxsRelative() = 0; // TODO
-			virtual bool HasCollisionBinding() = 0;
-			virtual void Unknown_1() = 0;
-			virtual void Unknown_2() = 0;
-			virtual void Unknown_3() = 0;
-			virtual void Unknown_4() = 0;
-			virtual void Unknown_5() = 0;
-			virtual void Unknown_6() = 0;
-			virtual void Unknown_7() = 0;
-			virtual void Unknown_8() = 0;
+			virtual bool HasCollisionBinding() = 0; // TODO
+			virtual void Unknown_1() = 0; // TODO
+			virtual void Unknown_2() = 0; // TODO
+			virtual void Unknown_3() = 0; // TODO
+			virtual void Unknown_4() = 0; // TODO
+			virtual void Unknown_5() = 0; // TODO
+			virtual void Unknown_6() = 0; // TODO
+			virtual void Unknown_7() = 0; // TODO
+			virtual void Unknown_8() = 0; // TODO
 			virtual void Rotate(const RwV3d& InOffset) = 0;
 			virtual void Translate(const RwV3d& InOffset) = 0;
 
@@ -39,9 +40,11 @@ namespace EARS
 
 			char m_EntityPadding_0[0x2C];
 			uint16_t m_LinkPriority = 0;		// 0x7C
-			char m_EntityPadding_1[0xE2];
+			char m_EntityPadding_1[0x12];
+			LLTransform m_Transform;
+			char m_EntityPadding_2[0x10];
 			void* m_MetaModelInstance = nullptr; // 0x130 (EARS::Framework::MetaModelInstance)
-			char m_EntityPadding_2[0x34];
+			char m_EntityPadding_3[0x34];
 			void* m_InterpolationMtx = nullptr; // 0x168 (EARS::Framework::Modules::imatrix44_t)
 			void* m_AudOcclusionCB = nullptr; // 0x16C
 			// Then entity finishes with one byte? TODO
