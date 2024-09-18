@@ -13,6 +13,15 @@ namespace EARS
 
 		class Base : public RWS::CAttributeHandler, public RWS::CEventHandler, public SafeObj, public BaseAllocationPolicy
 		{
+		public:
+
+			virtual ~Base() = 0;
+
+			virtual void QueryInterface() = 0;
+			virtual void LinkTick() = 0;
+			virtual void UnLinkTick() = 0;
+
+		private:
 			// I'm assuming this is 0x50 in size
 		};
 	} // Framework

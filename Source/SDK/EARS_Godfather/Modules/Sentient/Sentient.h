@@ -20,8 +20,6 @@ namespace EARS
 		{
 		public:
 
-			void Translate(const float X, const float Y, const float Z);
-
 			// Getters
 			EARS::Havok::CharacterProxy* GetCharacterProxy() { return &m_CharacterProxy; }
 			EARS::Modules::Family* GetFamily() const { return m_Family.GetPtr(); }

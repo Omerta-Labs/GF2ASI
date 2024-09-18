@@ -11,6 +11,9 @@ namespace RWS
 	public:
 
 		virtual ~CAttributeHandler() = 0;
+		virtual void HandleAttributes() = 0;
+		virtual void HandleAttributesFromProxy() = 0;
+		virtual void DisableMessages() = 0;
 
 		/**
 		 * Fetch the Instance ID of this Attribute Handler.

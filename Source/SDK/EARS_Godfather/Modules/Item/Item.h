@@ -3,6 +3,9 @@
 // Common
 #include "SDK/EARS_Common/String.h"
 
+// Framework
+#include "SDK/EARS_Framework/Game_Framework/Core/Entity/Entity.h"
+
 // CPP
 #include <stdint.h>
 
@@ -10,7 +13,7 @@ namespace EARS
 {
 	namespace Modules
 	{
-		class Item
+		class Item : public EARS::Framework::Entity
 		{
 		public:
 
@@ -95,8 +98,8 @@ namespace EARS
 
 		private:
 
-			char m_Padding[0x1A4];
-			uint8_t m_ItemCategory = 0;
+			char m_Item_Padding[0x38];
+			uint8_t m_ItemCategory = 0;		// 0x1A8
 			uint8_t m_CombatAnimType = 0;
 			uint8_t m_ItemHandUse = 0;
 			uint8_t m_MeleeItemLength = 0;

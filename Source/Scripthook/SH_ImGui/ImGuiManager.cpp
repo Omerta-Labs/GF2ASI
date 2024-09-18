@@ -688,12 +688,12 @@ void ImGuiManager::OnTick()
 		{
 			if (GetAsyncKeyState(OurSettings.GetFlyModeUpInput()) & 1)
 			{
-				LocalPlayer->Translate(0.0f, 10.0f, 0.0f);
+				LocalPlayer->Translate(RwV3d(0.0f, 10.0f, 0.0f));
 			}
 
 			if (GetAsyncKeyState(OurSettings.GetFlyModeDownInput()) & 1)
 			{
-				LocalPlayer->Translate(0.0f, -10.0f, 0.0f);
+				LocalPlayer->Translate(RwV3d(0.0f, -10.0f, 0.0f));
 			}
 		}
 	}
