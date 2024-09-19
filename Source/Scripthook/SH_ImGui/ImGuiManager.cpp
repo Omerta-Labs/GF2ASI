@@ -160,7 +160,8 @@ void ImGuiManager::Open()
 	LinkMsg(&DefinedEvents::PlayerExitVehicleEvent, 0x8000);
 
 #if SHOW_OBJECTMANAGER_TAB
-	LoadVehiclesFromFile("./scripts/all_vehicles.txt", VehicleGuids);
+	LoadEntityGuidsFromFile("./scripts/all_vehicles.txt", VehicleEntries);
+	LoadEntityGuidsFromFile("./scripts/all_npcs.txt", NPCEntries);
 #endif // SHOW_OBJECTMANAGER_TAB
 }
 
@@ -620,20 +621,18 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 		if (ImGui::BeginListBox("Select a Car", ImVec2(0.0f, 100.0f)))
 		{
 			ImGuiListClipper Clipper;
-			Clipper.Begin(VehicleGuids.size());
+			Clipper.Begin(VehicleEntries.size());
 			while (Clipper.Step())
 			{
 				for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
 				{
 					// TODO: std::format has proved to be too costly, we need an alternative method for names
 					// could we load a name from the file perhaps?
-					const EARS::Common::guid128_t VehicleGUID = VehicleGuids[i];
-					ImGui::PushID(i);
-					if (ImGui::Selectable("Car", (SelectedVehicleGuid == VehicleGUID)))
+					const EntityEntry& CurrentEntry = VehicleEntries[i];
+					if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedVehicleGuid == CurrentEntry.GUID)))
 					{
-						SelectedVehicleGuid = VehicleGUID;
+						SelectedVehicleGuid = CurrentEntry.GUID;
 					}
-					ImGui::PopID();
 				}
 			}
 
@@ -650,17 +649,34 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 			}
 		}
 
+		if (ImGui::BeginListBox("Select an NPC", ImVec2(0.0f, 100.0f)))
+		{
+			ImGuiListClipper Clipper;
+			Clipper.Begin(NPCEntries.size());
+			while (Clipper.Step())
+			{
+				for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
+				{
+					// TODO: std::format has proved to be too costly, we need an alternative method for names
+					// could we load a name from the file perhaps?
+					const EntityEntry& CurrentEntry = NPCEntries[i];
+					if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedNPCGuid == CurrentEntry.GUID)))
+					{
+						SelectedNPCGuid = CurrentEntry.GUID;
+					}
+				}
+			}
+
+			Clipper.End();
+
+			ImGui::EndListBox();
+		}
+
 		if (ImGui::Button("Spawn NPC"))
 		{
-			EARS::Common::guid128_t Test;
-			Test.a = 0x36C89EA4;
-			Test.b = 0x9441BF42;
-			Test.c = 0x52524550;
-			Test.d = 0x38333659;
-
 			if (OurObjectMgr)
 			{
-				OurObjectMgr->Spawn(Test);
+				OurObjectMgr->Spawn(SelectedNPCGuid);
 			}
 		}
 
@@ -830,7 +846,7 @@ bool ImGuiManager::SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, boo
 	return false;
 }
 
-void ImGuiManager::LoadVehiclesFromFile(const std::string& Filename, std::vector<EARS::Common::guid128_t>& OutVector) const
+void ImGuiManager::LoadEntityGuidsFromFile(const std::string& Filename, std::vector<EntityEntry>& OutVector) const
 {
 #if SHOW_OBJECTMANAGER_TAB
 	std::ifstream myfile;
@@ -843,6 +859,7 @@ void ImGuiManager::LoadVehiclesFromFile(const std::string& Filename, std::vector
 		{
 			std::stringstream linestream(line);
 
+			std::string CarName;
 			EARS::Common::guid128_t NewGuid;
 
 			std::string integer;
@@ -851,17 +868,21 @@ void ImGuiManager::LoadVehiclesFromFile(const std::string& Filename, std::vector
 			{
 				if (index == 0)
 				{
-					NewGuid.a = atoi(integer.c_str());
+					CarName = integer;
 				}
 				else if (index == 1)
 				{
-					NewGuid.b = atoi(integer.c_str());
+					NewGuid.a = atoi(integer.c_str());
 				}
 				else if (index == 2)
 				{
-					NewGuid.c = atoi(integer.c_str());
+					NewGuid.b = atoi(integer.c_str());
 				}
 				if (index == 3)
+				{
+					NewGuid.c = atoi(integer.c_str());
+				}
+				if (index == 4)
 				{
 					NewGuid.d = atoi(integer.c_str());
 				}
@@ -871,10 +892,13 @@ void ImGuiManager::LoadVehiclesFromFile(const std::string& Filename, std::vector
 
 			// do not accept duplicates
 			// TODO: Could move to std::set?
-			auto It = std::find(OutVector.begin(), OutVector.end(), NewGuid);
+			auto It = std::find_if(OutVector.begin(), OutVector.end(), [&NewGuid](const EntityEntry& Entry) { return Entry.GUID == NewGuid; });
 			if(It == OutVector.end())
 			{ 
-				OutVector.push_back(NewGuid);
+				EntityEntry NewEntry = {};
+				NewEntry.GUID = NewGuid;
+				NewEntry.Name = CarName;
+				OutVector.push_back(NewEntry);
 			}
 		}
 		myfile.close();

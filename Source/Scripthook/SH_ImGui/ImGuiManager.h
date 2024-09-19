@@ -58,6 +58,12 @@ public:
 
 private:
 
+	struct EntityEntry
+	{
+		std::string Name;
+		EARS::Common::guid128_t GUID;
+	};
+
 	void DrawTab_PlayerModelSwap();
 
 	void DrawTab_PlayerSettings();
@@ -79,14 +85,18 @@ private:
 	bool SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, bool bGodModeActive) const;
 
 	// Load a list of Vehicle GUIDs from the specified text documents; deals with duplication automatically
-	void LoadVehiclesFromFile(const std::string& Filename, std::vector<EARS::Common::guid128_t>& OutVector) const;
+	void LoadEntityGuidsFromFile(const std::string& Filename, std::vector<EntityEntry>& OutVector) const;
 
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 	
 	// List of spawnable vehicle guids
-	std::vector<EARS::Common::guid128_t> VehicleGuids;
+	std::vector<EntityEntry> VehicleEntries;
 	EARS::Common::guid128_t SelectedVehicleGuid;
+
+	// List of spawnable NPC guids
+	std::vector<EntityEntry> NPCEntries;
+	EARS::Common::guid128_t SelectedNPCGuid;
 
 	// Should we render the Parted Model window
 	bool bShowModMenuWindow = false;
