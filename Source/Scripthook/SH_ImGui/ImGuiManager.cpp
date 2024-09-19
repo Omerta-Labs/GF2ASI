@@ -6,12 +6,12 @@
 #include "Addons/Settings.h"
 #include "Addons/imgui/backends/imgui_impl_dx9.h"
 #include "Addons/imgui/backends/imgui_impl_win32.h"
+#include "Scripthook/SH_ObjectManager/ObjectManager.h"
 
 // Godfather
-#include "SDK/EARS_Framework/Game_Framework/Core/AttributeHandler/CAttributeHandler.h"
 #include "SDK/EARS_Framework/Game_Framework/Core/Camera/CameraManager.h"
+#include "SDK/EARS_Framework/Game_Framework/Core/SimManager/SimManager.h"
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
-#include "SDK/EARS_Godfather/Modules/Components/Damage/StandardDamageComponent.h"
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
@@ -24,6 +24,7 @@
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
 #include "SDK/EARS_Godfather/Modules/Turf/City.h"
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
+#include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
@@ -33,35 +34,23 @@
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 
 // CPP
+#include <iostream>
+#include <fstream>
+#include <format>
 #include <string>
+#include <sstream>
 
 #define ENABLE_ENTITY_SPAWN_DEBUG 0
 
 #if DEBUG
 #define SHOW_DEMOGRAPHICS_TAB 1
+#define SHOW_OBJECTMANAGER_TAB 1
 #else
 #define SHOW_DEMOGRAPHICS_TAB 0
+#define SHOW_OBJECTMANAGER_TAB 0
 #endif // DEBUG
 
 #if ENABLE_ENTITY_SPAWN_DEBUG
-class CAttributePacket : DoubleLinkedListNodeMixin2<CAttributePacket>
-{
-public:
-
-	inline uint32_t GetStreamHandle() const { return m_hStream; }
-
-private:
-
-	unsigned int m_hStream;
-	CAttributePacket* m_pPrevSibling;
-	CAttributePacket* m_pNextSibling;
-	void* m_EntityList = nullptr;
-	CAttributePacket* m_pHashNext;
-	unsigned __int8 m_flags;
-	unsigned __int8 m_pad[3];
-	//RWS::__Internal::CAttributeDataChunk firstChunk_;
-};
-
 class NPCManager
 {
 public:
@@ -78,38 +67,12 @@ public:
 		return *(NPCManager**)0x112FDD4;
 	}
 };
-
-class SimManager
-{
-public:
-
-	CAttributePacket* GetAttributePacket(const EARS::Common::guid128_t* InGuid, int bMaskStream)
-	{
-		return MemUtils::CallClassMethod<CAttributePacket*, SimManager*, const EARS::Common::guid128_t*, int>(
-			0x04461C0, this, InGuid, bMaskStream);
-	}
-
-	void* SpawnEntity(const EARS::Common::guid128_t* InGuid, int SpawnFlags)
-	{
-		return MemUtils::CallClassMethod<void*, SimManager*, const EARS::Common::guid128_t*, int>(
-			0x0446130, this, InGuid, SpawnFlags);
-	}
-
-	void* SpawnEntity(CAttributePacket* Packet, uint32_t StreamHandle, bool bSkipPostInit)
-	{
-		return MemUtils::CallClassMethod<void*, SimManager*, CAttributePacket*, uint32_t, bool>(
-			0x0446340, this, Packet, StreamHandle, bSkipPostInit);		
-	}
-
-	static SimManager* GetInstance()
-	{
-		// 
-		return *(SimManager**)0x1223410;
-	}
-};
 #endif // ENABLE_ENTITY_SPAWN_DEBUG
 
+
+
 Settings OurSettings;
+Mod::ObjectManager* OurObjectMgr;
 
 namespace DefinedEvents
 {
@@ -123,6 +86,8 @@ ImGuiManager::ImGuiManager()
 	: CEventHandler()
 {
 	LinkMsg(&DefinedEvents::RunningTickEvent, 0x8000);
+
+	OurObjectMgr = new Mod::ObjectManager();
 }
 
 ImGuiManager::~ImGuiManager()
@@ -134,6 +99,8 @@ ImGuiManager::~ImGuiManager()
 	UnlinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent);
 	UnlinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent);
 	UnlinkMsg(&DefinedEvents::PlayerExitVehicleEvent);
+
+	delete OurObjectMgr;
 }
 
 void ImGuiManager::HandleEvents(const RWS::CMsg& MsgEvent)
@@ -190,6 +157,10 @@ void ImGuiManager::Open()
 	LinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent, 0x8000);
 	LinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent, 0x8000);
 	LinkMsg(&DefinedEvents::PlayerExitVehicleEvent, 0x8000);
+
+#if SHOW_OBJECTMANAGER_TAB
+	LoadVehiclesFromFile("./scripts/all_vehicles.txt", VehicleGuids);
+#endif // SHOW_OBJECTMANAGER_TAB
 }
 
 void ImGuiManager::OnEndScene()
@@ -384,6 +355,15 @@ void ImGuiManager::DrawTab_PlayerSettings()
 					{
 						SetVehicleGodMode(CurrentCar, bNewVehicleGodModeActive);
 						bPlayerVehicleGodModeActive = bNewVehicleGodModeActive;
+					}
+
+					if (ImGui::Button("Duplicate"))
+					{
+						const EARS::Common::guid128_t CarID = CurrentCar->InqInstanceID();
+						if (OurObjectMgr)
+						{
+							OurObjectMgr->Spawn(CarID);
+						}
 					}
 				}
 				else
@@ -590,8 +570,6 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 						ImGui::TreePop();
 					}
 
-
-
 					ImGui::TreePop();
 				}
 
@@ -633,6 +611,60 @@ void ImGuiManager::DrawTab_UIHUDSettings()
 	}
 }
 
+void ImGuiManager::DrawTab_ObjectMgrSettings()
+{
+#if SHOW_OBJECTMANAGER_TAB
+	if (ImGui::BeginTabItem("Object Manager"))
+	{
+		if (ImGui::BeginListBox("Select a Car"))
+		{
+			ImGuiListClipper Clipper;
+			Clipper.Begin(VehicleGuids.size());
+			while (Clipper.Step())
+			{
+				for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
+				{
+					const EARS::Common::guid128_t VehicleGUID = VehicleGuids[i];
+					std::string Label = std::format("{} {} {} {}", VehicleGUID.a, VehicleGUID.b, VehicleGUID.c, VehicleGUID.d);
+					if (ImGui::Selectable(Label.data(), (SelectedVehicleGuid == VehicleGUID)))
+					{
+						SelectedVehicleGuid = VehicleGUID;
+					}
+				}
+			}
+
+			Clipper.End();
+
+			ImGui::EndListBox();
+		}
+
+		if (ImGui::Button("Spawn Car"))
+		{
+			if (OurObjectMgr)
+			{
+				OurObjectMgr->Spawn(SelectedVehicleGuid);
+			}
+		}
+
+		if (ImGui::Button("Spawn NPC"))
+		{
+			EARS::Common::guid128_t Test;
+			Test.a = 0x36C89EA4;
+			Test.b = 0x9441BF42;
+			Test.c = 0x52524550;
+			Test.d = 0x38333659;
+
+			if (OurObjectMgr)
+			{
+				OurObjectMgr->Spawn(Test);
+			}
+		}
+
+		ImGui::EndTabItem();
+	}
+#endif // SHOW_OBJECTMANAGER_TAB
+}
+
 void ImGuiManager::DrawTab_Support()
 {
 	auto AddUnderLine = [](ImColor col_)
@@ -663,6 +695,7 @@ void ImGuiManager::DrawTab_Support()
 				AddUnderLine(ImGui::GetStyle().Colors[ImGuiCol_Button]);
 			}
 		};
+
 	// shamelessly plug donations
 	if (ImGui::BeginTabItem("Support", nullptr, ImGuiTabItemFlags_None))
 	{
@@ -746,7 +779,13 @@ void ImGuiManager::OnTick()
 
 				DrawTab_TimeOfDaySettings();
 
+#if SHOW_DEMOGRAPHICS_TAB
 				DrawTab_DemographicSettings();
+#endif // SHOW_DEMOGRAPHICS_TAB
+
+#if SHOW_OBJECTMANAGER_TAB
+				DrawTab_ObjectMgrSettings();
+#endif // SHOW_OBJECTMANAGER_TAB
 
 				DrawTab_CitiesSettings();
 
@@ -785,4 +824,50 @@ bool ImGuiManager::SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, boo
 	}
 
 	return false;
+}
+
+void ImGuiManager::LoadVehiclesFromFile(const std::string& Filename, std::vector<EARS::Common::guid128_t>& OutVector) const
+{
+#if SHOW_OBJECTMANAGER_TAB
+	std::ifstream myfile;
+	myfile.open(Filename, std::ios::in);
+
+	if (myfile.is_open())
+	{
+		std::string line;
+		while (std::getline(myfile, line))
+		{
+			std::stringstream linestream(line);
+
+			EARS::Common::guid128_t NewGuid;
+
+			std::string integer;
+			int index = 0;
+			while (std::getline(linestream, integer, ' '))
+			{
+				if (index == 0)
+				{
+					NewGuid.a = atoi(integer.c_str());
+				}
+				else if (index == 1)
+				{
+					NewGuid.b = atoi(integer.c_str());
+				}
+				else if (index == 2)
+				{
+					NewGuid.c = atoi(integer.c_str());
+				}
+				if (index == 3)
+				{
+					NewGuid.d = atoi(integer.c_str());
+				}
+
+				index++;
+			}
+
+			OutVector.push_back(NewGuid);
+		}
+		myfile.close();
+	}
+#endif // #if SHOW_OBJECTMANAGER_TAB
 }

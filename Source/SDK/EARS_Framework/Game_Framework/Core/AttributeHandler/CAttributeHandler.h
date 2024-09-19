@@ -6,6 +6,29 @@
 
 namespace RWS
 {
+	class CAttributePacket : public EARS::Common::DoubleLinkedListNodeMixin2<CAttributePacket>
+	{
+	public:
+
+		// Fetch the Stream Handle this AttributePacket was likely loaded by
+		inline uint32_t GetStreamHandle() const { return m_hStream; }
+
+		// Fetch the ID of the class to create.
+		// This is stored within the data chunks.
+		uint32_t GetIdOfClassToCreate() const;
+
+	private:
+
+		uint32_t m_hStream = 0;
+		CAttributePacket* m_PrevSibling = nullptr;
+		CAttributePacket* m_NextSibling = nullptr;
+		void* m_EntityList = nullptr;
+		CAttributePacket* m_pHashNext = nullptr;
+		uint8_t m_Flags = 0;
+		uint8_t m_pad[3];
+		//RWS::__Internal::CAttributeDataChunk firstChunk_;
+	};
+
 	class CAttributeHandler : public EARS::Common::DoubleLinkedListNodeMixin2<CAttributeHandler>
 	{
 	public:

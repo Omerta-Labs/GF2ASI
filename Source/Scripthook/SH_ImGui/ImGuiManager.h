@@ -3,8 +3,13 @@
 // RenderWare Framework
 #include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
 
+// Common
+#include "SDK/EARS_Common/Guid.h"
+
 // CPP
 #include <windows.h>
+#include <string>
+#include <vector>
 
 // Forward declarations
 namespace EARS
@@ -67,12 +72,21 @@ private:
 
 	void DrawTab_UIHUDSettings();
 
+	void DrawTab_ObjectMgrSettings();
+
 	void DrawTab_Support();
 
 	bool SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, bool bGodModeActive) const;
 
+	// Load a list of Vehicle GUIDs from the specified text documents; deals with duplication automatically
+	void LoadVehiclesFromFile(const std::string& Filename, std::vector<EARS::Common::guid128_t>& OutVector) const;
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
+	
+	// List of spawnable vehicle guids
+	std::vector<EARS::Common::guid128_t> VehicleGuids;
+	EARS::Common::guid128_t SelectedVehicleGuid;
 
 	// Should we render the Parted Model window
 	bool bShowModMenuWindow = false;

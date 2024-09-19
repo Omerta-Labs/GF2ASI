@@ -36,8 +36,6 @@ namespace EARS
 
 		private:
 
-			// 0x90 -> LLTransform
-
 			char m_EntityPadding_0[0x2C];
 			uint16_t m_LinkPriority = 0;		// 0x7C
 			char m_EntityPadding_1[0x12];

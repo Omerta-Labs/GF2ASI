@@ -1,5 +1,8 @@
 #pragma once
 
+// SDK
+#include "SDK/EARS_Framework/Game_Framework/Core/Entity/Entity.h"
+
 namespace EARS
 {
 	namespace Modules { class VehicleDamageComponent; }
@@ -9,7 +12,7 @@ namespace EARS
 		/**
 		 * A Car in the world of Godfather II.
 		 */
-		class WhiteboxCar
+		class WhiteboxCar : public EARS::Framework::Entity
 		{
 		public:
 
@@ -18,9 +21,8 @@ namespace EARS
 
 		private:
 
-			void* VTABLE = nullptr;
-			char m_Padding0[0x7BC];
-			EARS::Modules::VehicleDamageComponent* m_DamageComponent = nullptr;
+			char m_Padding0[0x650];
+			EARS::Modules::VehicleDamageComponent* m_DamageComponent = nullptr; // 0x7C0
 		};
 	} // Vehicles
 } // EARS
