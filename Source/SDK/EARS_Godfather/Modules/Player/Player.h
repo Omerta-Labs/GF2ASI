@@ -4,7 +4,7 @@
 #include "SDK/EARS_Common/Guid.h"
 
 // SDK Framework
-#include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 
 // SDK Modules
 #include "SDK/EARS_Godfather/Modules/Player/PlayerDefines.h"

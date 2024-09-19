@@ -4,7 +4,7 @@
 
 // SDK
 #include "SDK/EARS_Common/Guid.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 
 // CPP
 #include <cstdint>

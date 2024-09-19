@@ -4,7 +4,7 @@
 #include "SDK/EARS_Common/Array.h"
 
 // SDK (Framework)
-#include "SDK/EARS_Framework/Game_Framework/Core/Persistence/PersistenceRegistry.h"
+#include "SDK/EARS_Framework/Core/Persistence/PersistenceRegistry.h"
 
 // CPP
 #include <functional>

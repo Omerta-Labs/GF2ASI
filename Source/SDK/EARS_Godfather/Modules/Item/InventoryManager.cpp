@@ -4,7 +4,7 @@
 #include "Addons/Hook.h"
 
 // Framework
-#include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 
 // Godfather
 #include "SDK/EARS_Godfather/Modules/Gun/Gun.h"

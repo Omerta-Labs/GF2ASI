@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDK/EARS_Framework/Game_Framework/Core/Component/Component.h>
+#include <SDK/EARS_Framework/Core/Component/Component.h>
 
 namespace EARS
 {

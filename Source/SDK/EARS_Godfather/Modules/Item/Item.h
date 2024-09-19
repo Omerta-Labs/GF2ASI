@@ -4,7 +4,7 @@
 #include "SDK/EARS_Common/String.h"
 
 // Framework
-#include "SDK/EARS_Framework/Game_Framework/Core/Entity/Entity.h"
+#include "SDK/EARS_Framework/Core/Entity/Entity.h"
 
 // CPP
 #include <stdint.h>

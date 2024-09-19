@@ -6,16 +6,10 @@
 #include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/SafePtr.h"
 #include "SDK/EARS_Common/String.h"
+#include "SDK/EARS_Common/RwMaths.h"
 
 // SDK Framework
-#include "SDK/EARS_Framework/Game_Framework/Core/Base/Base.h"
-
-struct Vector3_Temp
-{
-	float X;
-	float Y;
-	float Z;
-};
+#include "SDK/EARS_Framework/Core/Base/Base.h"
 
 namespace EARS
 {
@@ -40,7 +34,7 @@ namespace EARS
 
 		private:
 
-			Vector3_Temp m_CurrentPosition;
+			RwV3d m_CurrentPosition;
 			Flags32 m_Flags;
 			String m_Name;
 			int32_t m_SpawnWhenNearPlayer = 0;

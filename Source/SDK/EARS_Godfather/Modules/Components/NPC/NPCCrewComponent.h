@@ -3,7 +3,7 @@
 // SDK
 #include "SDK/EARS_Common/Bitflags.h"
 #include "SDK/EARS_Common/SafePtr.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/Component/Component.h"
+#include "SDK/EARS_Framework/Core/Component/Component.h"
 
 // CPP
 #include <stdint.h>

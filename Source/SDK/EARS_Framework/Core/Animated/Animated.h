@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/EARS_Framework/Game_Framework/Core/Entity/Entity.h"
+#include "SDK/EARS_Framework/Core/Entity/Entity.h"
 
 namespace EARS
 {

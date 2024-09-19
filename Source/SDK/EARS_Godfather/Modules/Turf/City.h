@@ -7,8 +7,8 @@
 #include "SDK/EARS_Common/String.h"
 
 // SDK (Framework)
-#include "SDK/EARS_Framework/Game_Framework/Core/Base/Base.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/EARS_Framework/Core/Base/Base.h"
+#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 
 // CPP
 #include <stdint.h>

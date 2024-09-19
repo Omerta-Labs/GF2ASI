@@ -5,8 +5,8 @@
 #include "SDK/EARS_Common/SafePtr.h"
 
 // Framework
-#include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/Persistence/PersistenceRegistry.h"
+#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/EARS_Framework/Core/Persistence/PersistenceRegistry.h"
 
 // CPP
 #include <stdint.h>

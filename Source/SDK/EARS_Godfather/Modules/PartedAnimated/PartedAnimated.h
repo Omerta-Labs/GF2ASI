@@ -2,7 +2,7 @@
 
 // SDK
 #include "SDK/EARS_Common/String.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/Animated/Animated.h"
+#include "SDK/EARS_Framework/Core/Animated/Animated.h"
 
 namespace EARS
 {

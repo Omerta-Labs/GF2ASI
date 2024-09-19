@@ -9,8 +9,8 @@
 #include "Scripthook/SH_ObjectManager/ObjectManager.h"
 
 // Godfather
-#include "SDK/EARS_Framework/Game_Framework/Core/Camera/CameraManager.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/SimManager/SimManager.h"
+#include "SDK/EARS_Framework/Core/Camera/CameraManager.h"
+#include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"

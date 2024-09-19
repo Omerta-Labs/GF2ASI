@@ -2,7 +2,7 @@
 
 // SDK
 #include "SDK/EARS_Common/RwMaths.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/Base/Base.h"
+#include "SDK/EARS_Framework/Core/Base/Base.h"
 #include "SDK/EARS_RT_LLRender/include/LLTransform.h"
 
 namespace EARS

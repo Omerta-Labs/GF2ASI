@@ -2,8 +2,8 @@
 
 // SDK
 #include "SDK/EARS_Common/SafePtr.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/AttributeHandler/CAttributeHandler.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/EARS_Framework/Core/AttributeHandler/CAttributeHandler.h"
+#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 
 namespace EARS
 {

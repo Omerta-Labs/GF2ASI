@@ -4,9 +4,9 @@
 #include <Addons/Hook.h>
 
 // SDK
-#include "SDK/EARS_Framework/Game_Framework/Core/AttributeHandler/CAttributeHandler.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/SimManager/SimManager.h"
-#include "SDK/EARS_Framework/Game_Framework/Core/Entity/Entity.h"
+#include "SDK/EARS_Framework/Core/AttributeHandler/CAttributeHandler.h"
+#include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
+#include "SDK/EARS_Framework/Core/Entity/Entity.h"
 
 void Mod::ObjectManager::Spawn(const RWS::CAttributePacket& AttrPacket)
 {
