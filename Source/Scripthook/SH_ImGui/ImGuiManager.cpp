@@ -11,6 +11,7 @@
 // Godfather
 #include "SDK/EARS_Framework/Core/Camera/CameraManager.h"
 #include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
+#include "SDK/EARS_Framework/Toolkits/GroupManager/GroupManager.h"
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
@@ -616,7 +617,7 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 #if SHOW_OBJECTMANAGER_TAB
 	if (ImGui::BeginTabItem("Object Manager"))
 	{
-		if (ImGui::BeginListBox("Select a Car"))
+		if (ImGui::BeginListBox("Select a Car", ImVec2(0.0f, 100.0f)))
 		{
 			ImGuiListClipper Clipper;
 			Clipper.Begin(VehicleGuids.size());
@@ -624,12 +625,15 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 			{
 				for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
 				{
+					// TODO: std::format has proved to be too costly, we need an alternative method for names
+					// could we load a name from the file perhaps?
 					const EARS::Common::guid128_t VehicleGUID = VehicleGuids[i];
-					std::string Label = std::format("{} {} {} {}", VehicleGUID.a, VehicleGUID.b, VehicleGUID.c, VehicleGUID.d);
-					if (ImGui::Selectable(Label.data(), (SelectedVehicleGuid == VehicleGUID)))
+					ImGui::PushID(i);
+					if (ImGui::Selectable("Car", (SelectedVehicleGuid == VehicleGUID)))
 					{
 						SelectedVehicleGuid = VehicleGUID;
 					}
+					ImGui::PopID();
 				}
 			}
 
@@ -865,7 +869,13 @@ void ImGuiManager::LoadVehiclesFromFile(const std::string& Filename, std::vector
 				index++;
 			}
 
-			OutVector.push_back(NewGuid);
+			// do not accept duplicates
+			// TODO: Could move to std::set?
+			auto It = std::find(OutVector.begin(), OutVector.end(), NewGuid);
+			if(It == OutVector.end())
+			{ 
+				OutVector.push_back(NewGuid);
+			}
 		}
 		myfile.close();
 	}
