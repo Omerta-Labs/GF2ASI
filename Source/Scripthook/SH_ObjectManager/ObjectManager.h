@@ -1,32 +1,27 @@
-#include "ObjectManager.h"
+#pragma once
 
-// Addons
-#include <Addons/Hook.h>
+// RenderWare Framework
+#include "SDK/EARS_Common/Guid.h"
+#include "SDK/EARS_Common/RwMaths.h"
+#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 
-// SDK
-#include "SDK/EARS_Framework/Core/AttributeHandler/CAttributeHandler.h"
-#include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
-#include "SDK/EARS_Framework/Core/Entity/Entity.h"
+// Forward declares
+namespace RWS { class CAttributePacket; }
 
-void Mod::ObjectManager::Spawn(const RWS::CAttributePacket& AttrPacket, const RwV3d Position)
+namespace Mod
 {
-	uint32_t ClassID = AttrPacket.GetIdOfClassToCreate();
-	RWS::CAttributeHandler* NewHandler = MemUtils::CallCdeclMethod<RWS::CAttributeHandler*, uint32_t, const RWS::CAttributePacket*>(0x0483410, ClassID, &AttrPacket);
-
-	EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
-	SimMgr->SendPostSpawnInitializeToEntity(NewHandler, true);
-
-	if (EARS::Framework::Entity* EntityHandler = reinterpret_cast<EARS::Framework::Entity*>(NewHandler))
+	class ObjectManager : public RWS::CEventHandler
 	{
-		EntityHandler->SetPosition(Position);
-	}
-}
+	public:
 
-void Mod::ObjectManager::Spawn(const EARS::Common::guid128_t& PacketID, const RwV3d Position)
-{
-	EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
-	if (RWS::CAttributePacket* FoundPacket = SimMgr->GetAttributePacket(&PacketID, 0))
-	{
-		Spawn(*FoundPacket, Position);
-	}
+		// NB: EXPERIMENTAL CODE
+		// Spawn an object in the game world
+		void Spawn(const RWS::CAttributePacket& AttrPacket, const RwV3d Position);
+
+		// NB: EXPERIMENTAL CODE
+		// Spawn an object in the game world
+		void Spawn(const EARS::Common::guid128_t& PacketID, const RwV3d Position);
+
+	private:
+	};
 }
