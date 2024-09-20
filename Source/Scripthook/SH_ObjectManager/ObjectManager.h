@@ -15,11 +15,11 @@ namespace Mod
 
 		// NB: EXPERIMENTAL CODE
 		// Spawn an object in the game world
-		void Spawn(const RWS::CAttributePacket& AttrPacket);
+		void Spawn(const RWS::CAttributePacket& AttrPacket, const RwV3d Position);
 
 		// NB: EXPERIMENTAL CODE
 		// Spawn an object in the game world
-		void Spawn(const EARS::Common::guid128_t& PacketID);
+		void Spawn(const EARS::Common::guid128_t& PacketID, const RwV3d Position);
 
 	private:
 	};
