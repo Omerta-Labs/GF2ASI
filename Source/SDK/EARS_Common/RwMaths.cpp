@@ -24,6 +24,14 @@ RwV3d::RwV3d(const float InValue)
 
 }
 
+RwV3d::RwV3d(const float InX, const float InY, const float InZ)
+	: m_X(InX)
+	, m_Y(InY)
+	, m_Z(InZ)
+{
+
+}
+
 RwV3d RwV3d::operator+(const RwV3d& InA) const
 {
 	RwV3d Out;
@@ -47,7 +55,9 @@ RwV3d RwV3d::operator*(const RwV3d& InA) const
 
 RwV3d RwV3d::operator*(const float InA) const
 {
-
+	RwV3d Out;
+	RwV3dScale(Out, *this, RwV3d(InA));
+	return Out;
 }
 
 bool RwV3d::operator!=(const RwV3d& InA) const

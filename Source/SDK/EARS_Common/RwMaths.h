@@ -15,6 +15,9 @@ public:
 	// sets all to specified 'InValue'
 	RwV3d(const float InValue);
 
+	// applies values to each component
+	RwV3d(const float InX, const float InY, const float InZ);
+
 	// copies the values from the other RwV3d
 	RwV3d(const RwV3d& Other);
 
