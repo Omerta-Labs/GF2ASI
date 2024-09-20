@@ -620,9 +620,9 @@ void ImGuiManager::DrawTab_UIHUDSettings()
 void ImGuiManager::DrawTab_ObjectMgrSettings()
 {
 #if SHOW_OBJECTMANAGER_TAB
-	if (ImGui::BeginTabItem("Object Manager"))
+	if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 	{
-		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
+		if (ImGui::BeginTabItem("Object Manager"))
 		{
 			if (ImGui::BeginListBox("Select a Car", ImVec2(0.0f, 100.0f)))
 			{
@@ -651,9 +651,8 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 			{
 				if (OurObjectMgr)
 				{
-					const RwV3d PlayerPosition = LocalPlayer->GetPosition();
-					const RwV3d PlayerMatrix = LocalPlayer->GetMatrix().m_At;
-					const RwV3d SpawnPosition = PlayerPosition + (PlayerMatrix * 5.0f);
+					const RwMatrixTag PlayerMatrix = LocalPlayer->GetMatrix();
+					const RwV3d SpawnPosition = PlayerMatrix.m_Pos + (PlayerMatrix.m_At * 5.0f);
 					OurObjectMgr->Spawn(SelectedVehicleGuid, SpawnPosition);
 				}
 			}
@@ -685,19 +684,13 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 			{
 				if (OurObjectMgr)
 				{
-					const RwV3d PlayerPosition = LocalPlayer->GetPosition();
-					const RwV3d PlayerMatrix = LocalPlayer->GetMatrix().m_At;
-					const RwV3d SpawnPosition = PlayerPosition + (PlayerMatrix * 5.0f);
+					const RwMatrixTag PlayerMatrix = LocalPlayer->GetMatrix();
+					const RwV3d SpawnPosition = PlayerMatrix.m_Pos + (PlayerMatrix.m_At * 5.0f);
 					OurObjectMgr->Spawn(SelectedNPCGuid, SpawnPosition);
 				}
 			}
+			ImGui::EndTabItem();
 		}
-		else
-		{
-			ImGui::Text("Local Player is missing!");
-		}
-
-		ImGui::EndTabItem();
 	}
 #endif // SHOW_OBJECTMANAGER_TAB
 }
