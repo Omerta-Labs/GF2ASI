@@ -36,4 +36,4 @@
 # premake stuff
 /.vs
 /obj
-
+premake5.lua
