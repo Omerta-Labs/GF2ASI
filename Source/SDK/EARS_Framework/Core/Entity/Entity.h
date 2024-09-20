@@ -33,6 +33,13 @@ namespace EARS
 			virtual void Rotate(const RwV3d& InOffset) = 0;
 			virtual void Translate(const RwV3d& InOffset) = 0;
 
+			// Get the world position of this Entity
+			// TODO: Is this actually local or world??
+			RwV3d GetPosition() const;
+
+			// Get the world matrix of this Entity
+			// TODO: Is this actually local or world??
+			RwMatrixTag GetMatrix() const;
 
 		private:
 

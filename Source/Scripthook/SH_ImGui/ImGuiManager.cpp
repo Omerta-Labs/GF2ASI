@@ -253,6 +253,9 @@ void ImGuiManager::DrawTab_PlayerSettings()
 		{
 			if (ImGui::CollapsingHeader("Players State", ImGuiTreeNodeFlags_DefaultOpen))
 			{
+				const RwV3d PlayerPosition = LocalPlayer->GetPosition();
+				ImGui::Text("Position: %f %f %f", PlayerPosition.m_X, PlayerPosition.m_Y, PlayerPosition.m_Z);
+
 				ImGui::TextWrapped("Toggle settings such as NoClip and GodMode");
 
 				bool bNewFlyModeState = bPlayerFlyModeActive;
