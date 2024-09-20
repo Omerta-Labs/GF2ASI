@@ -8,7 +8,7 @@
 #include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
 #include "SDK/EARS_Framework/Core/Entity/Entity.h"
 
-void Mod::ObjectManager::Spawn(const RWS::CAttributePacket& AttrPacket, const RwV3d Position)
+void Mod::ObjectManager::Spawn(const RWS::CAttributePacket& AttrPacket, const RwV3d& Position)
 {
 	uint32_t ClassID = AttrPacket.GetIdOfClassToCreate();
 	RWS::CAttributeHandler* NewHandler = MemUtils::CallCdeclMethod<RWS::CAttributeHandler*, uint32_t, const RWS::CAttributePacket*>(0x0483410, ClassID, &AttrPacket);
@@ -22,7 +22,7 @@ void Mod::ObjectManager::Spawn(const RWS::CAttributePacket& AttrPacket, const Rw
 	}
 }
 
-void Mod::ObjectManager::Spawn(const EARS::Common::guid128_t& PacketID, const RwV3d Position)
+void Mod::ObjectManager::Spawn(const EARS::Common::guid128_t& PacketID, const RwV3d& Position)
 {
 	EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
 	if (RWS::CAttributePacket* FoundPacket = SimMgr->GetAttributePacket(&PacketID, 0))
