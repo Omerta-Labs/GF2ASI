@@ -37,8 +37,7 @@ namespace EARS
 
 		protected:
 
-			void* VTABLE = nullptr; // vtable
-			char m_Padding_0[0x13C];
+			char m_PartedAnimated_Padding_0[0x98];
 			String m_PartsPresetName; // 0x2B0 // (EARS::Modules::PartedAnimated)
 			String m_PartsThemeName; // 0x2C0 // (EARS::Modules::PartedAnimated)
 			String m_PartsSwapSetName; // 0x2D0 // (EARS::Modules::PartedAnimated)
