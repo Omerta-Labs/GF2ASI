@@ -367,7 +367,8 @@ void ImGuiManager::DrawTab_PlayerSettings()
 						const EARS::Common::guid128_t CarID = CurrentCar->InqInstanceID();
 						if (OurObjectMgr)
 						{
-							OurObjectMgr->Spawn(CarID);
+							const RwV3d CarPosition = CurrentCar->GetPosition();
+							OurObjectMgr->Spawn(CarID, CarPosition);
 						}
 					}
 				}
@@ -621,66 +622,79 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 #if SHOW_OBJECTMANAGER_TAB
 	if (ImGui::BeginTabItem("Object Manager"))
 	{
-		if (ImGui::BeginListBox("Select a Car", ImVec2(0.0f, 100.0f)))
+		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 		{
-			ImGuiListClipper Clipper;
-			Clipper.Begin(VehicleEntries.size());
-			while (Clipper.Step())
+			if (ImGui::BeginListBox("Select a Car", ImVec2(0.0f, 100.0f)))
 			{
-				for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
+				ImGuiListClipper Clipper;
+				Clipper.Begin(VehicleEntries.size());
+				while (Clipper.Step())
 				{
-					// TODO: std::format has proved to be too costly, we need an alternative method for names
-					// could we load a name from the file perhaps?
-					const EntityEntry& CurrentEntry = VehicleEntries[i];
-					if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedVehicleGuid == CurrentEntry.GUID)))
+					for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
 					{
-						SelectedVehicleGuid = CurrentEntry.GUID;
+						// TODO: std::format has proved to be too costly, we need an alternative method for names
+						// could we load a name from the file perhaps?
+						const EntityEntry& CurrentEntry = VehicleEntries[i];
+						if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedVehicleGuid == CurrentEntry.GUID)))
+						{
+							SelectedVehicleGuid = CurrentEntry.GUID;
+						}
 					}
+				}
+
+				Clipper.End();
+
+				ImGui::EndListBox();
+			}
+
+			if (ImGui::Button("Spawn Car"))
+			{
+				if (OurObjectMgr)
+				{
+					const RwV3d PlayerPosition = LocalPlayer->GetPosition();
+					const RwV3d PlayerMatrix = LocalPlayer->GetMatrix().m_At;
+					const RwV3d SpawnPosition = PlayerPosition + (PlayerMatrix * 5.0f);
+					OurObjectMgr->Spawn(SelectedVehicleGuid, SpawnPosition);
 				}
 			}
 
-			Clipper.End();
-
-			ImGui::EndListBox();
-		}
-
-		if (ImGui::Button("Spawn Car"))
-		{
-			if (OurObjectMgr)
+			if (ImGui::BeginListBox("Select an NPC", ImVec2(0.0f, 100.0f)))
 			{
-				OurObjectMgr->Spawn(SelectedVehicleGuid);
-			}
-		}
-
-		if (ImGui::BeginListBox("Select an NPC", ImVec2(0.0f, 100.0f)))
-		{
-			ImGuiListClipper Clipper;
-			Clipper.Begin(NPCEntries.size());
-			while (Clipper.Step())
-			{
-				for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
+				ImGuiListClipper Clipper;
+				Clipper.Begin(NPCEntries.size());
+				while (Clipper.Step())
 				{
-					// TODO: std::format has proved to be too costly, we need an alternative method for names
-					// could we load a name from the file perhaps?
-					const EntityEntry& CurrentEntry = NPCEntries[i];
-					if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedNPCGuid == CurrentEntry.GUID)))
+					for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
 					{
-						SelectedNPCGuid = CurrentEntry.GUID;
+						// TODO: std::format has proved to be too costly, we need an alternative method for names
+						// could we load a name from the file perhaps?
+						const EntityEntry& CurrentEntry = NPCEntries[i];
+						if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedNPCGuid == CurrentEntry.GUID)))
+						{
+							SelectedNPCGuid = CurrentEntry.GUID;
+						}
 					}
 				}
+
+				Clipper.End();
+
+				ImGui::EndListBox();
 			}
 
-			Clipper.End();
-
-			ImGui::EndListBox();
-		}
-
-		if (ImGui::Button("Spawn NPC"))
-		{
-			if (OurObjectMgr)
+			if (ImGui::Button("Spawn NPC"))
 			{
-				OurObjectMgr->Spawn(SelectedNPCGuid);
+				if (OurObjectMgr)
+				{
+					const RwV3d PlayerPosition = LocalPlayer->GetPosition();
+					const RwV3d PlayerMatrix = LocalPlayer->GetMatrix().m_At;
+					const RwV3d SpawnPosition = PlayerPosition + (PlayerMatrix * 5.0f);
+					OurObjectMgr->Spawn(SelectedNPCGuid, SpawnPosition);
+				}
 			}
+		}
+		else
+		{
+			ImGui::Text("Local Player is missing!");
 		}
 
 		ImGui::EndTabItem();
