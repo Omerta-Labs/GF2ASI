@@ -7,6 +7,7 @@
 #include "SDK/EARS_Framework/Core/AttributeHandler/CAttributeHandler.h"
 #include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
 #include "SDK/EARS_Framework/Core/Entity/Entity.h"
+#include "SDK/EARS_Godfather/Modules/Player/Player.h"
 
 void Mod::ObjectManager::Spawn(const RWS::CAttributePacket& AttrPacket)
 {
@@ -18,10 +19,13 @@ void Mod::ObjectManager::Spawn(const RWS::CAttributePacket& AttrPacket)
 
 	if (EARS::Framework::Entity* EntityHandler = reinterpret_cast<EARS::Framework::Entity*>(NewHandler))
 	{
-		EntityHandler->SetPosition(RwV3d(-179.846008f, 6.0f, 6.0f));
+		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
+		{
+			const RwV3d PlayerPosition = LocalPlayer->GetPosition();
+			EntityHandler->SetPosition(PlayerPosition);
+			EntityHandler->Translate(RwV3d(5.0f, 0.0f, 0.0f));
+		}
 	}
-
-	int z = 0;
 }
 
 void Mod::ObjectManager::Spawn(const EARS::Common::guid128_t& PacketID)
