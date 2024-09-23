@@ -513,13 +513,41 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 			return;
 		}
 
-		// we've got everything we need, we can continue
-		if (ImGui::TreeNode("FamilyTree Data"))
+		if (ImGui::CollapsingHeader("Crew Members (simple)", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Add all members to crew"))
+			{
+				FamilyTreeData->ForEachMember([&](EARS::Modules::PlayerFamilyMember& InMember) {
+					if (EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC())
+					{
+						if (MadeManNPC->GetIsCrewMember() == false)
+						{
+							InMember.JoinCrew();
+						}
+					}
+					});
+			}
+
+			if (ImGui::Button("Remove all members from crew"))
+			{
+				FamilyTreeData->ForEachMember([&](EARS::Modules::PlayerFamilyMember& InMember) {
+					if (EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC())
+					{
+						if (MadeManNPC->GetIsCrewMember() == true)
+						{
+							InMember.LeaveCrew();
+						}
+					}
+					});
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Crew Members (detailed)", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			uint32_t CurrentIdx = 0;
 			FamilyTreeData->ForEachMember([&](EARS::Modules::PlayerFamilyMember& InMember) {
 
-				const char* Name = "Unknown";
+				const char* Name = "[UNKNOWN]";
 				if (EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC())
 				{
 					String* NPC_Name = MadeManNPC->GetName();
@@ -534,6 +562,31 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 
 					const EARS::Common::guid128_t WeaponGUID = InMember.GetWeaponGUID();
 					ImGui::Text("Weapon GUID: [%p %p %p %p]", WeaponGUID.a, WeaponGUID.b, WeaponGUID.c, WeaponGUID.d);
+
+					EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC();
+					if (MadeManNPC)
+					{
+						if (ImGui::Button("Toggle Spawn (As Crew Member)"))
+						{
+							const bool bInCrew = MadeManNPC->GetIsCrewMember();
+							if (MadeManNPC->GetIsCrewMember())
+							{
+								InMember.LeaveCrew();
+							}
+							else
+							{
+								InMember.JoinCrew();
+							}
+						}
+
+						// Provide the option to change weapon license for this character
+						const EARS::Common::guid128_t SimNPCID = MadeManNPC->InqInstanceID();
+						uint8_t WeaponLicense = FamilyData->GetWeaponLicense(SimNPCID);
+						if (ImGui::SliderScalar("Weapon License", ImGuiDataType_U8, &WeaponLicense, &EARS::Modules::CorleoneFamilyData::MIN_WEAPON_LICENSE, &EARS::Modules::CorleoneFamilyData::MAX_WEAPON_LICENSE))
+						{
+							FamilyData->SetWeaponLicense(SimNPCID, WeaponLicense);
+						}
+					}
 
 					if (ImGui::TreeNode("Specialties"))
 					{
@@ -556,34 +609,12 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 						ImGui::TreePop();
 					}
 
-					if (ImGui::TreeNode("Honour Data"))
-					{
-						if (EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC())
-						{
-							// Provide the option to change weapon license for this character
-							const EARS::Common::guid128_t SimNPCID = MadeManNPC->InqInstanceID();
-							uint8_t WeaponLicense = FamilyData->GetWeaponLicense(SimNPCID);
-							if (ImGui::SliderScalar("Weapon License", ImGuiDataType_U8, &WeaponLicense, &EARS::Modules::CorleoneFamilyData::MIN_WEAPON_LICENSE, &EARS::Modules::CorleoneFamilyData::MAX_WEAPON_LICENSE))
-							{
-								FamilyData->SetWeaponLicense(SimNPCID, WeaponLicense);
-							}
-						}
-						else
-						{
-							ImGui::Text("Missing SimNPC, cannot show data");
-						}
-
-						ImGui::TreePop();
-					}
-
 					ImGui::TreePop();
 				}
 
 				CurrentIdx++;
 
 				});
-
-			ImGui::TreePop();
 		}
 
 		ImGui::EndTabItem();

@@ -57,6 +57,16 @@ void EARS::Modules::PlayerFamilyMember::RemoveSpecialty(const EARS::Modules::Spe
 	OnSpecialitiesUpdated();
 }
 
+void EARS::Modules::PlayerFamilyMember::JoinCrew()
+{
+	MemUtils::CallClassMethod<void, EARS::Modules::PlayerFamilyMember*>(0x090A660, this);
+}
+
+void EARS::Modules::PlayerFamilyMember::LeaveCrew()
+{
+	MemUtils::CallClassMethod<void, EARS::Modules::PlayerFamilyMember*>(0x090A700, this);
+}
+
 void EARS::Modules::PlayerFamilyMember::OnSpecialitiesUpdated()
 {
 	// TODO: Access SimNPC

@@ -74,6 +74,10 @@ namespace EARS
 			// (TODO: Ensure that the HUD and crew system is updated to reflect addition)
 			void RemoveSpecialty(const EARS::Modules::Specialties Speciality);
 
+			void JoinCrew();
+
+			void LeaveCrew();
+
 			// Getters
 			Flags32 GetFlags() const { return m_Flags; }
 			EARS::Modules::SentientRank GetRank() const { return m_Rank; }

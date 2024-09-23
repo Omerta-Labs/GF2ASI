@@ -29,6 +29,16 @@ namespace EARS
 			 */
 			String* GetName();
 
+			/**
+			 * Add this SimNPC to the Players Family and Crew.
+			 */
+			void SetIsCrewMember(bool bIsCrewMember);
+
+			/**
+			 * Is this SimNPC part of the Players Crew and Family?
+			 */
+			bool GetIsCrewMember() const;
+
 			// Fetch the NPC associated with this SimNPC.
 			EARS::Modules::NPC* GetNPC() const { return m_NPC.GetPtr(); }
 
