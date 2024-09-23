@@ -8,11 +8,7 @@ namespace EARS
 {
 	namespace Modules
 	{
-		// TODO: Move elsewhere when it has a home
-		class PresetInstance
-		{
-
-		};
+		class PresetInstance;
 
 		/**
 		 * An object in the world to describe an animated

@@ -1,6 +1,6 @@
 #include "PartedModelMgr.h"
 
-void PartedModelMgr::ForEachAssemblyHeader(const TVisitAssemblyHeaderFunctor& InFunction) const
+void EARS::Modules::PartedModelMgr::ForEachAssemblyHeader(const TVisitAssemblyHeaderFunctor& InFunction) const
 {
 	PartedModel::AssemblyListHeader* CurrentHeader = m_AssembliesList;
 	while (CurrentHeader)
@@ -13,7 +13,7 @@ void PartedModelMgr::ForEachAssemblyHeader(const TVisitAssemblyHeaderFunctor& In
 	}
 }
 
-PartedModelMgr* PartedModelMgr::GetInstance()
+EARS::Modules::PartedModelMgr* EARS::Modules::PartedModelMgr::GetInstance()
 {
-	return *(PartedModelMgr**)0x112990C;
+	return *(EARS::Modules::PartedModelMgr**)0x112990C;
 }

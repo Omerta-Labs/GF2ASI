@@ -193,7 +193,7 @@ void ImGuiManager::DrawTab_PlayerModelSwap()
 	{
 		ImGui::BeginChild("parted_model_list");
 
-		PartedModelMgr* ModelMgr = PartedModelMgr::GetInstance();
+		EARS::Modules::PartedModelMgr* ModelMgr = EARS::Modules::PartedModelMgr::GetInstance();
 		if (ModelMgr == nullptr)
 		{
 			// not loaded yet so don't show anything

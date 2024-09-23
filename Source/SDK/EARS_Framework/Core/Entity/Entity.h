@@ -53,6 +53,9 @@ namespace EARS
 			void* m_InterpolationMtx = nullptr; // 0x168 (EARS::Framework::Modules::imatrix44_t)
 			void* m_AudOcclusionCB = nullptr; // 0x16C
 			// Then entity finishes with one byte? TODO
+
+			// 0x150 alpha value
+			// 0x15E flags
 		};
 	} // Modules
 } // EARS
