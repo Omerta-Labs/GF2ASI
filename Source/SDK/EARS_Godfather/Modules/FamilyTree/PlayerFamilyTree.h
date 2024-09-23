@@ -74,8 +74,10 @@ namespace EARS
 			// (TODO: Ensure that the HUD and crew system is updated to reflect addition)
 			void RemoveSpecialty(const EARS::Modules::Specialties Speciality);
 
+			// Trigger this member of the family to automatically join the Players crew.
 			void JoinCrew();
 
+			// Trigger this member of the family to leave the Players crew.
 			void LeaveCrew();
 
 			// Getters

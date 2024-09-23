@@ -17,7 +17,7 @@ namespace EARS
 	{
 		/**
 		 * Stores the meta information of an NPC.
-		 * This does not appear to consist of the actual rendered NPC.
+		 * Primarily for the games monopoly system.
 		 */
 		class SimNPC : public EARS::Framework::Base
 		{
