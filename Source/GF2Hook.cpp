@@ -16,7 +16,7 @@
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
-#define ENABLE_GF2_MULTIPLAYER 0
+#define ENABLE_GF2_MULTIPLAYER 1
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
 #define ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK 0
 #define ENABLE_GF2_SPAWN_ENTITY_HOOKS 0
@@ -311,35 +311,35 @@ void GF2Hook::Init()
 
 #if ENABLE_GF2_MULTIPLAYER
 	// TODO: Adjust all addresses to use Steam EXE addresses
-	PLH::x86Detour detour100((char*)0x0C6B2C0, (char*)&HOOK_ProtoAriesConnect, &ProtoAriesConnect_old, dis);
+	PLH::x86Detour detour100((char*)0x0C7E2E0, (char*)&HOOK_ProtoAriesConnect, &ProtoAriesConnect_old, dis);
 	detour100.hook();
 
-	PLH::x86Detour detour110((char*)0xC6B190, (char*)&HOOK_ProtoAriesPeek, &HOOK_ProtoAriesPeek_old, dis);
+	PLH::x86Detour detour110((char*)0x0C7E1B0, (char*)&HOOK_ProtoAriesPeek, &HOOK_ProtoAriesPeek_old, dis);
 	detour110.hook();
 
-	PLH::x86Detour detour111((char*)0x0C6B080, (char*)&HOOK_ProtoAriesSend, &HOOK_ProtoAriesSend_old, dis);
+	PLH::x86Detour detour111((char*)0x0C7E0A0, (char*)&HOOK_ProtoAriesSend, &HOOK_ProtoAriesSend_old, dis);
 	detour111.hook();
 
-	PLH::x86Detour detour112((char*)0xC6B250, (char*)&HOOK_ProtoAriesRecv, &HOOK_ProtoAriesRecv_old, dis);
+	PLH::x86Detour detour112((char*)0x0C7E270, (char*)&HOOK_ProtoAriesRecv, &HOOK_ProtoAriesRecv_old, dis);
 	detour112.hook();
 
-	PLH::x86Detour detour101((char*)0xADAC10, (char*)&HOOK_ConnectSocket, &ConnectSocket_old, dis);
+	PLH::x86Detour detour101((char*)0x0AEDD10, (char*)&HOOK_ConnectSocket, &ConnectSocket_old, dis);
 	detour101.hook();
 
-	PLH::x86Detour detour104((char*)0x0ADAB80, (char*)&HOOK_DisconnectSocket, &DisonnectSocket_old, dis);
+	PLH::x86Detour detour104((char*)0x0AEDC80, (char*)&HOOK_DisconnectSocket, &DisonnectSocket_old, dis);
 	detour104.hook();
 
-	PLH::x86Detour detour105((char*)0x0ADAC80, (char*)&HOOK_Idle, &Idle_old, dis);
+	PLH::x86Detour detour105((char*)0x0AEDD80, (char*)&HOOK_Idle, &Idle_old, dis);
 	detour105.hook();
 
-	PLH::x86Detour detour102((char*)0x08A1C80, (char*)&HOOK_GodfatherConnectionManager_CTOR, &GodfatherConnectionManager_CTOR_old, dis);
+	PLH::x86Detour detour102((char*)0x08A19F0, (char*)&HOOK_GodfatherConnectionManager_CTOR, &GodfatherConnectionManager_CTOR_old, dis);
 	detour102.hook();
 
-	PLH::x86Detour detour155((char*)0x403A30, (char*)&HOOK_StreamManager_Load, &StreamManager_Load_Old, dis);
-	detour155.hook();
+	//PLH::x86Detour detour155((char*)0x403A30, (char*)&HOOK_StreamManager_Load, &StreamManager_Load_Old, dis);
+	//detour155.hook();
 
-	PLH::x86Detour detour103((char*)0x0AEA650, (char*)&HOOK_HelloReceived, &HelloReceived_old, dis);
-	detour103.hook();
+	//PLH::x86Detour detour103((char*)0x0AEA650, (char*)&HOOK_HelloReceived, &HelloReceived_old, dis);
+	//detour103.hook();
 #endif // ENABLE_GF2_MULTIPLAYER
 
 #if ENABLE_GF2_DISPL_BEGINSCENE_HOOK
