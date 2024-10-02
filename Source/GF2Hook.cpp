@@ -40,11 +40,30 @@ struct ConnectionParams
 	//void(__cdecl* connGoneCB)(int);
 };
 
+struct InternetAddress
+{
+	void* vtable = nullptr;
+	unsigned int mAddr;
+	unsigned __int16 mPort;
+};
+
+struct AriesPacket
+{
+	int mKind;
+	int mCode;
+	char* mBody;
+	unsigned int mSize;
+	bool mMode;
+	InternetAddress mAddress;
+};
+
 uint64_t ConnectSocket_old;
 typedef int(__thiscall* ConnectSocket)(void* pThis, void* fa, bool bUseSSL);
 int __fastcall HOOK_ConnectSocket(void* pThis, void* ecx, void* fa, bool bUseSSL)
 {
 	C_Logger::Printf("Fesl::ConnectSocket");
+
+	bUseSSL = false;
 
 	ConnectSocket funcCast = (ConnectSocket)ConnectSocket_old;
 	const int value = funcCast(pThis, fa, bUseSSL);
@@ -106,7 +125,7 @@ int _cdecl HOOK_ProtoAriesConnect(uint32_t a1, const char* a2, uint32_t a3, uint
 }
 
 uint64_t HOOK_ProtoAriesPeek_old;
-int _cdecl HOOK_ProtoAriesPeek(uint32_t a1, void* a2, int& a3, int& a4)
+int _cdecl HOOK_ProtoAriesPeek(uint32_t a1, void* a2, void* a3, void* a4)
 {
 	auto r = PLH::FnCast(HOOK_ProtoAriesPeek_old, &HOOK_ProtoAriesPeek)(a1, a2, a3, a4);
 	C_Logger::Printf("ProtoAriesPeek [%u -> %u]", a3, a4);
@@ -115,19 +134,19 @@ int _cdecl HOOK_ProtoAriesPeek(uint32_t a1, void* a2, int& a3, int& a4)
 }
 
 uint64_t HOOK_ProtoAriesSend_old;
-int _cdecl HOOK_ProtoAriesSend(void* a1, void* a2, void* a3, void* a4, void* a5)
+int _cdecl HOOK_ProtoAriesSend(void* a1, uint32_t a2, void* a3, const char* a4, uint32_t a5)
 {
 	auto r = PLH::FnCast(HOOK_ProtoAriesSend_old, &HOOK_ProtoAriesSend)(a1, a2, a3, a4, a5);
-	C_Logger::Printf("!! ProtoAriesSend !!");
+	C_Logger::Printf("[ProtoAriesSend] -> [%u] \n [%s]", a2, a4);
 
 	return r;
 }
 
 uint64_t HOOK_ProtoAriesRecv_old;
-int _cdecl HOOK_ProtoAriesRecv(void* a1, void* a2, void* a3, void* a4, void* a5)
+int _cdecl HOOK_ProtoAriesRecv(void* a1, AriesPacket* a2, uint32_t* a3, void* a4, void* a5)
 {
 	auto r = PLH::FnCast(HOOK_ProtoAriesRecv_old, &HOOK_ProtoAriesRecv)(a1, a2, a3, a4, a5);
-	C_Logger::Printf("!! ProtoAriesRecv !!");
+	C_Logger::Printf("[ProtoAriesRecv] -> [%u - %u] \n [%s]", a2->mKind, a2->mCode, a2->mBody);
 
 	return r;
 }
