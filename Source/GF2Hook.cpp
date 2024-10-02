@@ -87,7 +87,7 @@ void* __fastcall HOOK_GodfatherConnectionManager_CTOR(void* pThis, void* ecx, Co
 {
 	C_Logger::Printf("GodfatherConnectionManager_CTOR [%u -> %u]", params->port, 18020);
 
-	params->port = 18020;
+	//params->port = 18020;
 	//params->titleString = "gf2";
 
 	GodfatherConnectionManager_CTOR funcCast = (GodfatherConnectionManager_CTOR)GodfatherConnectionManager_CTOR_old;
@@ -98,10 +98,10 @@ void* __fastcall HOOK_GodfatherConnectionManager_CTOR(void* pThis, void* ecx, Co
 uint64_t ProtoAriesConnect_old;
 int _cdecl HOOK_ProtoAriesConnect(uint32_t a1, const char* a2, uint32_t a3, uint32_t a4)
 {
-	const char* CustomFilter = "nephthys.xyz";
+	const char* CustomFilter = "gf2.xyz";
 
-	C_Logger::Printf("ProtoAriesConnect [%s -> %s] [%u -> %u]", a2, CustomFilter, a3, 908500230);
-	auto r = PLH::FnCast(ProtoAriesConnect_old, &HOOK_ProtoAriesConnect)(a1, CustomFilter, 908500230, a4);
+	C_Logger::Printf("ProtoAriesConnect [%s -> %s] [%u -> %u]", a2, CustomFilter, a3, 2371851708);
+	auto r = PLH::FnCast(ProtoAriesConnect_old, &HOOK_ProtoAriesConnect)(a1, a2, 2371851708, a4);
 	return r;
 }
 
@@ -306,6 +306,7 @@ void __cdecl Hook_CloseLevelServices()
 void GF2Hook::Init()
 {
 	C_Logger::Create("GF2_Hook.txt");
+	tConsole::fCreate("GF2SE");
 
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
 
