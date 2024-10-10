@@ -159,6 +159,15 @@ int _cdecl HOOK_ProtoSSLRecv(int* a1, char* buf, int len)
 
 	return r;
 }
+
+uint64_t HOOK_ProtoSSLSend_old;
+int _cdecl HOOK_ProtoSSLSend(int* a1, char* buf, int len)
+{
+	auto r = PLH::FnCast(HOOK_ProtoSSLSend_old, &HOOK_ProtoSSLSend)(a1, buf, len);
+	C_Logger::Printf("[HOOK_ProtoSSLSend] -> [%u - %s]", len, buf);
+
+	return r;
+}
 #endif // ENABLE_GF2_MULTIPLAYER
 
 /**
@@ -354,6 +363,9 @@ void GF2Hook::Init()
 
 	PLH::x86Detour detour122((char*)0x0C8C830, (char*)&HOOK_ProtoSSLRecv, &HOOK_ProtoSSLRecv_old, dis);
 	detour122.hook();
+
+	PLH::x86Detour detour123((char*)0x0C8C790, (char*)&HOOK_ProtoSSLSend, &HOOK_ProtoSSLSend_old, dis);
+	detour123.hook();
 
 	PLH::x86Detour detour101((char*)0x0AEDD10, (char*)&HOOK_ConnectSocket, &ConnectSocket_old, dis);
 	detour101.hook();

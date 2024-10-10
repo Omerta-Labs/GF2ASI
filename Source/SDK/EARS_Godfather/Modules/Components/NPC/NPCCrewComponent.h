@@ -43,7 +43,7 @@ namespace EARS
 
 		private:
 
-			char m_Padding0[0x1C];
+			char m_IDamageListener_Padding0[0xC];
 			SafePtr<void*> m_CrewLeaderSentient; // EARS::Modules::Sentient
 			void* m_CrewLeaderComponent = nullptr; // EARS::Modules::CrewLeaderComponent
 			EARS::Modules::NPC* m_NPC = nullptr;
