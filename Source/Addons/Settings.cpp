@@ -1,11 +1,22 @@
 #include "Addons/Settings.h"
 
+#include <filesystem>
+
 void Settings::Init()
 {
-	LPTSTR path = (LPTSTR) "./scripts/gf2asi.ini";
-	ShowModMenuWindowInput = GetPrivateProfileInt("Keybinds", "model", ShowModMenuWindowInput, path);
-	FlyModeUpInput = GetPrivateProfileInt("Keybinds", "flyup", FlyModeUpInput, path);
-	FlyModeDownInput = GetPrivateProfileInt("Keybinds", "flydown", FlyModeDownInput, path);
+	// TODO: Could probably move this to utility header
+	const std::filesystem::path SettingsPath = "scripts/gf2asi.ini";
+	const std::filesystem::path GamePath = std::filesystem::current_path();
+	const std::filesystem::path CompletePath = GamePath / SettingsPath;
+
+	// file must exist to load .ini properly
+	if (std::filesystem::exists(CompletePath))
+	{
+		const std::wstring& WidePath = CompletePath.wstring();
+		ShowModMenuWindowInput = GetPrivateProfileIntW(L"Keybinds", L"model", ShowModMenuWindowInput, WidePath.data());
+		FlyModeUpInput = GetPrivateProfileIntW(L"Keybinds", L"flyup", FlyModeUpInput, WidePath.data());
+		FlyModeDownInput = GetPrivateProfileIntW(L"Keybinds", L"flydown", FlyModeDownInput, WidePath.data());
+	}
 }
 
 int Settings::GetShowModMenuWindowInput() const
