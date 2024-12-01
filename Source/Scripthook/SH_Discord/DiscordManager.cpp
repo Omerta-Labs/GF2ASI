@@ -18,6 +18,14 @@ namespace Events
 	hook::Type<RWS::CEventId> PlayerAsDriverEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E030);
 	hook::Type<RWS::CEventId> PlayerExitVehicleEvent = hook::Type<RWS::CEventId>(0x112E018);
 	hook::Type<RWS::CEventId> CityChangedEvent = hook::Type<RWS::CEventId>(0x112DCF4);
+	hook::Type<RWS::CEventId> EnteredSelectMenuEvent = hook::Type<RWS::CEventId>(0x1130378);
+	hook::Type<RWS::CEventId> ExitedSelectMenuEvent = hook::Type<RWS::CEventId>(0x1130218);
+	hook::Type<RWS::CEventId> ChaseStartedEvent = hook::Type<RWS::CEventId>(0x112FE64);
+	hook::Type<RWS::CEventId> ChaseEndedEvent = hook::Type<RWS::CEventId>(0x112FE88);
+	hook::Type<RWS::CEventId> ExtortionSuccessCompleteEvent = hook::Type<RWS::CEventId>(0x112A658);
+	hook::Type<RWS::CEventId> PlayerLostVenueEvent = hook::Type<RWS::CEventId>(0x112A594);
+	hook::Type<RWS::CEventId> EnteredPauseMapEvent = hook::Type<RWS::CEventId>(0x11302B8);
+	hook::Type<RWS::CEventId> ExitedPauseMapEvent = hook::Type<RWS::CEventId>(0x1130248);
 }
 
 namespace Precense
@@ -56,6 +64,14 @@ DiscordManager::~DiscordManager()
 	UnlinkMsg(&Events::PlayerAsDriverEnterVehicleEvent);
 	UnlinkMsg(&Events::PlayerExitVehicleEvent);
 	UnlinkMsg(&Events::CityChangedEvent);
+	UnlinkMsg(&Events::EnteredSelectMenuEvent);
+	UnlinkMsg(&Events::ExitedSelectMenuEvent);
+	UnlinkMsg(&Events::ChaseStartedEvent);
+	UnlinkMsg(&Events::ChaseEndedEvent);
+	UnlinkMsg(&Events::ExtortionSuccessCompleteEvent);
+	UnlinkMsg(&Events::PlayerLostVenueEvent);
+	UnlinkMsg(&Events::EnteredPauseMapEvent);
+	UnlinkMsg(&Events::ExitedPauseMapEvent);
 }
 
 void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
@@ -69,12 +85,12 @@ void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
 
 	if (MsgEvent.IsEvent(Events::PlayerAsDriverEnterVehicleEvent))
 	{
-		UpdatePresence("Cruising around");
+		UpdateState("Cruising around");
 	}
 
 	if (MsgEvent.IsEvent(Events::PlayerExitVehicleEvent))
 	{
-		UpdatePresence("Walking around");
+		UpdateState("Walking around");
 	}
 
 	if (MsgEvent.IsEvent(Events::CityChangedEvent))
@@ -86,9 +102,44 @@ void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
 			{
 				currentCity = DisplayName->m_pCStr;
 				m_CurrentActivity.GetAssets().SetLargeImage(Precense::GetSmallImageFromCityID(CurrentCityID));
-				UpdatePresence("Walking around");
+				UpdateState("Walking around");
 			}
 		}
+	}
+
+	if (MsgEvent.IsEvent(Events::EnteredSelectMenuEvent))
+	{
+		UpdateDetails("Game paused");
+	}
+
+	if (MsgEvent.IsEvent(Events::ChaseStartedEvent))
+	{
+		UpdateDetails("Escaping");
+	}
+
+	if (MsgEvent.IsEvent(Events::ChaseEndedEvent))
+	{
+		UpdateDetails("Escaped");
+	}
+
+	if (MsgEvent.IsEvent(Events::ExtortionSuccessCompleteEvent))
+	{
+		UpdateDetails("Took over the racket");
+	}
+
+	if (MsgEvent.IsEvent(Events::PlayerLostVenueEvent))
+	{
+		UpdateDetails("The venue was stolen");
+	}
+
+	if (MsgEvent.IsEvent(Events::EnteredPauseMapEvent))
+	{
+		UpdateDetails("Planning the next move");
+	}
+
+	if (MsgEvent.IsEvent(Events::ExitedPauseMapEvent) || MsgEvent.IsEvent(Events::ExitedSelectMenuEvent))
+	{
+		UpdateDetails("Thinking like a don");
 	}
 }
 
@@ -113,14 +164,28 @@ void DiscordManager::Open()
 	LinkMsg(&Events::PlayerAsDriverEnterVehicleEvent, 0x8000);
 	LinkMsg(&Events::PlayerExitVehicleEvent, 0x8000);
 	LinkMsg(&Events::CityChangedEvent, 0x8000);
+	LinkMsg(&Events::EnteredSelectMenuEvent, 0x8000);
+	LinkMsg(&Events::ExitedSelectMenuEvent, 0x8000);
+	LinkMsg(&Events::ChaseStartedEvent, 0x8000);
+	LinkMsg(&Events::ChaseEndedEvent, 0x8000);
+	LinkMsg(&Events::ExtortionSuccessCompleteEvent, 0x8000);
+	LinkMsg(&Events::PlayerLostVenueEvent, 0x8000);
+	LinkMsg(&Events::EnteredPauseMapEvent, 0x8000);
+	LinkMsg(&Events::ExitedPauseMapEvent, 0x8000);
 
 	C_Logger::Printf("Discord Initialised Successfully!");
 }
 
-void DiscordManager::UpdatePresence(std::string text)
+void DiscordManager::UpdateState(std::string text)
 {
 	const std::string NewState = std::format("{} {}", text, currentCity);
 	m_CurrentActivity.SetState(NewState.data());
+	m_Core->ActivityManager().UpdateActivity(m_CurrentActivity, [](discord::Result result) {});
+}
+
+void DiscordManager::UpdateDetails(std::string text)
+{
+	m_CurrentActivity.SetDetails(text.data());
 	m_Core->ActivityManager().UpdateActivity(m_CurrentActivity, [](discord::Result result) {});
 }
 
