@@ -13,10 +13,6 @@ namespace EARS
 
 			// Access the CrimeManager instance.
 			static CrimeManager* GetInstance();
-
-		private:
-
-			float m_TimeScale = 0.0f;
 		};
 	} // Modules
 } // EARS
