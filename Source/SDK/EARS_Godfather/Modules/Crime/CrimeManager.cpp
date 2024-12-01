@@ -10,5 +10,5 @@ void EARS::Modules::CrimeManager::CalmPoliceTowardsCorleones()
 
 EARS::Modules::CrimeManager* EARS::Modules::CrimeManager::GetInstance()
 {
-	return *(EARS::Modules::CrimeManager**)0x112AA1C; //DONE
+	return *(EARS::Modules::CrimeManager**)0x112AA1C;
 }
