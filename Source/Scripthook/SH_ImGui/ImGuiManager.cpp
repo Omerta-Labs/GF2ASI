@@ -13,6 +13,7 @@
 #include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
 #include "SDK/EARS_Framework/Toolkits/GroupManager/GroupManager.h"
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
+#include "SDK/EARS_Godfather/Modules/Crime/CrimeManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
@@ -289,6 +290,14 @@ void ImGuiManager::DrawTab_PlayerSettings()
 					DamageComp->SetInvincible(bNewGodModeActive);
 
 					bPlayerGodModeActive = bNewGodModeActive;
+				}
+
+				if (EARS::Modules::CrimeManager* CrimeMgr = EARS::Modules::CrimeManager::GetInstance())
+				{
+					if (ImGui::Button("Call off the police"))
+					{
+						CrimeMgr->CalmPoliceTowardsCorleones();
+					}
 				}
 			}
 
