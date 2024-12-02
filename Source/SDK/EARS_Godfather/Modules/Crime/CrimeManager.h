@@ -8,7 +8,7 @@ namespace EARS
 		{
 		public:
 
-			// Trigger this member of the family to automatically join the Players crew.
+			// Trigger this to call off the police.
 			void CalmPoliceTowardsCorleones();
 
 			// Access the CrimeManager instance.
