@@ -26,6 +26,7 @@
 #include "SDK/EARS_Godfather/Modules/Turf/City.h"
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
 #include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
+#include "SDK/EARS_Godfather/Modules/NPC/Crime/CrimeManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
@@ -289,6 +290,14 @@ void ImGuiManager::DrawTab_PlayerSettings()
 					DamageComp->SetInvincible(bNewGodModeActive);
 
 					bPlayerGodModeActive = bNewGodModeActive;
+				}
+
+				if (EARS::Modules::CrimeManager* CrimeMgr = EARS::Modules::CrimeManager::GetInstance())
+				{
+					if (ImGui::Button("Call off the police"))
+					{
+						CrimeMgr->CalmPoliceTowardsCorleones();
+					}
 				}
 			}
 
