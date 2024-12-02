@@ -31,7 +31,9 @@ public:
 
 private:
 
-	void UpdatePresence(std::string);
+	void UpdateState(std::string);
+
+	void UpdateDetails(std::string);
 
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
