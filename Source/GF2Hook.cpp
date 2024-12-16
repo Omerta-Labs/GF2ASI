@@ -9,11 +9,13 @@
 #include "Addons/imgui/backends/imgui_impl_win32.h"
 #include "Addons/imgui/backends/imgui_impl_dx9.h"
 
+#include "Scripthook/ScripthookEvents.h"
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
 #include "Scripthook/SH_Discord/DiscordManager.h"
 
 #include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
+#include "SDK/EARS_Godfather/Modules/Scoring/ScoreKeeper.h"
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 1
@@ -429,7 +431,9 @@ void GF2Hook::Init()
 	PLH::x86Detour detour221((char*)0x0682860, (char*)&Hook_CloseLevelServices, &CloseLevelServices_Old, dis);
 	detour221.hook();
 
+	Mod::ScripthookEvents_Open();
 	EARS::Modules::DemographicRegion::StaticApplyHooks();
+	EARS::Modules::ScoreKeeper::StaticApplyHooks();
 }
 
 void GF2Hook::Tick()

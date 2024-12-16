@@ -2,6 +2,13 @@
 
 #include "Addons/Hook.h"
 
+void RWS::CMsg::Clear()
+{
+	m_EventId = 0;
+	m_EventData = nullptr;
+	m_bBroadcast = false;
+}
+
 bool RWS::CMsg::IsEvent(const RWS::CEventId& Event) const
 {
 	return m_EventId == Event.GetMsgId();

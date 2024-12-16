@@ -37,7 +37,46 @@ namespace RWS
 	{
 	public:
 
+		// default constructor, considered to be invalid
+		CMsg()
+			: m_EventId(0)
+			, m_EventData(nullptr)
+			, m_bBroadcast(false)
+		{
+
+		}
+
+		// message constructor with event ID but no data
+		CMsg(const CEventId& InEventId)
+			: m_EventId(InEventId.GetMsgId())
+			, m_EventData(nullptr)
+			, m_bBroadcast(false)
+
+		{
+
+		}
+
+		// message constructor with event ID with data
+		CMsg(const CEventId& InEventId, void* InData)
+			: m_EventId(InEventId.GetMsgId())
+			, m_EventData(InData)
+			, m_bBroadcast(false)
+		{
+
+		}
+
+		// Clear this message, does not destroy event data!
+		void Clear();
+
+		// Check whether this CMsg is of a specific type.
 		bool IsEvent(const RWS::CEventId& Event) const;
+
+		// NB: CONSIDER THIS UNSAFE ALWAYS! reinterpret_cast is extremely unsafe, with very little type safety.
+		template<typename TDataType>
+		const TDataType* GetDataAs() const
+		{
+			return reinterpret_cast<const TDataType*>(m_EventData);
+		}
 
 	private:
 
