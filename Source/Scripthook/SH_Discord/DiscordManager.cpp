@@ -100,7 +100,7 @@ void DiscordManager::HandleEvents(const RWS::CMsg& MsgEvent)
 			const uint32_t CurrentCityID = CityMgr->GetCurrentCity();
 			if (const String* DisplayName = CityMgr->GetDisplayName(CurrentCityID))
 			{
-				currentCity = DisplayName->m_pCStr;
+				currentCity = DisplayName->c_str();
 				m_CurrentActivity.GetAssets().SetLargeImage(Precense::GetSmallImageFromCityID(CurrentCityID));
 				UpdateState("Walking around");
 			}

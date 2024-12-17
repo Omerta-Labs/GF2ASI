@@ -1,9 +1,25 @@
 #pragma once
 
+// C++
+#include <stdint.h>
+
 struct String
 {
-	const char* m_pCStr;
-	unsigned __int32 m_len;
-	unsigned __int32 m_allocLen;
-	void* m_Unk0;
+public:
+
+	String(const char* InSrc);
+	~String();
+
+	const char* c_str() const { return m_pCStr; }
+
+	void assign(const char* InSrc);
+
+private:
+
+	typedef void (*StringAllocator_Free)(String* pThis);
+
+	char* m_pCStr = nullptr;
+	uint32_t m_Length = 0;
+	uint32_t m_AllocatedLength = 0;
+	uint32_t m_StringAllocateFreeFunc = 0;
 };

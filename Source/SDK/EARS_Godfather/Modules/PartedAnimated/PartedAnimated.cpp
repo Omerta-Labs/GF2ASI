@@ -13,10 +13,8 @@ void EARS::Modules::PartedAnimated::ForceModelRebuild(EARS::Modules::PresetInsta
 
 void EARS::Modules::PartedAnimated::TrySwapModel(const char* AssemblyName, const char* PresetName)
 {
-	// FREDO
-	m_PartsAssemblyName.m_pCStr = AssemblyName;
-	m_PartsAssemblyName.m_len = strlen(AssemblyName);
-	m_PartsAssemblyName.m_allocLen = 32;
+	m_PartsAssemblyName.assign(AssemblyName);
+	m_PartsPresetName.assign(PresetName);
 
 	ForceModelRebuild(nullptr, PresetName);
 }

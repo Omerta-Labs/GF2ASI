@@ -93,7 +93,7 @@ namespace EARS
 			inline uint8_t GetItemType() const { return m_ItemType; }
 			inline uint8_t GetMeleeItemLength() const { return m_MeleeItemLength; }
 			inline uint8_t GetSafeHouseIndex() const { return m_SafeHouseIndex; }
-			inline const char* GetName() const { return m_Name.m_pCStr; }
+			inline const char* GetName() const { return m_Name.c_str(); }
 			inline uint32_t GetNameHash() const { return m_HashedName; }
 
 		private:

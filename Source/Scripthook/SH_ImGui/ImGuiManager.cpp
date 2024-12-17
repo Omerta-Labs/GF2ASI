@@ -45,8 +45,8 @@
 #define ENABLE_ENTITY_SPAWN_DEBUG 0
 
 #if DEBUG
-#define SHOW_DEMOGRAPHICS_TAB 1
-#define SHOW_OBJECTMANAGER_TAB 1
+#define SHOW_DEMOGRAPHICS_TAB 0
+#define SHOW_OBJECTMANAGER_TAB 0
 #else
 #define SHOW_DEMOGRAPHICS_TAB 0
 #define SHOW_OBJECTMANAGER_TAB 0
@@ -457,12 +457,12 @@ void ImGuiManager::DrawTab_CitiesSettings()
 		{
 			const uint32_t CurrentCityID = CityMgr->GetCurrentCity();
 			const String* CurrentCityName = CityMgr->GetDisplayName(CurrentCityID);
-			ImGui::Text("Current City: %s", (CurrentCityName ? CurrentCityName->m_pCStr : "None"));
+			ImGui::Text("Current City: %s", (CurrentCityName ? CurrentCityName->c_str() : "None"));
 
 			if (ImGui::TreeNode("Registered Cities"))
 			{
 				CityMgr->ForEachCity([](EARS::Modules::City& InCity) {
-					if (ImGui::TreeNodeEx((void*)InCity.GetCityID(), ImGuiTreeNodeFlags_DefaultOpen, "%s", InCity.GetDisplayName()->m_pCStr))
+					if (ImGui::TreeNodeEx((void*)InCity.GetCityID(), ImGuiTreeNodeFlags_DefaultOpen, "%s", InCity.GetDisplayName()->c_str()))
 					{
 						bool bIsVisible = InCity.IsKnownToPlayer();
 						if (ImGui::Checkbox("Is Visible To Player", &bIsVisible))
@@ -560,7 +560,7 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 				if (EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC())
 				{
 					String* NPC_Name = MadeManNPC->GetName();
-					Name = NPC_Name->m_pCStr;
+					Name = NPC_Name->c_str();
 				}
 
 				if (ImGui::TreeNode(&InMember, "Member[%u] -> '%s'", CurrentIdx, Name))
