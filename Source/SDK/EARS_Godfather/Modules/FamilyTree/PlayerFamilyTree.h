@@ -105,6 +105,21 @@ namespace EARS
 		{
 		public:
 
+			enum class FamilyTreeSlot : uint32_t
+			{
+				FAMILYTREE_SLOT_INVALID = 0xFFFFFFFF,
+				FAMILYTREE_SLOT_PLAYER = 0xFFFFFFFF,
+				FAMILYTREE_SLOT_FIRST = 0x0,
+				FAMILYTREE_SLOT_SOLDIER1 = 0x0,
+				FAMILYTREE_SLOT_SOLDIER2 = 0x1,
+				FAMILYTREE_SLOT_SOLDIER3 = 0x2,
+				FAMILYTREE_SLOT_SOLDIER4 = 0x3,
+				FAMILYTREE_SLOT_CAPO1 = 0x4,
+				FAMILYTREE_SLOT_CAPO2 = 0x5,
+				FAMILYTREE_SLOT_UNDERBOSS = 0x6,
+				FAMILYTREE_NUM_SLOTS = 0x7,
+			};
+
 			/**
 			 * Utility function to iterate through all loaded Cities
 			 * All const, we do not expect to modify any of the assemblies during iteration.
