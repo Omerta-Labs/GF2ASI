@@ -21,6 +21,7 @@ project "GF2ASI"
    "$(ProjectDir)Source/Packages",
    "vendors/detours",
    "vendors/polyhook/include",
+   "vendors/libcurl/include",
    }
 
    libdirs {
@@ -46,7 +47,8 @@ project "GF2ASI"
 	  "vendors/polyhook/libs/debug/PolyHook_2.lib",
 	  "vendors/polyhook/libs/debug/Zycore.lib",
 	  "vendors/polyhook/libs/debug/Zydis.lib",
-	  "vendors/discord/libs/discord_game_sdk.dll.lib"
+	  "vendors/discord/libs/discord_game_sdk.dll.lib",
+	  "vendors/libcurl/debug/libcurl-d.lib"
       }
 
    filter "configurations:Release"
@@ -60,5 +62,6 @@ project "GF2ASI"
 	  "vendors/polyhook/libs/release/PolyHook_2.lib",
 	  "vendors/polyhook/libs/release/Zycore.lib",
 	  "vendors/polyhook/libs/release/Zydis.lib",
-	  "vendors/discord/libs/discord_game_sdk.dll.lib"
+	  "vendors/discord/libs/discord_game_sdk.dll.lib",
+	  "vendors/libcurl/release/libcurl.lib"
       }
