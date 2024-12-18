@@ -13,12 +13,15 @@
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
 #include "Scripthook/SH_Discord/DiscordManager.h"
 
+#include "SDK/EARS_Godfather/Modules/PartedAnimated/PartedAnimated.h"
 #include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/Scoring/ScoreKeeper.h"
+#include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
+#include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
-#define ENABLE_GF2_MULTIPLAYER 1
+#define ENABLE_GF2_MULTIPLAYER 0
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
 #define ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK 0
 #define ENABLE_GF2_SPAWN_ENTITY_HOOKS 0
@@ -185,6 +188,43 @@ void* __fastcall HOOK_StreamManager_Load(void* pThis, void* ecx, const char* a1,
 	StreamManager_Load funcCast = (StreamManager_Load)StreamManager_Load_Old;
 	auto value = funcCast(pThis, a1, a2, a3, a4, a5);
 	return value;
+}
+
+uint64_t MobfaceManager_SetTargetModel_Old;
+typedef void (__thiscall* MobfaceManager_SetTargetModel)(void*, EARS::Modules::PartedAnimated*);
+void __fastcall HOOK_MobfaceManager_SetTargetModel(void* pThis, void* ecx, EARS::Modules::PartedAnimated* InModel)
+{
+	/*
+	// NB: This is the code to fix crashing when entering mobface and apparel editor with mobface people when the player model has been swapped.
+	// This works as MVP but still has bugs:
+	// - Hats will still show regardless of hidden state
+	// - Crew members can end up with no bodies, no clothes etc
+	// - Initial Mobface is broken too, with no bodies or clothes.
+	// We need to fix these bugs before this can be enabled.
+
+	// ensure we have dependencies
+	EARS::Modules::MobfaceManager* MobfaceMgr = EARS::Modules::MobfaceManager::GetInstance();
+	assert(MobfaceMgr);
+
+	EARS::Modules::PlayerFamilyTree* PlayerTree = EARS::Modules::PlayerFamilyTree::GetInstance();
+	assert(PlayerTree);
+
+	EARS::Modules::PlayerFamilyTree::FamilyTreeSlot TargetSlot = EARS::Modules::PlayerFamilyTree::FamilyTreeSlot::FAMILYTREE_SLOT_PLAYER;
+
+	if (const EARS::Modules::NPC* const AsNPC = EARS::Framework::_QueryInterface<EARS::Modules::NPC>(InModel, 0x369AC561))
+	{
+		const EARS::Modules::SimNPC* const OwnSimNPC = AsNPC->GetOwningSimNPC();
+		TargetSlot = PlayerTree->FindTreeSlotIndex(OwnSimNPC);
+	}
+
+	if(MobfaceMgr->HasSavedData(TargetSlot))
+	{
+		MobfaceMgr->BuildModelFromSavedData(TargetSlot, InModel);
+	}
+	*/
+
+	MobfaceManager_SetTargetModel funcCast = (MobfaceManager_SetTargetModel)MobfaceManager_SetTargetModel_Old;
+	funcCast(pThis, InModel);
 }
 
 #if ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK
@@ -430,6 +470,9 @@ void GF2Hook::Init()
 
 	PLH::x86Detour detour221((char*)0x0682860, (char*)&Hook_CloseLevelServices, &CloseLevelServices_Old, dis);
 	detour221.hook();
+
+	PLH::x86Detour detour1555((char*)0x09BCB30, (char*)&HOOK_MobfaceManager_SetTargetModel, &MobfaceManager_SetTargetModel_Old, dis);
+	detour1555.hook();
 
 	Mod::ScripthookEvents_Open();
 	EARS::Modules::DemographicRegion::StaticApplyHooks();

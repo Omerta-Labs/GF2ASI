@@ -26,8 +26,20 @@ namespace EARS
 			// Getters
 			EARS::Modules::NPCCrewComponent* GetCrewComponent() const;
 			EARS::Modules::NPCUpgradeComponent* GetUpgradeComponent() const;
+			EARS::Modules::SimNPC* GetOwningSimNPC() const { return m_OwnerSimNPC.GetPtr(); }
 
 		private:
+
+			char m_Padding_NPC_0[0x2C];
+			char m_DebugName[64];
+			float m_LastMovementBlockedTime = 0.0f;
+			void* m_PressureComponent = nullptr; // EARS::Modules::PressureComponent
+			Flags32 m_RWSFlags;
+			Flags32 m_Flags1;
+			Flags32 m_Flags2;
+			Flags32 m_RaycastLockFlags;
+			char m_Padding_NPC_1[0x214];
+			SafePtr<EARS::Modules::SimNPC> m_OwnerSimNPC;
 
 		};
 	} // Modules

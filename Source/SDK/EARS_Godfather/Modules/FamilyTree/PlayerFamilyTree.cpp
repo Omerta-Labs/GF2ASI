@@ -11,6 +11,22 @@
 // CPP
 #include <bitset>
 
+EARS::Modules::PlayerFamilyTree::FamilyTreeSlot EARS::Modules::PlayerFamilyTree::FindTreeSlotIndex(const EARS::Modules::SimNPC* InSimNPC) const
+{
+	// NB: This is completed implementation of the engine function
+
+	for (uint32_t i = 0; i < 7; i++)
+	{
+		const EARS::Modules::PlayerFamilyMember& Member = m_FamilyMembers[i];
+		if (Member.IsSlotFilled() && Member.GetSimNPC() == InSimNPC)
+		{
+			return (FamilyTreeSlot)i;
+		}
+	}
+
+	return FamilyTreeSlot::FAMILYTREE_SLOT_INVALID;
+}
+
 void EARS::Modules::PlayerFamilyTree::ForEachMember(const TVisitFamilyMemberFunctor& InFunction)
 {
 	for (uint32_t i = 0; i < 7; i++)
@@ -57,6 +73,11 @@ void EARS::Modules::PlayerFamilyMember::RemoveSpecialty(const EARS::Modules::Spe
 	OnSpecialitiesUpdated();
 }
 
+bool EARS::Modules::PlayerFamilyMember::IsSlotFilled() const
+{
+	return (TestPlayerFamilyMemberFlags((uint32_t)Flags::FLAG_FAMILYMEMBER_SLOT_FILLED) == true);
+}
+
 void EARS::Modules::PlayerFamilyMember::JoinCrew()
 {
 	MemUtils::CallClassMethod<void, EARS::Modules::PlayerFamilyMember*>(0x090A660, this);
@@ -86,4 +107,9 @@ void EARS::Modules::PlayerFamilyMember::OnSpecialitiesUpdated()
 			//CrewComponent->AddNewCrewSpecialty(m_Specialties);
 		}
 	}
+}
+
+bool EARS::Modules::PlayerFamilyMember::TestPlayerFamilyMemberFlags(uint32_t Flag) const
+{
+	return m_Flags.Test(Flag);
 }

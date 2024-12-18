@@ -74,6 +74,10 @@ namespace EARS
 			// (TODO: Ensure that the HUD and crew system is updated to reflect addition)
 			void RemoveSpecialty(const EARS::Modules::Specialties Speciality);
 
+			// Check whether this Slot is filled with a valid SimNPC.
+			// This is part of engine code
+			bool IsSlotFilled() const;
+
 			// Trigger this member of the family to automatically join the Players crew.
 			void JoinCrew();
 
@@ -90,6 +94,10 @@ namespace EARS
 
 			// React to this Family Member's Specialties updating
 			void OnSpecialitiesUpdated();
+
+			// Tests whether a flag is set.
+			// This is part of engine code
+			bool TestPlayerFamilyMemberFlags(uint32_t Flag) const;
 
 			Flags32 m_Flags;
 			EARS::Modules::SentientRank m_Rank = SentientRank::SentientRank_REF;
@@ -119,6 +127,14 @@ namespace EARS
 				FAMILYTREE_SLOT_UNDERBOSS = 0x6,
 				FAMILYTREE_NUM_SLOTS = 0x7,
 			};
+
+			/**
+			 * Find the Tree Slot this SimNPC is currently filling.
+			 * If they aren't filling any, then assume FAMILYTREE_SLOT_INVALID.
+			 * @param InSimNPC - The SimNPC we want to check whether is in this Family Tree
+			 * @return FamilyTreeSlot - The slot index this SimNPC is filling
+			 */
+			FamilyTreeSlot FindTreeSlotIndex(const EARS::Modules::SimNPC* InSimNPC) const;
 
 			/**
 			 * Utility function to iterate through all loaded Cities
