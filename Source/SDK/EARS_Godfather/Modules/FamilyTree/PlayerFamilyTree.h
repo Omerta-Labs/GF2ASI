@@ -92,6 +92,9 @@ namespace EARS
 
 		private:
 
+			// Apply the specialties (stored using bitmask, therefore within each bit)
+			void SetSpecialties(const uint32_t Specialties);
+
 			// React to this Family Member's Specialties updating
 			void OnSpecialitiesUpdated();
 

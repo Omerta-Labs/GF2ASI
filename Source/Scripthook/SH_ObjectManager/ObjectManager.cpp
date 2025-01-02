@@ -16,6 +16,7 @@ void Mod::ObjectManager::Spawn(const RWS::CAttributePacket& AttrPacket, const Rw
 	EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
 	SimMgr->SendPostSpawnInitializeToEntity(NewHandler, true);
 
+	// TODO: Do not assume that this is an entity, some objects do not inherit entity
 	if (EARS::Framework::Entity* EntityHandler = reinterpret_cast<EARS::Framework::Entity*>(NewHandler))
 	{
 		EntityHandler->SetPosition(Position);

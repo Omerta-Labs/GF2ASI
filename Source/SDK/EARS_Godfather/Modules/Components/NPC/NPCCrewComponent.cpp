@@ -8,6 +8,12 @@
 // Addons
 #include "Addons/Hook.h"
 
+bool EARS::Modules::NPCCrewComponent::CanRecruit() const
+{
+	const uint16_t Value = (uint16_t)EARS::Modules::CrewSettings::CREW_FLAG_CAN_RECRUIT;
+	return (m_CrewSettings.Test(Value) == true);
+}
+
 void EARS::Modules::NPCCrewComponent::AddNewCrewSpecialty(const uint32_t Specialty)
 {
 	m_CrewSettings.Set((uint16_t)Specialty);
@@ -16,11 +22,12 @@ void EARS::Modules::NPCCrewComponent::AddNewCrewSpecialty(const uint32_t Special
 	{
 		if (EARS::Apt::UIHUD* HUD = EARS::Apt::UIHUD::GetInstance())
 		{
-			HUD->AddCrewSpecialty(m_NPC, Specialty);
+			HUD->AddCrewSpecialty(m_NPC, (uint32_t)EARS::Modules::CrewSettings::CREW_FLAG_SPECIALIST_DEMOLITIONS);
 		}
 	}
 
-	if (m_CrewSettings.Test(0x40)) // query medic specialty
+	const uint16_t MedicSetting = (uint16_t)EARS::Modules::CrewSettings::CREW_FLAG_SPECIALIST_MEDIC;
+	if (m_CrewSettings.Test(MedicSetting)) // query medic specialty
 	{
 		InitMedic();
 	}

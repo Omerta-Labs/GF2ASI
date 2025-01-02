@@ -21,12 +21,32 @@ namespace EARS
 
 		class NPC;
 
+		enum class CrewSettings : int32_t
+		{
+			CrewSettings_REF = -1,
+			CREW_FLAG_CREW = 0x1,
+			CREW_FLAG_UNCOMMANDABLE = 0x2,
+			CREW_FLAG_SPECIALIST_DEMOLITIONS = 0x4,
+			CREW_FLAG_SPECIALIST_ARSON = 0x8,
+			CREW_FLAG_SPECIALIST_SAFE_CRACKER = 0x10,
+			CREW_FLAG_SPECIALIST_ENGINEER = 0x20,
+			CREW_FLAG_SPECIALIST_MEDIC = 0x40,
+			CREW_FLAG_SPECIALIST_BRUISER = 0x80,
+			CREW_FLAG_CAN_RECRUIT = 0x100,
+		};
+
 		/**
 		 * NPC Component to store Crew specific information.
 		 */
 		class NPCCrewComponent : public EARS::Framework::Component
 		{
 		public:
+
+			/**
+			 * Whether or not the NPC which owns this component can
+			 * be recruited by the Player
+			 */
+			bool CanRecruit() const;
 
 			/**
 			 * Add a new Specialty to the component.
@@ -39,6 +59,9 @@ namespace EARS
 			 */
 			void InitMedic();
 
+			/**
+			 * Has this crew member to be considered as hired
+			 */
 			bool IsHiredCrew() const;
 
 		private:

@@ -38,7 +38,9 @@ namespace EARS
 			Flags32 m_Flags1;
 			Flags32 m_Flags2;
 			Flags32 m_RaycastLockFlags;
-			char m_Padding_NPC_1[0x214];
+			char m_Padding_NPC_1[0x1BC];
+			void* m_CrewSpecialtyIndicator = nullptr;
+			char m_Padding_NPC_2[0x54];
 			SafePtr<EARS::Modules::SimNPC> m_OwnerSimNPC;
 
 		};

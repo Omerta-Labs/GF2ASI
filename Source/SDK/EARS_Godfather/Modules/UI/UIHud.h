@@ -27,6 +27,14 @@ namespace EARS
 			// If Suppress == 0, show hud
 			void Unsuppress();
 
+			// Add a crew member to the UIHUD element
+			// Handy for updating their element if the crew member has been modified
+			void AddCrew(EARS::Modules::NPC* CrewMember) const;
+
+			// Remove a crew member to the UIHUD element
+			// Handy for updating their element if the crew member has been modified
+			void RemoveCrew(EARS::Modules::NPC* CrewMember) const;
+
 			/**
 			 * Update a Crew Members specialties on the HUD.
 			 * (Part of Engine code)

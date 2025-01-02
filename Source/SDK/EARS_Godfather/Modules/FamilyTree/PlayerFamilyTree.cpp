@@ -4,9 +4,9 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/EARS_Godfather/Modules/Components/NPC/NPCCrewComponent.h"
 #include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
+#include "SDK/EARS_Godfather/Modules/UI/UIHud.h"
 
 // CPP
 #include <bitset>
@@ -88,23 +88,27 @@ void EARS::Modules::PlayerFamilyMember::LeaveCrew()
 	MemUtils::CallClassMethod<void, EARS::Modules::PlayerFamilyMember*>(0x090A700, this);
 }
 
+void EARS::Modules::PlayerFamilyMember::SetSpecialties(const uint32_t Specialties)
+{
+	MemUtils::CallClassMethod<void, EARS::Modules::PlayerFamilyMember*, uint32_t>(0x090A610, this, m_Specialties);
+}
+
 void EARS::Modules::PlayerFamilyMember::OnSpecialitiesUpdated()
 {
-	// TODO: Access SimNPC
-	// TODO: Get CrewComponent
-	// TODO: CrewComponent - Update Settings
-	// TODO: Update HUD
-	// TODO: If Medic, Init medic data
+	// TODO: If Medic, Init medic data? (TODO: How do we validate this?)
 
-	MemUtils::CallClassMethod<void, EARS::Modules::PlayerFamilyMember*, uint32_t>(0x090A610, this, m_Specialties);
+	SetSpecialties(m_Specialties);
 
-	if(EARS::Modules::SimNPC* FamilySimNPC = GetSimNPC())
+	// TODO: This works for now, by forcing the UIHUD to remove then immediately add onto the list
+	// This ensures that the specialty update is reflected appropriately.
+	// This should only have an effect if the NPC is currently hired by the Player
+	if (const EARS::Modules::SimNPC* const SimulationNPC = m_SimNPC.GetPtr())
 	{
-		if (EARS::Modules::NPC* FamilyNPC = FamilySimNPC->GetNPC())
+		if (EARS::Modules::NPC* const CrewNPC = SimulationNPC->GetNPC())
 		{
-			// TODO: Does not work
-			EARS::Modules::NPCCrewComponent* CrewComponent = FamilyNPC->GetCrewComponent();
-			//CrewComponent->AddNewCrewSpecialty(m_Specialties);
+			EARS::Apt::UIHUD* HUD = EARS::Apt::UIHUD::GetInstance();
+			HUD->RemoveCrew(CrewNPC);
+			HUD->AddCrew(CrewNPC);
 		}
 	}
 }
