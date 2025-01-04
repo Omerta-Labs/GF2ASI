@@ -12,7 +12,6 @@
 #include "SDK/EARS_Framework/Core/Camera/CameraManager.h"
 #include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
 #include "SDK/EARS_Framework/Toolkits/GroupManager/GroupManager.h"
-#include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
@@ -259,6 +258,11 @@ void ImGuiManager::DrawTab_PlayerSettings()
 	{
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 		{
+			if (ImGui::Button("Inspect Player"))
+			{
+				InitialiseNPCInspector(LocalPlayer, true);
+			}
+
 			if (ImGui::CollapsingHeader("Players State", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				const RwV3d PlayerPosition = LocalPlayer->GetPosition();
@@ -304,24 +308,6 @@ void ImGuiManager::DrawTab_PlayerSettings()
 					if (ImGui::Button("Call off the police"))
 					{
 						CrimeMgr->CalmPoliceTowardsCorleones();
-					}
-				}
-			}
-
-			if (ImGui::CollapsingHeader("Players Appearance", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::TextWrapped("Adjust Players Appearance (Such as Bulletproof Vest, Ammo Belt)");
-
-				if (EARS::Modules::PlayerUpgradeComponent* PlayerUpgradeComp = LocalPlayer->GetUpgradeComponent())
-				{
-					if (ImGui::Button("Hide Upgrade Parts"))
-					{
-						PlayerUpgradeComp->ModifyAllUpgradeParts(false);
-					}
-
-					if (ImGui::Button("Show Upgrade Parts"))
-					{
-						PlayerUpgradeComp->ModifyAllUpgradeParts(true);
 					}
 				}
 			}
@@ -579,13 +565,12 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 					const EARS::Common::guid128_t WeaponGUID = InMember.GetWeaponGUID();
 					ImGui::Text("Weapon GUID: [%p %p %p %p]", WeaponGUID.a, WeaponGUID.b, WeaponGUID.c, WeaponGUID.d);
 
-					EARS::Modules::SimNPC* MadeManNPC = InMember.GetSimNPC();
-					if (MadeManNPC)
+					if (EARS::Modules::SimNPC* SimulatedNPC = InMember.GetSimNPC())
 					{
 						if (ImGui::Button("Toggle Spawn (As Crew Member)"))
 						{
-							const bool bInCrew = MadeManNPC->GetIsCrewMember();
-							if (MadeManNPC->GetIsCrewMember())
+							const bool bInCrew = SimulatedNPC->GetIsCrewMember();
+							if (SimulatedNPC->GetIsCrewMember())
 							{
 								InMember.LeaveCrew();
 							}
@@ -595,8 +580,16 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 							}
 						}
 
+						if (EARS::Modules::NPC* CrewNPC = SimulatedNPC->GetNPC())
+						{
+							if (ImGui::Button("Inspect"))
+							{
+								InitialiseNPCInspector(CrewNPC, false);
+							}
+						}
+
 						// Provide the option to change weapon license for this character
-						const EARS::Common::guid128_t SimNPCID = MadeManNPC->InqInstanceID();
+						const EARS::Common::guid128_t SimNPCID = SimulatedNPC->InqInstanceID();
 						uint8_t WeaponLicense = FamilyData->GetWeaponLicense(SimNPCID);
 						if (ImGui::SliderScalar("Weapon License", ImGuiDataType_U8, &WeaponLicense, &EARS::Modules::CorleoneFamilyData::MIN_WEAPON_LICENSE, &EARS::Modules::CorleoneFamilyData::MAX_WEAPON_LICENSE))
 						{
@@ -879,6 +872,8 @@ void ImGuiManager::OnTick()
 		}
 	}
 
+	CurrentInspector.DrawWindow();
+
 	ImGui::EndFrame();
 	ImGui::Render();
 }
@@ -961,4 +956,9 @@ void ImGuiManager::LoadEntityGuidsFromFile(const std::string& Filename, std::vec
 		myfile.close();
 	}
 #endif // #if SHOW_OBJECTMANAGER_TAB
+}
+
+void ImGuiManager::InitialiseNPCInspector(EARS::Modules::Sentient* InSentient, const bool bIsPlayer)
+{
+	CurrentInspector.Initialise(InSentient, bIsPlayer);
 }

@@ -17,3 +17,13 @@ RwMatrixTag EARS::Framework::Entity::GetMatrix() const
 	LLMatrix Local = m_Transform.GetLocal();
 	return *(RwMatrixTag*)&Local;
 }
+
+RwV3d EARS::Framework::Entity::GetForwardVector() const
+{
+	return GetMatrix().m_At;
+}
+
+RwV3d EARS::Framework::Entity::GetUpVector() const
+{
+	return GetMatrix().m_Up;
+}

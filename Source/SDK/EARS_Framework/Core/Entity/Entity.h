@@ -41,6 +41,12 @@ namespace EARS
 			// TODO: Is this actually local or world??
 			RwMatrixTag GetMatrix() const;
 
+			// Get the forward direction (facing direction) of this entity
+			RwV3d GetForwardVector() const;
+
+			// Get the up direction for this entity
+			RwV3d GetUpVector() const;
+
 		private:
 
 			char m_EntityPadding_0[0x2C];

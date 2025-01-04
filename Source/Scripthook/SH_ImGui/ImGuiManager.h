@@ -1,5 +1,8 @@
 #pragma once
 
+// addons
+#include "Scripthook/SH_ImGui/ImGuiNPCInspector.h"
+
 // RenderWare Framework
 #include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 
@@ -87,6 +90,9 @@ private:
 	// Load a list of Vehicle GUIDs from the specified text documents; deals with duplication automatically
 	void LoadEntityGuidsFromFile(const std::string& Filename, std::vector<EntityEntry>& OutVector) const;
 
+	// Initialise an NPC Inspector for a given object in the game world
+	void InitialiseNPCInspector(EARS::Modules::Sentient* InSentient, const bool bIsPlayer);
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 	
@@ -97,6 +103,10 @@ private:
 	// List of spawnable NPC guids
 	std::vector<EntityEntry> NPCEntries;
 	EARS::Common::guid128_t SelectedNPCGuid;
+
+	// Inspector for the current object
+	// (Either Player or NPC)
+	ImGuiNPCInspector CurrentInspector;
 
 	// Should we render the Parted Model window
 	bool bShowModMenuWindow = false;
