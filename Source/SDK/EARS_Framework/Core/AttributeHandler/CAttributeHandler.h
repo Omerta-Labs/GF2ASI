@@ -4,6 +4,16 @@
 #include "SDK/EARS_Common/DoubleInternalLinkedList2.h"
 #include "SDK/EARS_Common/Guid.h"
 
+// Forward declare
+namespace EARS
+{
+	namespace Framework
+	{
+		class Component;
+		class ComponentListRecord;
+	}
+}
+
 namespace RWS
 {
 	class CAttributePacket : public EARS::Common::DoubleLinkedListNodeMixin2<CAttributePacket>
@@ -53,6 +63,8 @@ namespace RWS
 		EARS::Common::guid128_t m_InstanceId;
 
 		// TODO: Figure out whether or not this is correct
-		char m_AttributeHandler_Padding[0xC];
+		char m_AttributeHandler_Padding[0x4];
+		EARS::Framework::ComponentListRecord* m_ComponentList = nullptr;
+		EARS::Framework::Component** m_Components = nullptr;
 	};
 } // EARS

@@ -10,6 +10,17 @@ namespace EARS
 {
 	namespace Framework
 	{
+		class ComponentListRecord
+		{
+		public:
+
+		private:
+		};
+
+		/**
+		 * Contains shareable functionality across entity types
+		 * Stored within an Attribute Handler.
+		 */
 		class Component  : public RWS::CEventHandler
 		{
 		public:

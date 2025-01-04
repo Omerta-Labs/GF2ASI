@@ -4,6 +4,7 @@
 
 // SDK
 #include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
+#include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/Components/NPCUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
@@ -90,7 +91,12 @@ EARS::Modules::UpgradeComponent* ImGuiNPCInspector::GetUpgradeComponent() const
 	}
 	else
 	{
-		EARS::Modules::NPC* AsNPC = EARS::Framework::_QueryInterface<EARS::Modules::NPC>(ActiveObject, 0xA0D329D6);
-		return AsNPC->GetUpgradeComponent();
+		// NB: Upgrade Component is stored on SimNPC instead
+		if (EARS::Modules::NPC* AsNPC = EARS::Framework::_QueryInterface<EARS::Modules::NPC>(ActiveObject, 0xA0D329D6))
+		{
+			return AsNPC->GetOwningSimNPC()->GetUpgradeComponent();
+		}
+
+		return nullptr;
 	}
 }

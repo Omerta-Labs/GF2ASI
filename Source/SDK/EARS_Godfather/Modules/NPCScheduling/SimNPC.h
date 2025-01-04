@@ -15,6 +15,8 @@ namespace EARS
 {
 	namespace Modules
 	{
+		class NPCUpgradeComponent;
+
 		/**
 		 * Stores the meta information of an NPC.
 		 * Primarily for the games monopoly system.
@@ -41,6 +43,11 @@ namespace EARS
 
 			// Fetch the NPC associated with this SimNPC.
 			EARS::Modules::NPC* GetNPC() const { return m_NPC.GetPtr(); }
+
+			// Fetch the Upgrade Component for this SimNPC.
+			// After extensive investigation, it was found that this is stored on the SimNPC.
+			// This is likely due to the fact that the NPC derived component has monopoly upgrades too
+			EARS::Modules::NPCUpgradeComponent* GetUpgradeComponent() const;
 
 		private:
 

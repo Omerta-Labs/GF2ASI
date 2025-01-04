@@ -1,8 +1,8 @@
 #include "NPC.h"
 
 // SDK
-#include "SDK/EARS_Godfather/Modules/Components/NPCUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Components/NPC/NPCCrewComponent.h"
+#include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
 
 // Hook
 #include <Addons/Hook.h>
@@ -16,6 +16,10 @@ EARS::Modules::NPCCrewComponent* EARS::Modules::NPC::GetCrewComponent() const
 
 EARS::Modules::NPCUpgradeComponent* EARS::Modules::NPC::GetUpgradeComponent() const
 {
-	EARS::Framework::Component* FoundComp = MemUtils::CallClassMethod<EARS::Framework::Component*, const EARS::Modules::NPC*, uint32_t>(0x043B870, this, EARS::Modules::NPCUpgradeComponent::GetComponentIndex());
-	return (EARS::Modules::NPCUpgradeComponent*)FoundComp;
+	if (EARS::Modules::SimNPC* OwnSimNPC = m_OwnerSimNPC.GetPtr())
+	{
+		return OwnSimNPC->GetUpgradeComponent();
+	}
+
+	return nullptr;
 }
