@@ -67,8 +67,6 @@ private:
 		EARS::Common::guid128_t GUID;
 	};
 
-	void DrawTab_PlayerModelSwap();
-
 	void DrawTab_PlayerSettings();
 
 	void DrawTab_TimeOfDaySettings();

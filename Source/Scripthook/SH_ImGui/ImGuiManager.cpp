@@ -15,16 +15,13 @@
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
-#include "SDK/EARS_Godfather/Modules/FamilyTree/PlayerFamilyTree.h"
 #include "SDK/EARS_Godfather/Modules/Item/Inventory.h"
 #include "SDK/EARS_Godfather/Modules/Item/InventoryManager.h"
 #include "SDK/EARS_Godfather/Modules/Item/Item.h"
-#include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
 #include "SDK/EARS_Godfather/Modules/Turf/City.h"
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
-#include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
 #include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
 #include "SDK/EARS_Godfather/Modules/NPC/Crime/CrimeManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
@@ -183,73 +180,6 @@ LRESULT ImGuiManager::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-}
-
-void ImGuiManager::DrawTab_PlayerModelSwap()
-{
-	if (ImGui::BeginTabItem("Player Model Swap", nullptr, ImGuiTabItemFlags_None))
-	{
-		ImGui::BeginChild("parted_model_list");
-
-		EARS::Modules::PartedModelMgr* ModelMgr = EARS::Modules::PartedModelMgr::GetInstance();
-		if (ModelMgr == nullptr)
-		{
-			// not loaded yet so don't show anything
-			ImGui::Text("Parted Model Manager is not active, cannot switch models!");
-			return;
-		}
-
-		// we've committed to this menu so cache local player
-		EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
-
-		ImGui::Text("Find a Preset and press 'SWITCH' to swap Player Models.");
-
-		if(ImGui::Button("Load Mobface"))
-		{
-			EARS::Modules::MobfaceManager* MobfaceMgr = EARS::Modules::MobfaceManager::GetInstance();
-			MobfaceMgr->BuildModelFromSavedData(EARS::Modules::PlayerFamilyTree::FamilyTreeSlot::FAMILYTREE_SLOT_PLAYER, LocalPlayer);
-		}
-
-		ModelMgr->ForEachAssemblyHeader([](const PartedModel::AssemblyListHeader& InAssemblyHeader) {
-
-			// First iterate through the assemblies within this header
-			for (uint32_t i = 0; i < InAssemblyHeader.m_NumAssemblies; i++)
-			{
-				const PartedModel::Assembly& ThisAssembly = InAssemblyHeader.m_Assemblies[i];
-				if (ThisAssembly.m_Flags == 4)
-				{
-					// we do not want people turning into cars
-					continue;
-				}
-
-				// Present the tree node for the presets within the assembly
-				if (ImGui::TreeNodeEx(&ThisAssembly, ImGuiTreeNodeFlags_None, "%s", ThisAssembly.m_AssemblyName))
-				{
-					for (uint32_t x = 0; x < ThisAssembly.m_NumPresets; x++)
-					{
-						const PartedModel::Preset& ThisPreset = ThisAssembly.m_PresetsArr[x];
-						ImGui::PushID(&ThisPreset);
-						if (ImGui::Button("SWTICH"))
-						{
-							if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
-							{
-								LocalPlayer->TrySwapModel(ThisAssembly.m_AssemblyName, ThisPreset.m_PresetName);
-							}
-						}
-						ImGui::SameLine();
-						ImGui::Text(ThisPreset.m_PresetName);
-						ImGui::PopID();
-					}
-
-					ImGui::TreePop();
-				}
-			}
-			});
-
-		ImGui::EndChild();
-
-		ImGui::EndTabItem();
-	}
 }
 
 void ImGuiManager::DrawTab_PlayerSettings()
@@ -843,8 +773,6 @@ void ImGuiManager::OnTick()
 		{
 			if (ImGui::BeginTabBar("mod_menu_tab_bar"))
 			{
-				DrawTab_PlayerModelSwap();
-
 				DrawTab_PlayerSettings();
 
 				DrawTab_TimeOfDaySettings();
