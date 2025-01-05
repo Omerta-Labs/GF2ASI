@@ -176,6 +176,7 @@ EARS::Modules::PlayerFamilyTree::FamilyTreeSlot ImGuiNPCInspector::GetTreeSlot()
 			return FamilyTree->FindTreeSlotIndex(AsNPC->GetOwningSimNPC());
 		}
 
+		// TODO: Could this fetch Player mobface? Is this a good idea?
 		return EARS::Modules::PlayerFamilyTree::FamilyTreeSlot::FAMILYTREE_SLOT_INVALID;
 	}
 }
