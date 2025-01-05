@@ -69,6 +69,8 @@ private:
 
 	void DrawTab_PlayerSettings();
 
+	void DrawTab_CheckpointSettings();
+
 	void DrawTab_TimeOfDaySettings();
 
 	void DrawTab_DemographicSettings();

@@ -2,6 +2,7 @@
 
 // SDK (Common)
 #include "SDK/EARS_Common/Array.h"
+#include "SDK/EARS_Common/Singleton.h"
 
 // SDK (Framework)
 #include "SDK/EARS_Framework/Core/Persistence/PersistenceRegistry.h"
@@ -11,18 +12,6 @@
 #include <stdint.h>
 
 struct String;
-
-template <typename T>
-class Singleton
-{
-public:
-
-	virtual ~Singleton() { }
-
-private:
-
-
-};
 
 namespace EARS
 {

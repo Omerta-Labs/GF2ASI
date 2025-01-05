@@ -27,6 +27,8 @@
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
+#include "SDK/EARS_Godfather/Modules/Missions/CheckpointManager.h"
+#include "SDK/EARS_Godfather/Modules/Missions/Checkpoint.h"
 #include "SDK/EARS_Godfather/Modules/UI/UIHud.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/Behaviours/WhiteboxCar/WhiteboxCar.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/VehicleDamageComponent.h"
@@ -314,6 +316,35 @@ void ImGuiManager::DrawTab_PlayerSettings()
 		{
 			ImGui::Text("Local Player is missing!");
 		}
+
+		ImGui::EndTabItem();
+	}
+}
+
+void ImGuiManager::DrawTab_CheckpointSettings()
+{
+	if (ImGui::BeginTabItem("Checkpoints", nullptr, ImGuiTabItemFlags_None))
+	{
+		EARS::Modules::CheckpointManager* CheckpointMgr = EARS::Modules::CheckpointManager::GetInstance();
+
+		// get active and tell user
+		if(EARS::Modules::Checkpoint* CurrentCheckpoint = CheckpointMgr->GetCurrentCheckpoint())
+		{
+			const String& DebugName = CurrentCheckpoint->GetDebugName();
+			ImGui::Text("Current Checkpoint: %s", DebugName.c_str());
+		}
+
+		CheckpointMgr->ForEachCheckpoint([&](EARS::Modules::Checkpoint& CurCheckpoint) {
+			ImGui::PushID(&CurCheckpoint);
+			const String& DebugName = CurCheckpoint.GetDebugName();
+			ImGui::Text("%u %u - %s", CurCheckpoint.GetCheckpointNumber(), CurCheckpoint.GetChapterNumber(), DebugName.c_str());
+			ImGui::SameLine();
+			if(ImGui::Button("Start"))
+			{
+				CheckpointMgr->RestartNewCheckpoint(&CurCheckpoint, EARS::Modules::CheckpointManager::RestartType::RESTART_DEBUG_TELEPORT, 0);
+			}
+			ImGui::PopID();
+		});
 
 		ImGui::EndTabItem();
 	}
@@ -774,6 +805,8 @@ void ImGuiManager::OnTick()
 			if (ImGui::BeginTabBar("mod_menu_tab_bar"))
 			{
 				DrawTab_PlayerSettings();
+
+				DrawTab_CheckpointSettings();
 
 				DrawTab_TimeOfDaySettings();
 
