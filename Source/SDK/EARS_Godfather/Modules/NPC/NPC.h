@@ -23,6 +23,9 @@ namespace EARS
 		{
 		public:
 
+			/** Checks whether or not this NPC is considered to be suspended. */
+			bool IsSuspended() const;
+
 			// Getters
 			EARS::Modules::NPCCrewComponent* GetCrewComponent() const;
 			EARS::Modules::NPCUpgradeComponent* GetUpgradeComponent() const;

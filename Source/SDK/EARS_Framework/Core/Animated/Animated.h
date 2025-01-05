@@ -3,6 +3,15 @@
 // SDK
 #include "SDK/EARS_Framework/Core/Entity/Entity.h"
 
+// forward declares
+namespace EA
+{
+	namespace CCT
+	{
+		class AnimView;
+	}
+}
+
 namespace EARS
 {
 	namespace Framework
@@ -11,12 +20,15 @@ namespace EARS
 		{
 		public:
 
+			// getters
+			EA::CCT::AnimView* GetAnimViewInfo() const { return m_AnimViewInfo; }
+
 		private:
 
-			char m_Animated_Padding[0x98];
+			char m_Animated_Padding[0x9C];
 			void* m_CctInfo = nullptr;		// 0x20C
 			RWS::CEventId m_MsgSetAnimTrigger;
-			void* m_AnimViewInfo = nullptr;
+			EA::CCT::AnimView* m_AnimViewInfo = nullptr;
 		};
 	} // Modules
 } // EARS

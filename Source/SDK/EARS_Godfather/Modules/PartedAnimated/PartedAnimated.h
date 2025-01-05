@@ -33,7 +33,7 @@ namespace EARS
 
 		protected:
 
-			char m_PartedAnimated_Padding_0[0x98];
+			char m_PartedAnimated_Padding_0[0x94];
 			String m_PartsPresetName; // 0x2B0
 			String m_PartsThemeName; // 0x2C0
 			String m_PartsSwapSetName; // 0x2D0
