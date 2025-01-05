@@ -70,17 +70,15 @@ public:
 };
 #endif // ENABLE_ENTITY_SPAWN_DEBUG
 
-
-
 Settings OurSettings;
 Mod::ObjectManager* OurObjectMgr;
 
 namespace DefinedEvents
 {
 	static hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
-	hook::Type<RWS::CEventId> PlayerAsDriverEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E030);
-	hook::Type<RWS::CEventId> PlayerAsPassengerEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E11C);
-	hook::Type<RWS::CEventId> PlayerExitVehicleEvent = hook::Type<RWS::CEventId>(0x112E018);
+	static hook::Type<RWS::CEventId> PlayerAsDriverEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E030);
+	static hook::Type<RWS::CEventId> PlayerAsPassengerEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E11C);
+	static hook::Type<RWS::CEventId> PlayerExitVehicleEvent = hook::Type<RWS::CEventId>(0x112E018);
 }
 
 ImGuiManager::ImGuiManager()
@@ -327,24 +325,35 @@ void ImGuiManager::DrawTab_CheckpointSettings()
 	{
 		EARS::Modules::CheckpointManager* CheckpointMgr = EARS::Modules::CheckpointManager::GetInstance();
 
-		// get active and tell user
-		if(EARS::Modules::Checkpoint* CurrentCheckpoint = CheckpointMgr->GetCurrentCheckpoint())
+		if (ImGui::CollapsingHeader("Current Checkpoint", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			const String& DebugName = CurrentCheckpoint->GetDebugName();
-			ImGui::Text("Current Checkpoint: %s", DebugName.c_str());
+			// get active and tell user
+			if (EARS::Modules::Checkpoint* CurrentCheckpoint = CheckpointMgr->GetCurrentCheckpoint())
+			{
+				const String& DebugName = CurrentCheckpoint->GetDebugName();
+				ImGui::Text("Current Checkpoint: %s", DebugName.c_str());
+			}
 		}
 
-		CheckpointMgr->ForEachCheckpoint([&](EARS::Modules::Checkpoint& CurCheckpoint) {
-			ImGui::PushID(&CurCheckpoint);
-			const String& DebugName = CurCheckpoint.GetDebugName();
-			ImGui::Text("%u %u - %s", CurCheckpoint.GetCheckpointNumber(), CurCheckpoint.GetChapterNumber(), DebugName.c_str());
-			ImGui::SameLine();
-			if(ImGui::Button("Start"))
-			{
-				CheckpointMgr->RestartNewCheckpoint(&CurCheckpoint, EARS::Modules::CheckpointManager::RestartType::RESTART_DEBUG_TELEPORT, 0);
-			}
-			ImGui::PopID();
-		});
+		// TODO: Consider extending this so we have more info in ImGui such as checkpoint and chapters
+		if(ImGui::CollapsingHeader("Select Checkpoint", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			CheckpointMgr->ForEachCheckpoint([&](EARS::Modules::Checkpoint& CurCheckpoint) {
+				ImGui::PushID(&CurCheckpoint);
+
+				// compile name
+				const String& DebugName = CurCheckpoint.GetDebugName();
+
+				// present selectable element which user can press
+				ImGui::Bullet();
+				if (ImGui::Selectable(DebugName.c_str(), (CheckpointMgr->GetCurrentCheckpoint() == &CurCheckpoint)))
+				{
+					CheckpointMgr->RestartNewCheckpoint(&CurCheckpoint, EARS::Modules::CheckpointManager::RestartType::RESTART_DEBUG_TELEPORT, 0);
+				}
+
+				ImGui::PopID();
+				});
+		}
 
 		ImGui::EndTabItem();
 	}
