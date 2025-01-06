@@ -12,9 +12,9 @@ project "GF2ASI"
    staticruntime "on"
    characterset "MBCS"
    targetextension ".asi"
-   targetdir "C:/Users/conno/Documents/My Games/Godfather 2/scripts"
-   debugcommand "C:/Users/conno/Documents/My Games/Godfather 2/godfather2.exe"
-   debugdir "C:/Users/conno/Documents/My Games/Godfather 2/"
+   targetdir "E:/Games/Godfather 2/The Godfather II/scripts"
+   debugcommand "E:/Games/Godfather 2/The Godfather II/godfather2.exe"
+   debugdir "E:/Games/Godfather 2/The Godfather II/"
    includedirs { 
    "$(ProjectDir)" ,
    "$(ProjectDir)Source",

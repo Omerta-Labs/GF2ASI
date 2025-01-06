@@ -1,6 +1,7 @@
 #pragma once
 
 // SDK Common
+#include "SDK/EARS_Common/CommonTypes.h"
 #include "SDK/EARS_Common/DoubleInternalLinkedList2.h"
 #include "SDK/EARS_Common/Guid.h"
 
@@ -16,6 +17,11 @@ namespace RWS
 		// Fetch the ID of the class to create.
 		// This is stored within the data chunks.
 		uint32_t GetIdOfClassToCreate() const;
+
+		const EARS::Common::guid128_t& GetInstanceID() const;
+
+		CAttributePacket* GetNext() const { return m_pHashNext; }
+		void SetNext(CAttributePacket* InNext) { m_pHashNext = InNext; }
 
 	private:
 
@@ -56,3 +62,19 @@ namespace RWS
 		char m_AttributeHandler_Padding[0xC];
 	};
 } // EARS
+
+template<>
+struct EARS::Common::HashNext<RWS::CAttributePacket>
+{
+public:
+
+	static RWS::CAttributePacket* GetHashNext(const RWS::CAttributePacket& Value)
+	{
+		return Value.GetNext();
+	}
+
+	static void SetHashNext(RWS::CAttributePacket& Value, RWS::CAttributePacket* Next)
+	{
+		Value.SetNext(Next);
+	}
+};
