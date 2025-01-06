@@ -101,6 +101,10 @@ private:
 	std::vector<EntityEntry> NPCEntries;
 	EARS::Common::guid128_t SelectedNPCGuid;
 
+	// List of spawnable Item guids
+	std::vector<EntityEntry> ItemEntries;
+	EARS::Common::guid128_t SelectedItemGuid;
+
 	// Inspector for the current object
 	// (Either Player or NPC)
 	ImGuiNPCInspector CurrentInspector;

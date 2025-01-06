@@ -23,6 +23,17 @@ void Mod::ObjectManager::Spawn(const RWS::CAttributePacket& AttrPacket, const Rw
 	}
 }
 
+void Mod::ObjectManager::SpawnItem(const EARS::Common::guid128_t& PacketID, const RwV3d& Position)
+{
+	RWS::CAttributeHandler* Result = MemUtils::CallCdeclMethod<RWS::CAttributeHandler*, const EARS::Common::guid128_t&, unsigned int, bool, const EARS::Common::guid128_t*, bool>(0x0856780, PacketID, 0, false, nullptr, true);
+
+	// TODO: Do not assume that this is an entity, some objects do not inherit entity
+	if (EARS::Framework::Entity* EntityHandler = reinterpret_cast<EARS::Framework::Entity*>(Result))
+	{
+		EntityHandler->SetPosition(Position);
+	}
+}
+
 void Mod::ObjectManager::Spawn(const EARS::Common::guid128_t& PacketID, const RwV3d& Position)
 {
 	EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();

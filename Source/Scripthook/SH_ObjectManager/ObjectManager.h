@@ -22,6 +22,10 @@ namespace Mod
 		// Spawn an object in the game world
 		void Spawn(const EARS::Common::guid128_t& PacketID, const RwV3d& Position);
 
+		// NB: EXPERIMENTAL CODE
+		// Spawn an object in the game world
+		void SpawnItem(const EARS::Common::guid128_t& PacketID, const RwV3d& Position);
+
 	private:
 	};
 }

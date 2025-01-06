@@ -636,6 +636,7 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 
 				uint32_t VehIdx = 0;
 				uint32_t NPCIdx = 0;
+				uint32_t ItemIdx = 0;
 
 				EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
 				SimMgr->ForEachPacket([&](RWS::CAttributePacket& Packet)
@@ -660,6 +661,16 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 							VehicleEntries.push_back(NewEntry);
 
 							VehIdx++;
+						}
+						else if (ClassID == 0xF26FB813 || ClassID == 0x332D5A20 || ClassID == 0x4ECFBE13)
+						{
+							EntityEntry NewEntry = {};
+							NewEntry.GUID = Packet.GetInstanceID();
+							NewEntry.Name = std::format("ITEM_{}", ItemIdx);
+
+							ItemEntries.push_back(NewEntry);
+
+							ItemIdx++;
 						}
 					});
 			}
@@ -729,6 +740,40 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 					OurObjectMgr->Spawn(SelectedNPCGuid, SpawnPosition);
 				}
 			}
+
+			if (ImGui::BeginListBox("Select an Item", ImVec2(0.0f, 100.0f)))
+			{
+				ImGuiListClipper Clipper;
+				Clipper.Begin(ItemEntries.size());
+				while (Clipper.Step())
+				{
+					for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
+					{
+						// TODO: std::format has proved to be too costly, we need an alternative method for names
+						// could we load a name from the file perhaps?
+						const EntityEntry& CurrentEntry = ItemEntries[i];
+						if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedItemGuid == CurrentEntry.GUID)))
+						{
+							SelectedItemGuid = CurrentEntry.GUID;
+						}
+					}
+				}
+
+				Clipper.End();
+
+				ImGui::EndListBox();
+			}
+
+			if (ImGui::Button("Spawn Item"))
+			{
+				if (OurObjectMgr)
+				{
+					const RwMatrixTag PlayerMatrix = LocalPlayer->GetMatrix();
+					const RwV3d SpawnPosition = PlayerMatrix.m_Pos + (PlayerMatrix.m_At * 5.0f);
+					OurObjectMgr->SpawnItem(SelectedItemGuid, SpawnPosition);
+				}
+			}
+
 			ImGui::EndTabItem();
 		}
 	}
