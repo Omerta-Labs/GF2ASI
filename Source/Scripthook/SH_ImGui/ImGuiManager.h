@@ -87,9 +87,6 @@ private:
 
 	bool SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, bool bGodModeActive) const;
 
-	// Load a list of Vehicle GUIDs from the specified text documents; deals with duplication automatically
-	void LoadEntityGuidsFromFile(const std::string& Filename, std::vector<EntityEntry>& OutVector) const;
-
 	// Initialise an NPC Inspector for a given object in the game world
 	void InitialiseNPCInspector(EARS::Modules::Sentient* InSentient, const bool bIsPlayer);
 

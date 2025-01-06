@@ -45,7 +45,7 @@
 
 #if DEBUG
 #define SHOW_DEMOGRAPHICS_TAB 0
-#define SHOW_OBJECTMANAGER_TAB 0
+#define SHOW_OBJECTMANAGER_TAB 1
 #else
 #define SHOW_DEMOGRAPHICS_TAB 0
 #define SHOW_OBJECTMANAGER_TAB 0
@@ -156,11 +156,6 @@ void ImGuiManager::Open()
 	LinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent, 0x8000);
 	LinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent, 0x8000);
 	LinkMsg(&DefinedEvents::PlayerExitVehicleEvent, 0x8000);
-
-#if SHOW_OBJECTMANAGER_TAB
-	LoadEntityGuidsFromFile("./scripts/all_vehicles.txt", VehicleEntries);
-	LoadEntityGuidsFromFile("./scripts/all_npcs.txt", NPCEntries);
-#endif // SHOW_OBJECTMANAGER_TAB
 }
 
 void ImGuiManager::OnEndScene()
@@ -634,6 +629,41 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 	{
 		if (ImGui::BeginTabItem("Object Manager"))
 		{
+			if (ImGui::Button("Populate lists"))
+			{
+				VehicleEntries.clear();
+				NPCEntries.clear();
+
+				uint32_t VehIdx = 0;
+				uint32_t NPCIdx = 0;
+
+				EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
+				SimMgr->ForEachPacket([&](RWS::CAttributePacket& Packet)
+					{
+						const uint32_t ClassID = Packet.GetIdOfClassToCreate();
+						if (ClassID == 0xA0D329D6)
+						{
+							EntityEntry NewEntry = {};
+							NewEntry.GUID = Packet.GetInstanceID();
+							NewEntry.Name = std::format("NPC_{}", NPCIdx);
+
+							NPCEntries.push_back(NewEntry);
+
+							NPCIdx++;
+						}
+						else if (ClassID == 0x10E5319E)
+						{
+							EntityEntry NewEntry = {};
+							NewEntry.GUID = Packet.GetInstanceID();
+							NewEntry.Name = std::format("CAR_{}", VehIdx);
+
+							VehicleEntries.push_back(NewEntry);
+
+							VehIdx++;
+						}
+					});
+			}
+
 			if (ImGui::BeginListBox("Select a Car", ImVec2(0.0f, 100.0f)))
 			{
 				ImGuiListClipper Clipper;
@@ -866,66 +896,6 @@ bool ImGuiManager::SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, boo
 	}
 
 	return false;
-}
-
-void ImGuiManager::LoadEntityGuidsFromFile(const std::string& Filename, std::vector<EntityEntry>& OutVector) const
-{
-#if SHOW_OBJECTMANAGER_TAB
-	std::ifstream myfile;
-	myfile.open(Filename, std::ios::in);
-
-	if (myfile.is_open())
-	{
-		std::string line;
-		while (std::getline(myfile, line))
-		{
-			std::stringstream linestream(line);
-
-			std::string CarName;
-			EARS::Common::guid128_t NewGuid;
-
-			std::string integer;
-			int index = 0;
-			while (std::getline(linestream, integer, ' '))
-			{
-				if (index == 0)
-				{
-					CarName = integer;
-				}
-				else if (index == 1)
-				{
-					NewGuid.a = atoi(integer.c_str());
-				}
-				else if (index == 2)
-				{
-					NewGuid.b = atoi(integer.c_str());
-				}
-				if (index == 3)
-				{
-					NewGuid.c = atoi(integer.c_str());
-				}
-				if (index == 4)
-				{
-					NewGuid.d = atoi(integer.c_str());
-				}
-
-				index++;
-			}
-
-			// do not accept duplicates
-			// TODO: Could move to std::set?
-			auto It = std::find_if(OutVector.begin(), OutVector.end(), [&NewGuid](const EntityEntry& Entry) { return Entry.GUID == NewGuid; });
-			if(It == OutVector.end())
-			{ 
-				EntityEntry NewEntry = {};
-				NewEntry.GUID = NewGuid;
-				NewEntry.Name = CarName;
-				OutVector.push_back(NewEntry);
-			}
-		}
-		myfile.close();
-	}
-#endif // #if SHOW_OBJECTMANAGER_TAB
 }
 
 void ImGuiManager::InitialiseNPCInspector(EARS::Modules::Sentient* InSentient, const bool bIsPlayer)
