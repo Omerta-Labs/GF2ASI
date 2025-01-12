@@ -23,6 +23,9 @@ namespace EARS
 			// This searches through the loaded SimGroupTOCs.
 			RWS::CAttributePacket* GetAttributePacket(const EARS::Common::guid128_t* InGuid, int bMaskStream);
 
+			// Fetch an active handler for the specified packet
+			RWS::CAttributeHandler* Find(const EARS::Common::guid128_t& InstanceID, RWS::CAttributeHandler* StartHandler);
+
 			// NB: EXPERIMENTAL CODE
 			// Spawn an object in the game world
 			void* SpawnEntity(const EARS::Common::guid128_t* InGuid, int SpawnFlags);

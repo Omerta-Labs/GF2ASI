@@ -43,6 +43,7 @@ namespace EARS
 
 			// Fetch the NPC associated with this SimNPC.
 			EARS::Modules::NPC* GetNPC() const { return m_NPC.GetPtr(); }
+			EARS::Common::guid128_t GetNPCGuid() const { return m_NPCGuid; }
 
 			// Fetch the Upgrade Component for this SimNPC.
 			// After extensive investigation, it was found that this is stored on the SimNPC.

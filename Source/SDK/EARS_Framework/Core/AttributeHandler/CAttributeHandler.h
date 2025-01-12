@@ -20,6 +20,11 @@ namespace RWS
 	class CAttributePacket;
 	class CAttributeHandler;
 
+	/**
+	 * A list of entities associated one an other, using a linked list
+	 * The list is stored within the packets, rather than a unique structure
+	 * stored within the list. Use the iterator to search through the list.
+	 */
 	struct CAttributePacketEntityList
 	{
 	public:
@@ -33,6 +38,9 @@ namespace RWS
 		// check whether the list is empty
 		bool IsEmpty() const { return m_Head == nullptr; }
 
+		/**
+		 * An iterator for simplify use
+		 */
 		struct Iterator
 		{
 		public:
@@ -40,13 +48,14 @@ namespace RWS
 			Iterator() = delete;
 			Iterator(const RWS::CAttributePacketEntityList& InEntityList);
 
-			bool IsFinished() const { return m_CurrentHandler; }
+			// whether or not we've reached the end of the list
+			bool IsFinished() const { return m_CurrentHandler == nullptr; }
 
-			const RWS::CAttributeHandler* GetObject() const { return m_CurrentHandler; }
+			// fetch the current entity
+			const RWS::CAttributeHandler* GetEntity() const { return m_CurrentHandler; }
 
 			// operator overloads
-			const RWS::CAttributeHandler* operator*() { return GetObject(); }
-
+			const RWS::CAttributeHandler* operator*() { return GetEntity(); }
 			Iterator& operator++(int a1);
 
 		private:
@@ -57,7 +66,8 @@ namespace RWS
 
 	private:
 
-		CAttributeHandler* m_Head = nullptr;
+		// The start of the list
+		RWS::CAttributeHandler* m_Head = nullptr;
 	};
 
 	struct CAttributeCommand
@@ -94,24 +104,31 @@ namespace RWS
 		const CAttributeDataChunk* m_DataChunk = nullptr;
 	};
 
+	/**
+	 * Iterate through the commands stored within the attribute packet.
+	 */
 	struct CAttributeCommandIterator
 	{
 	public:
 
+		// Have we reached the end of the command buffer
 		bool IsFinished() const;
 
+		// Get the current ID of the command we're at
 		uint32_t GetCommandID() const { return m_CurIdx; }
 
+		// Query whether this command is actually used / set
 		bool TestBit(uint32_t m_Idx) const;
+
+		// Seek to a specific command within the buffer
+		void SeekTo(const uint32_t NewIdx);
 
 		const CAttributeDataChunk* GetDataChunk() const { return m_ChunkIterator.GetDataChunk(); }
 
+		// operator overloads
 		CAttributeDataChunkIterator& operator++(int a1);
-
 		//const CAttributeDataChunk& operator*() const;
-
 		const CAttributeCommand* operator->() const;
-
 		//const CAttributeDataChunk* GetDataChunk(void) { return pCurrChunk_; }
 
 		static CAttributeCommandIterator MakeIterator(const RWS::CAttributePacket& InPacket, uint32_t InTargetClassID);
@@ -140,11 +157,13 @@ namespace RWS
 		// This is stored within the data chunks.
 		uint32_t GetIdOfClassToCreate() const;
 
+		// Get the instance of this packet
 		const EARS::Common::guid128_t& GetInstanceID() const;
 
 		// Check whether this Packet has any entities registered to them
 		bool HasEntities() const { return (m_EntityList.IsEmpty() == false); }
 
+		// Get the iterator for this packet
 		CAttributePacketEntityList::Iterator GetEntityIterator() const;
 
 		CAttributePacket* GetNext() const { return m_pHashNext; }
@@ -176,7 +195,14 @@ namespace RWS
 		 */
 		EARS::Common::guid128_t InqInstanceID() const { return m_InstanceId; }
 
+		bool HasAttributeHandlerFlag(const uint32_t InFlag) const;
+
 	private:
+
+		/**
+		 * Unpack the flags from the handler and return - useful to query specific flags
+		 */
+		uint32_t GetAttributeHandlerFlags() const { return m_FlagsAndID & 0xFFFFF000; }
 
 		RWS::CAttributeHandler** m_PrevNextHandlerFromPacket = nullptr;
 		RWS::CAttributeHandler* m_NextHandlerFromPacket = nullptr;

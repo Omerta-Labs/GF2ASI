@@ -17,7 +17,7 @@ namespace EARS
 
 			virtual ~Base() = 0;
 
-			virtual bool QueryInterface(const uint32_t ClassID, void** OutObjectPtr) = 0;
+			virtual bool QueryInterface(const uint32_t ClassID, void** OutObjectPtr) const = 0;
 			virtual void LinkTick() = 0;
 			virtual void UnLinkTick() = 0;
 
@@ -29,7 +29,7 @@ namespace EARS
 		// NB: Ensure type safety because this does not!
 		// This exists in engine code too (excluding the assert)
 		template<typename T>
-		T* _QueryInterface(EARS::Framework::Base* InBase, const uint32_t InClassID)
+		T* _QueryInterface(const EARS::Framework::Base* InBase, const uint32_t InClassID)
 		{
 			void* ObjectPtr;
 			if (InBase->QueryInterface(InClassID, &ObjectPtr))

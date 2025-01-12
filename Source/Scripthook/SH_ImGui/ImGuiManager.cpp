@@ -629,13 +629,14 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 	{
 		if (ImGui::BeginTabItem("Object Manager"))
 		{
+			EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
+
 			if (ImGui::Button("Populate lists"))
 			{
 				VehicleEntries.clear();
 				NPCEntries.clear();
 				ItemEntries.clear();
 
-				EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
 				SimMgr->ForEachPacket([&](RWS::CAttributePacket& Packet)
 					{
 						const uint32_t ClassID = Packet.GetIdOfClassToCreate();
@@ -643,66 +644,47 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 						{
 							EntityEntry NewEntry = {};
 							NewEntry.GUID = Packet.GetInstanceID();
-							NewEntry.Name = std::format("NPC_{}", 0);
 
-							const bool bTest = Packet.HasEntities();
+							// We need to get NPC name from active SimNPC
+							const auto& EntityIt = Packet.GetEntityIterator();
+							if (EntityIt.IsFinished() == false)
+							{
+								const RWS::CAttributeHandler* CurrentEntity = EntityIt.GetEntity();
+								assert(CurrentEntity->HasAttributeHandlerFlag(0x8000000));
+
+								const EARS::Framework::Base* AsBase = reinterpret_cast<const EARS::Framework::Base*>(CurrentEntity);
+								EARS::Modules::SimNPC* AsSimNPC = EARS::Framework::_QueryInterface<EARS::Modules::SimNPC>(AsBase, 0xD7E44D6A);
+								String* NPCName = AsSimNPC->GetName();
+
+								NewEntry.Name = NPCName->c_str();
+							}
+							else
+							{
+								// TODO: If the SimNPC does not exist, perhaps we should fetch the NPC name from the NPC packet?
+							}
 
 							NPCEntries.push_back(NewEntry);
-
-							RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0x369AC561);
-
-							while (PacketIt.IsFinished() == false)
-							{
-								if (PacketIt.GetCommandID() == 2)
-								{
-									const char* DebugName = PacketIt->GetAs_char_ptr();
-									int z = 0;
-								}
-
-								PacketIt++;
-							}
 						}
 						else if (ClassID == 0x10E5319E)
 						{
-							const char* PartsName = "NULL";
-
 							RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0xA5975EB2);
+							PacketIt.SeekTo(0x55); // seek straight to parts name
 
-							while (PacketIt.IsFinished() == false)
-							{
-								if (PacketIt.GetCommandID() == 0x55)
-								{
-									PartsName = PacketIt->GetAs_char_ptr();
-								}
-
-								PacketIt++;
-							}
-
+							// create entity and fetch name
 							EntityEntry NewEntry = {};
 							NewEntry.GUID = Packet.GetInstanceID();
-							NewEntry.Name = std::format("{}", PartsName);
+							NewEntry.Name = PacketIt->GetAs_char_ptr();
 
 							VehicleEntries.push_back(NewEntry);
 						}
 						else if (ClassID == 0xF26FB813 || ClassID == 0x332D5A20 || ClassID == 0x4ECFBE13)
 						{
-							const char* ItemName = "WeaponName";
-
 							RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0x4ECFBE13);
-
-							while (PacketIt.IsFinished() == false)
-							{
-								if (PacketIt.GetCommandID() == 0)
-								{
-									ItemName = PacketIt->GetAs_char_ptr();
-								}
-
-								PacketIt++;
-							}
+							PacketIt.SeekTo(0); // seek straight to item name
 
 							EntityEntry NewEntry = {};
 							NewEntry.GUID = Packet.GetInstanceID();
-							NewEntry.Name = std::format("{}", ItemName);
+							NewEntry.Name = PacketIt->GetAs_char_ptr();
 
 							ItemEntries.push_back(NewEntry);
 						}
@@ -718,8 +700,6 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 				{
 					for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
 					{
-						// TODO: std::format has proved to be too costly, we need an alternative method for names
-						// could we load a name from the file perhaps?
 						const EntityEntry& CurrentEntry = VehicleEntries[i];
 						if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedVehicleGuid == CurrentEntry.GUID)))
 						{
@@ -753,8 +733,6 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 				{
 					for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
 					{
-						// TODO: std::format has proved to be too costly, we need an alternative method for names
-						// could we load a name from the file perhaps?
 						const EntityEntry& CurrentEntry = NPCEntries[i];
 						if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedNPCGuid == CurrentEntry.GUID)))
 						{
@@ -771,11 +749,18 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 
 			if (ImGui::Button("Spawn NPC"))
 			{
-				if (OurObjectMgr)
+				const RWS::CAttributeHandler* ActiveSimNPC = SimMgr->Find(SelectedNPCGuid, nullptr);
+				assert(ActiveSimNPC->HasAttributeHandlerFlag(0x8000000));
+
+				if (OurObjectMgr && ActiveSimNPC)
 				{
+					const EARS::Framework::Base* AsBase = reinterpret_cast<const EARS::Framework::Base*>(ActiveSimNPC);
+					const EARS::Modules::SimNPC* AsSimNPC = EARS::Framework::_QueryInterface<EARS::Modules::SimNPC>(AsBase, 0xD7E44D6A);
+					const EARS::Common::guid128_t NPCGuid = AsSimNPC->GetNPCGuid();
+
 					const RwMatrixTag PlayerMatrix = LocalPlayer->GetMatrix();
 					const RwV3d SpawnPosition = PlayerMatrix.m_Pos + (PlayerMatrix.m_At * 5.0f);
-					OurObjectMgr->Spawn(SelectedNPCGuid, SpawnPosition);
+					OurObjectMgr->Spawn(NPCGuid, SpawnPosition);
 				}
 			}
 

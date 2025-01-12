@@ -40,6 +40,11 @@ bool RWS::CAttributeCommandIterator::TestBit(uint32_t m_Idx) const
 	return m_ZeroValueBitVec[m_Idx >> 3] & (1 << (m_Idx & 7));
 }
 
+void RWS::CAttributeCommandIterator::SeekTo(const uint32_t NewIdx)
+{
+	MemUtils::CallClassMethod<void, RWS::CAttributeCommandIterator*, uint32_t>(0x043AF00, this, NewIdx);
+}
+
 RWS::CAttributeDataChunkIterator& RWS::CAttributeCommandIterator::operator++(int a1)
 {
 	return MemUtils::CallClassMethod<RWS::CAttributeDataChunkIterator&, RWS::CAttributeCommandIterator*>(0x043B1A0, this);
@@ -71,4 +76,15 @@ RWS::CAttributePacketEntityList::Iterator RWS::CAttributePacket::GetEntityIterat
 {
 	RWS::CAttributePacketEntityList::Iterator NewIt = RWS::CAttributePacketEntityList::Iterator(m_EntityList);
 	return NewIt;
+}
+
+bool RWS::CAttributeHandler::HasAttributeHandlerFlag(const uint32_t InFlag) const
+{
+	const uint32_t Flags = GetAttributeHandlerFlags();
+	if ((Flags & InFlag) != 0)
+	{
+		return true;
+	}
+
+	return false;
 }

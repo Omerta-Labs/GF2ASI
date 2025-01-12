@@ -11,6 +11,11 @@ RWS::CAttributePacket* EARS::Framework::SimManager::GetAttributePacket(const EAR
 	return MemUtils::CallClassMethod<RWS::CAttributePacket*, SimManager*, const EARS::Common::guid128_t*, int>(0x04461C0, this, InGuid, bMaskStream);
 }
 
+RWS::CAttributeHandler* EARS::Framework::SimManager::Find(const EARS::Common::guid128_t& InstanceID, RWS::CAttributeHandler* StartHandler)
+{
+	return MemUtils::CallClassMethod<RWS::CAttributeHandler*, EARS::Framework::SimManager*, const EARS::Common::guid128_t&, RWS::CAttributeHandler*>(0x0445FF0, this, InstanceID, StartHandler);
+}
+
 void* EARS::Framework::SimManager::SpawnEntity(const EARS::Common::guid128_t* InGuid, int SpawnFlags)
 {
 	return MemUtils::CallClassMethod<void*, SimManager*, const EARS::Common::guid128_t*, int>(0x0446130, this, InGuid, SpawnFlags);
