@@ -10,6 +10,7 @@
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
 #include "SDK/EARS_Godfather/Modules/PartedModel/PartedModelMgr.h"
+#include "SDK/EARS_RT_CCT/include/ChrCntrl_AnimView.h"
 
 void ImGuiNPCInspector::Initialise(EARS::Modules::Sentient* InSentient, const bool bInPlayerObject)
 {
@@ -33,6 +34,8 @@ void ImGuiNPCInspector::DrawWindow()
 	if (ImGui::BeginTabBar("npc_tab_bar"))
 	{
 		DrawTab_GeneralState();
+
+		DrawTab_Animation();
 
 		DrawTab_Appearance();
 
@@ -59,6 +62,15 @@ void ImGuiNPCInspector::DrawTab_GeneralState()
 		const RwV3d EntityPos = ActiveObject->GetPosition();
 		ImGui::Text("Position: %f %f %f", EntityPos.m_X, EntityPos.m_Y, EntityPos.m_Z);
 
+		ImGui::EndTabItem();
+	}
+}
+
+void ImGuiNPCInspector::DrawTab_Animation()
+{
+	if (ImGui::BeginTabItem("Animations", nullptr, ImGuiTabItemFlags_None))
+	{
+		EA::CCT::AnimView* SentientAnimView = ActiveObject->GetAnimViewInfo();
 		ImGui::EndTabItem();
 	}
 }

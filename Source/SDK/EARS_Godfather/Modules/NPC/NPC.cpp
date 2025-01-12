@@ -7,6 +7,11 @@
 // Hook
 #include <Addons/Hook.h>
 
+bool EARS::Modules::NPC::IsSuspended() const
+{
+	return m_Flags1.Test(0x2000000);
+}
+
 EARS::Modules::NPCCrewComponent* EARS::Modules::NPC::GetCrewComponent() const
 {
 	hook::Type<uint32_t> CrewComponentIndex = hook::Type<uint32_t>(0x1131040);

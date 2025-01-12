@@ -32,6 +32,8 @@ private:
 
 	void DrawTab_GeneralState();
 
+	void DrawTab_Animation();
+
 	void DrawTab_Appearance();
 
 	void DrawTab_Upgrades();
