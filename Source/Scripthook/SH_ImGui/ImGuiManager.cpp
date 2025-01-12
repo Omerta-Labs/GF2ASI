@@ -942,9 +942,9 @@ void ImGuiManager::OnTick()
 
 			ImGui::End();
 		}
-	}
 
-	CurrentInspector.DrawWindow();
+		CurrentInspector.DrawWindow();
+	}
 
 	ImGui::EndFrame();
 	ImGui::Render();

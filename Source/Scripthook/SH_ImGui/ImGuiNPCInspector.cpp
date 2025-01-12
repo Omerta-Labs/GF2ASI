@@ -26,8 +26,10 @@ void ImGuiNPCInspector::DrawWindow()
 		return;
 	}
 
-	if (!ImGui::Begin("NPC Inspector"))
+	bool bWantsOpen = true;
+	if (!ImGui::Begin("NPC Inspector", &bWantsOpen))
 	{
+		ImGui::End();
 		return;
 	}
 
@@ -45,6 +47,11 @@ void ImGuiNPCInspector::DrawWindow()
 	}
 
 	ImGui::End();
+
+	if (bWantsOpen == false)
+	{
+		Clear();
+	}
 }
 
 void ImGuiNPCInspector::Clear()

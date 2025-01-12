@@ -151,7 +151,9 @@ namespace EARS
 			//EARS::Modules::InventorySlot* m_pSwapSlot;
 			//unsigned int m_slotsExcludedFromRotationMask;
 			//bool m_AlreadyPickedUpItemsArray[35];
-			//unsigned int m_savedInventorySize;
+
+			char m_InventoryManager_Padding2[0x2C];
+			uint32_t m_SavedInventorySize = 0;
 			//char* m_savedInventoryBuffer;
 			//bool m_bInventoryBuffer;
 			//bool m_bHasRegisteredPersistable;
