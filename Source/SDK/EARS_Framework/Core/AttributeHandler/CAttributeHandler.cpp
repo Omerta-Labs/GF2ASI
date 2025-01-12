@@ -30,6 +30,11 @@ const char* RWS::CAttributeCommand::GetAs_char_ptr() const
 	return MemUtils::CallClassMethod<const char*, const RWS::CAttributeCommand*>(0x43AB90, this);
 }
 
+EARS::Common::guid128_t* RWS::CAttributeCommand::GetAs_RWS_GUID() const
+{
+	return MemUtils::CallClassMethod<EARS::Common::guid128_t*, const RWS::CAttributeCommand*>(0x043ABC0, this);
+}
+
 bool RWS::CAttributeCommandIterator::IsFinished() const
 {
 	return MemUtils::CallClassMethod<bool, const RWS::CAttributeCommandIterator*>(0x043B120, this);

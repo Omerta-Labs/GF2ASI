@@ -2,6 +2,8 @@
 
 // GF2
 #include "SDK/EARS_Common/Array.h"
+#include "SDK/EARS_Common/Singleton.h"
+#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 
 // CPP
 #include <functional>
@@ -17,7 +19,7 @@ namespace EARS
 		 * Manages Demographic Regions, objects which 
 		 * manage population in game worlds
 		 */
-		class DemographicRegionManager
+		class DemographicRegionManager : public RWS::CEventHandler, public Singleton<DemographicRegionManager>
 		{
 		public:
 
@@ -41,8 +43,6 @@ namespace EARS
 
 		private:
 
-			void* VTable_0 = nullptr;
-			char m_Padding0[0xC];
 			Array<EARS::Modules::DemographicRegion*> m_RegisteredRegions;
 			EARS::Modules::DemographicRegion* m_CurrentRegion = nullptr;
 		};

@@ -28,6 +28,9 @@ namespace EARS
 			String m_PartsPresetName;											// 0xE5C
 			String m_AssemblyName;												// 0xE6C
 			EARS::Modules::PresetInstance* m_PresetInstance = nullptr;			// 0xE7C
+			char m_WhiteboxCar_Padding2[0x88];
+			EARS::Common::guid128_t m_ModelStrGuid;
+
 		};
 	} // Vehicles
 } // EARS

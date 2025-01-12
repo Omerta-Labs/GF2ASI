@@ -76,6 +76,8 @@ namespace RWS
 
 		const char* GetAs_char_ptr() const;
 
+		EARS::Common::guid128_t* GetAs_RWS_GUID() const;
+
 	private:
 
 		// TODO: This is a union, but im too lazy to implement union right now

@@ -10,6 +10,7 @@
 
 // CPP
 #include <stdint.h>
+#include <string>
 
 
 namespace EARS
@@ -21,6 +22,14 @@ namespace EARS
 		public:
 
 			void ApplyUserSettings();
+
+			/**
+			 * Because the game removed ability to load from command ID 0,
+			 * this function is used to fetch the name on demand at runtime.
+			 * Note that this is likely to be costly, so use caution.
+			 * @return std::string - If found, the debug name of the Demographic Region.
+			 */
+			std::string GetDebugName() const;
 
 			static void StaticApplyHooks();
 

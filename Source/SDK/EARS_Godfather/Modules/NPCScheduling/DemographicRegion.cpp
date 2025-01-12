@@ -1,5 +1,9 @@
 #include "DemographicRegion.h"
 
+// GF2
+#include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
+
+// HOOK
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
 
@@ -61,6 +65,22 @@ void EARS::Modules::DemographicRegion::ApplyUserSettings()
 	m_VehicleFilters[0].m_MaxCivilianCount = 500;
 	m_VehicleFilters[1].m_MaxCivilianCount = 500;
 	m_VehicleFilters[2].m_MaxCivilianCount = 500;
+}
+
+std::string EARS::Modules::DemographicRegion::GetDebugName() const
+{
+	EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
+
+	const EARS::Common::guid128_t LocalGuid = InqInstanceID();
+	if(const RWS::CAttributePacket* Packet = SimMgr->GetAttributePacket(&LocalGuid, 0))
+	{
+		RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(*Packet, 0x84BF4579);
+		PacketIt.SeekTo(0);
+
+		return PacketIt->GetAs_char_ptr();
+	}
+
+	return {};
 }
 
 void EARS::Modules::DemographicRegion::StaticApplyHooks()

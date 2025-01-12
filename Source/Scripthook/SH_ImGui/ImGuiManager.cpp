@@ -427,7 +427,8 @@ void ImGuiManager::DrawTab_DemographicSettings()
 			if (ImGui::TreeNode("Registered Regions"))
 			{
 				DRMgr->ForEachDemographicRegion([](const EARS::Modules::DemographicRegion& InRegion) {
-						ImGui::Text("%p", &InRegion);
+						const std::string RegionName = InRegion.GetDebugName();
+						ImGui::Text("%s - (%p)", RegionName.data(), &InRegion);
 					});
 
 				ImGui::TreePop();
@@ -703,6 +704,14 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 						}
 						else if (ClassID == 0x10E5319E)
 						{
+							RWS::CAttributeCommandIterator AnimatedIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0xAE986323);
+							AnimatedIt.SeekTo(5);
+
+							// NB: This is Stream GUID!
+							// TODO: We should figure out how to stream the file and await loading
+							const EARS::Common::guid128_t* RWSGuid = AnimatedIt->GetAs_RWS_GUID();
+							const uint32_t AsGuid32 = RWSGuid->GetGuid32();
+
 							RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0xA5975EB2);
 							PacketIt.SeekTo(0x55); // seek straight to parts name
 
