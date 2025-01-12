@@ -633,49 +633,84 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 			{
 				VehicleEntries.clear();
 				NPCEntries.clear();
-
-				uint32_t VehIdx = 0;
-				uint32_t NPCIdx = 0;
-				uint32_t ItemIdx = 0;
+				ItemEntries.clear();
 
 				EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
 				SimMgr->ForEachPacket([&](RWS::CAttributePacket& Packet)
 					{
 						const uint32_t ClassID = Packet.GetIdOfClassToCreate();
-						if (ClassID == 0xA0D329D6)
+						if (ClassID == 0xD7E44D6A)
 						{
 							EntityEntry NewEntry = {};
 							NewEntry.GUID = Packet.GetInstanceID();
-							NewEntry.Name = std::format("NPC_{}", NPCIdx);
+							NewEntry.Name = std::format("NPC_{}", 0);
+
+							const bool bTest = Packet.HasEntities();
 
 							NPCEntries.push_back(NewEntry);
 
-							NPCIdx++;
+							RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0x369AC561);
+
+							while (PacketIt.IsFinished() == false)
+							{
+								if (PacketIt.GetCommandID() == 2)
+								{
+									const char* DebugName = PacketIt->GetAs_char_ptr();
+									int z = 0;
+								}
+
+								PacketIt++;
+							}
 						}
 						else if (ClassID == 0x10E5319E)
 						{
+							const char* PartsName = "NULL";
+
+							RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0xA5975EB2);
+
+							while (PacketIt.IsFinished() == false)
+							{
+								if (PacketIt.GetCommandID() == 0x55)
+								{
+									PartsName = PacketIt->GetAs_char_ptr();
+								}
+
+								PacketIt++;
+							}
+
 							EntityEntry NewEntry = {};
 							NewEntry.GUID = Packet.GetInstanceID();
-							NewEntry.Name = std::format("CAR_{}", VehIdx);
+							NewEntry.Name = std::format("{}", PartsName);
 
 							VehicleEntries.push_back(NewEntry);
-
-							VehIdx++;
 						}
 						else if (ClassID == 0xF26FB813 || ClassID == 0x332D5A20 || ClassID == 0x4ECFBE13)
 						{
+							const char* ItemName = "WeaponName";
+
+							RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0x4ECFBE13);
+
+							while (PacketIt.IsFinished() == false)
+							{
+								if (PacketIt.GetCommandID() == 0)
+								{
+									ItemName = PacketIt->GetAs_char_ptr();
+								}
+
+								PacketIt++;
+							}
+
 							EntityEntry NewEntry = {};
 							NewEntry.GUID = Packet.GetInstanceID();
-							NewEntry.Name = std::format("ITEM_{}", ItemIdx);
+							NewEntry.Name = std::format("{}", ItemName);
 
 							ItemEntries.push_back(NewEntry);
-
-							ItemIdx++;
 						}
 					});
 			}
 
-			if (ImGui::BeginListBox("Select a Car", ImVec2(0.0f, 100.0f)))
+			ImGui::PushItemWidth(-1.0f);
+			if (ImGui::BeginListBox("##spawner_cars", ImVec2(0.0f, 0.0f)))
 			{
 				ImGuiListClipper Clipper;
 				Clipper.Begin(VehicleEntries.size());
@@ -697,6 +732,7 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 
 				ImGui::EndListBox();
 			}
+			ImGui::PopItemWidth();
 
 			if (ImGui::Button("Spawn Car"))
 			{
@@ -708,7 +744,8 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 				}
 			}
 
-			if (ImGui::BeginListBox("Select an NPC", ImVec2(0.0f, 100.0f)))
+			ImGui::PushItemWidth(-1.0f);
+			if (ImGui::BeginListBox("##spawner_npcs", ImVec2(0.0f, 0.0f)))
 			{
 				ImGuiListClipper Clipper;
 				Clipper.Begin(NPCEntries.size());
@@ -730,6 +767,7 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 
 				ImGui::EndListBox();
 			}
+			ImGui::PopItemWidth();
 
 			if (ImGui::Button("Spawn NPC"))
 			{
@@ -741,7 +779,8 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 				}
 			}
 
-			if (ImGui::BeginListBox("Select an Item", ImVec2(0.0f, 100.0f)))
+			ImGui::PushItemWidth(-1.0f);
+			if (ImGui::BeginListBox("##spawner_items", ImVec2(0.0f, 0.0f)))
 			{
 				ImGuiListClipper Clipper;
 				Clipper.Begin(ItemEntries.size());
@@ -763,7 +802,9 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 
 				ImGui::EndListBox();
 			}
+			ImGui::PopItemWidth();
 
+			ImGui::PushItemWidth(-1.0f);
 			if (ImGui::Button("Spawn Item"))
 			{
 				if (OurObjectMgr)
@@ -773,6 +814,7 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 					OurObjectMgr->SpawnItem(SelectedItemGuid, SpawnPosition);
 				}
 			}
+			ImGui::PopItemWidth();
 
 			ImGui::EndTabItem();
 		}

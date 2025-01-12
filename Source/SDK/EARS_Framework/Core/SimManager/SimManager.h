@@ -3,14 +3,12 @@
 // RenderWare Framework
 #include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/HashTable.h"
+#include "SDK/EARS_Framework/Core/AttributeHandler/CAttributeHandler.h"
 #include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 #include "SDK/EARS_Framework/Core/ResourceManager/CResourceHandler.h"
 
 // C++
 #include <functional>
-
-// Forward declares
-namespace RWS { class CAttributePacket; class CAttributeHandler; }
 
 namespace EARS
 {
@@ -51,7 +49,10 @@ namespace EARS
 				static const EARS::Common::guid128_t& GetKey(const RWS::CAttributePacket* InPacket);
 			};
 
-			char m_SimManagerPadding_0[0x5C];
+			char m_SimManagerPadding_0[0x54];
+
+			RWS::CAttributePacketEntityList m_OrphanedEntityList;
+			RWS::CAttributePacketEntityList m_HiddenEntityList;
 
 			// TODO: This is fairly messy
 			DEFINE_MEMBER_IntrusiveHashTable(EARS::Common::guid128_t, RWS::CAttributePacket, AttrPacketGetKey, EARS::Common::HashNext<RWS::CAttributePacket>, m_AttributePacketHash);
