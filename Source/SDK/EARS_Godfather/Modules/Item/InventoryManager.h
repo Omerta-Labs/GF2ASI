@@ -2,6 +2,7 @@
 
 // Common
 #include "SDK/EARS_Common/Array.h"
+#include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/SafePtr.h"
 
 // Framework
@@ -121,6 +122,18 @@ namespace EARS
 			 * NB: Only SLOT_BOMB, SLOT_MOLOTOV and SLOT_DYNAMITE is supported!
 			 */
 			void SetItemSlotMax(uint32_t SlotIdx, uint32_t InMax);
+
+			/**
+			 * Attempt to spawn an item - uses ItemManager internally to spawn said item
+			 * This does not add the item into the inventory - you must call accompanying function AddItemToInventory
+			 */
+			EARS::Modules::Item* TrySpawnItem(const EARS::Common::guid128_t& ItemID, uint32_t PlayerStream);
+
+			/**
+			 * Add the Item into the Inventory - will slot into correct space automatically
+			 * If the Item is a gun, then it might get declined if weapon levels is lower than current
+			 */
+			void AddItemToInventory(EARS::Modules::Item* InItem, bool bShowFanfare);
 
 			// Getters for a specific slot. All types are supported
 			uint32_t GetItemSlotCount(uint32_t SlotIdx);

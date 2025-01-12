@@ -239,7 +239,7 @@ void ImGuiManager::DrawTab_PlayerSettings()
 
 			if (ImGui::CollapsingHeader("Players Inventory", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ImGui::TextWrapped("Modify Players Inventory (Unlimited Ammo, swapping weapons (TODO))");
+				ImGui::TextWrapped("Modify Players Inventory (Unlimited Ammo, swapping weapons)");
 
 				if (EARS::Modules::InventoryManager* PlayerInventoryMgr = LocalPlayer->GetInventoryManager())
 				{
@@ -247,6 +247,42 @@ void ImGuiManager::DrawTab_PlayerSettings()
 					if (ImGui::Button(Label))
 					{
 						PlayerInventoryMgr->ToggleUnlimitedAmmo();
+					}
+
+					ImGui::PushItemWidth(-1.0f);
+					if (ImGui::BeginListBox("##add_to_inventory", ImVec2(0.0f, 0.0f)))
+					{
+						ImGuiListClipper Clipper;
+						Clipper.Begin(ItemEntries.size());
+						while (Clipper.Step())
+						{
+							for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
+							{
+								const EntityEntry& CurrentEntry = ItemEntries[i];
+								if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedItemGuid == CurrentEntry.GUID)))
+								{
+									SelectedItemGuid = CurrentEntry.GUID;
+								}
+							}
+						}
+
+						Clipper.End();
+
+						ImGui::EndListBox();
+					}
+					ImGui::PopItemWidth();
+
+					if (ImGui::Button("Add To Inventory"))
+					{
+						if(EARS::Modules::Item* NewItem = PlayerInventoryMgr->TrySpawnItem(SelectedItemGuid, LocalPlayer->GetStream()))
+						{
+							const bool bExistingValue = NewItem->GetFanFareWhenAcquiredFlag();
+							NewItem->SetFanFareWhenAcquiredFlag(false);
+							NewItem->SetForceIntoInventoryFlag(true);
+							PlayerInventoryMgr->AddItemToInventory(NewItem, false);
+							NewItem->SetFanFareWhenAcquiredFlag(true);
+							NewItem->SetForceIntoInventoryFlag(bExistingValue);
+						}
 					}
 				}
 			}

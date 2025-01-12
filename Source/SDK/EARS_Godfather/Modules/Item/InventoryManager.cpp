@@ -67,6 +67,16 @@ void EARS::Modules::InventoryManager::SetItemSlotMax(uint32_t SlotIdx, uint32_t 
 	}
 }
 
+EARS::Modules::Item* EARS::Modules::InventoryManager::TrySpawnItem(const EARS::Common::guid128_t& ItemID, uint32_t PlayerStream)
+{
+	return MemUtils::CallClassMethod<EARS::Modules::Item*, EARS::Modules::InventoryManager*, const EARS::Common::guid128_t&, uint32_t>(0x0704B00, this, ItemID, PlayerStream);
+}
+
+void EARS::Modules::InventoryManager::AddItemToInventory(EARS::Modules::Item* InItem, bool bShowFanfare)
+{
+	MemUtils::CallClassMethod<void, EARS::Modules::InventoryManager*, EARS::Modules::Item*, bool>(0x07062A0, this, InItem, bShowFanfare);
+}
+
 uint32_t EARS::Modules::InventoryManager::GetItemSlotCount(uint32_t SlotIdx)
 {
 	return m_Slots[SlotIdx].GetItemCount();

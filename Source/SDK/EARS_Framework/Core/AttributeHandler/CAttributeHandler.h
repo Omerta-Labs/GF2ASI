@@ -197,6 +197,8 @@ namespace RWS
 
 		bool HasAttributeHandlerFlag(const uint32_t InFlag) const;
 
+		uint32_t GetStream() const { return m_hStream; }
+
 	private:
 
 		/**

@@ -1,6 +1,7 @@
 #pragma once
 
 // Common
+#include "SDK/EARS_Common/Bitflags.h"
 #include "SDK/EARS_Common/String.h"
 
 // Framework
@@ -86,6 +87,14 @@ namespace EARS
 			// EARS::Modules::Item::IsTouched
 			inline bool IsTwoHanded() const { return m_ItemHandUse == Handedness::TWO_HANDED; }
 
+			// Manage FanFare flag on the Item
+			void SetFanFareWhenAcquiredFlag(bool bValue);
+			bool GetFanFareWhenAcquiredFlag() const;
+
+			// Manage the 'Force into inventory' flag on the Item
+			void SetForceIntoInventoryFlag(bool bValue);
+			bool GetForceIntoInventoryFlag() const;
+
 			// getters
 			inline uint8_t GetCombatAnimType() const { return m_CombatAnimType; }
 			inline uint8_t GetItemCategory() const { return m_ItemCategory; }
@@ -109,6 +118,9 @@ namespace EARS
 			void* m_HavokResource = nullptr;
 			String m_Name;
 			uint32_t m_HashedName = 0;
+			float m_FadeTime = 0.0f;
+			Flags32 m_ItemFlags;
+			uint16_t m_ListItemFlags = 0;
 		};
 	} // Modules
 } // EARS
