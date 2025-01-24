@@ -14,7 +14,12 @@ namespace EARS
 		{
 		public:
 
+			uint16_t GetIndex(const uint32_t RegisteredIndex) const { return m_Map[RegisteredIndex]; }
+
 		private:
+
+			char m_Padding_0[0xE];
+			uint16_t m_Map[255];
 		};
 
 		/**

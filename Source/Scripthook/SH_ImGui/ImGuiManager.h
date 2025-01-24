@@ -61,12 +61,6 @@ public:
 
 private:
 
-	struct EntityEntry
-	{
-		std::string Name;
-		EARS::Common::guid128_t GUID;
-	};
-
 	void DrawTab_PlayerSettings();
 
 	void DrawTab_CheckpointSettings();
@@ -93,18 +87,6 @@ private:
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 	
-	// List of spawnable vehicle guids
-	std::vector<EntityEntry> VehicleEntries;
-	EARS::Common::guid128_t SelectedVehicleGuid;
-
-	// List of spawnable NPC guids
-	std::vector<EntityEntry> NPCEntries;
-	EARS::Common::guid128_t SelectedNPCGuid;
-
-	// List of spawnable Item guids
-	std::vector<EntityEntry> ItemEntries;
-	EARS::Common::guid128_t SelectedItemGuid;
-
 	// Inspector for the current object
 	// (Either Player or NPC)
 	ImGuiNPCInspector CurrentInspector;
@@ -123,4 +105,7 @@ private:
 	bool bPlayerVehicleGodModeActive = false;
 
 	bool bWantsUISuppressed = false;
+
+	std::string InventoryAddItem_SelectedName;
+	EARS::Common::guid128_t InventoryAddItem_SelectedGuid;
 };

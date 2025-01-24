@@ -201,6 +201,9 @@ namespace RWS
 
 		uint32_t GetStream() const { return m_hStream; }
 
+		bool HasComponents() const;
+		EARS::Framework::Component* GetComponent(const uint32_t Index) const;
+
 	private:
 
 		/**

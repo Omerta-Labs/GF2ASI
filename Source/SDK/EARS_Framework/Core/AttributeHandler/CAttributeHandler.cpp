@@ -3,6 +3,9 @@
 // Hooks
 #include <Addons/Hook.h>
 
+// Framework
+#include "SDK/EARS_Framework/Core/Component/Component.h"
+
 // CPP
 #include <assert.h>
 
@@ -92,4 +95,19 @@ bool RWS::CAttributeHandler::HasAttributeHandlerFlag(const uint32_t InFlag) cons
 	}
 
 	return false;
+}
+
+bool RWS::CAttributeHandler::HasComponents() const
+{
+	return (m_ComponentList != nullptr && m_Components != nullptr);
+}
+
+EARS::Framework::Component* RWS::CAttributeHandler::GetComponent(const uint32_t Index) const
+{
+	if (HasComponents())
+	{
+		return m_Components[m_ComponentList->GetIndex(Index)];
+	}
+
+	return nullptr;
 }

@@ -126,6 +126,73 @@ namespace EARS
 			uint32_t m_NumEntries = 0;
 			bool m_bGrowable = false;
 		};
+
+		template<typename TKey, typename TValue, size_t N, class TCompare = CompareFunc<TKey>, class THash = HashFunc<TKey>>
+		struct HashTableByValue
+		{
+		public:
+
+			struct Entry
+			{
+			public:
+
+			private:
+
+				TKey m_Key = 0;
+				TValue m_Obj = nullptr;
+				Entry* m_Next = nullptr;
+			
+				friend HashTableByValue;
+			};
+
+			struct EntryBlock
+			{
+			public:
+
+			private:
+
+				EntryBlock* m_Next = nullptr;
+				Entry m_EntryArray[N];
+			};
+
+			uint32_t GetBin(const TKey& Key) const
+			{
+				return THash::Hash(Key) % m_NumBins;
+			}
+
+			bool Get(const TKey& Key, TValue* OutFoundValue) const
+			{
+				if (Entry* FoundEntry = FindEntry(Key))
+				{
+					*OutFoundValue = FoundEntry->m_Obj;
+					return true;
+				}
+
+				return false;
+			}
+
+			Entry* FindEntry(const TKey& KeyToFind) const
+			{
+				for (Entry* i = m_BinArr[GetBin(KeyToFind)]; i; i = i->m_Next)
+				{
+					if (TCompare::Equal(KeyToFind, i->m_Key))
+					{
+						return i;
+					}
+				}
+
+				return nullptr;
+			}
+
+		private:
+
+			Entry** m_BinArr = nullptr;
+			uint32_t m_NumBins = 0;
+			Entry* m_FreeList = nullptr;
+			uint32_t m_NumEntries = 0;
+			EntryBlock* m_BlockList = nullptr;
+			bool m_bGrowable = false;
+		};
 	}
 }
 

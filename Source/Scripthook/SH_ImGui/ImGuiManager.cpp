@@ -11,6 +11,7 @@
 // Godfather
 #include "SDK/EARS_Framework/Core/Camera/CameraManager.h"
 #include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
+#include "SDK/EARS_Framework/Core/StreamManager/StreamManager.h"
 #include "SDK/EARS_Framework/Toolkits/GroupManager/GroupManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
@@ -45,10 +46,8 @@
 
 #if DEBUG
 #define SHOW_DEMOGRAPHICS_TAB 0
-#define SHOW_OBJECTMANAGER_TAB 1
 #else
 #define SHOW_DEMOGRAPHICS_TAB 0
-#define SHOW_OBJECTMANAGER_TAB 1
 #endif // DEBUG
 
 #if ENABLE_ENTITY_SPAWN_DEBUG
@@ -221,7 +220,6 @@ void ImGuiManager::DrawTab_PlayerSettings()
 				bool bNewGodModeActive = bPlayerGodModeActive;
 				if (ImGui::Checkbox("God Mode", &bNewGodModeActive))
 				{
-					EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
 					EARS::Modules::StandardDamageComponent* DamageComp = LocalPlayer->GetDamageComponent();
 					DamageComp->SetInvincible(bNewGodModeActive);
 
@@ -250,31 +248,24 @@ void ImGuiManager::DrawTab_PlayerSettings()
 					}
 
 					ImGui::PushItemWidth(-1.0f);
-					if (ImGui::BeginListBox("##add_to_inventory", ImVec2(0.0f, 0.0f)))
+					if(ImGui::BeginCombo("##add_to_inventory", InventoryAddItem_SelectedName.data()))
 					{
-						ImGuiListClipper Clipper;
-						Clipper.Begin(ItemEntries.size());
-						while (Clipper.Step())
+						OurObjectMgr->ForEachItem([&](const std::string& Name, const EARS::Common::guid128_t& EntityID)
 						{
-							for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
-							{
-								const EntityEntry& CurrentEntry = ItemEntries[i];
-								if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedItemGuid == CurrentEntry.GUID)))
+								if (ImGui::Selectable(Name.data(), (InventoryAddItem_SelectedGuid == EntityID)))
 								{
-									SelectedItemGuid = CurrentEntry.GUID;
+									InventoryAddItem_SelectedName = Name;
+									InventoryAddItem_SelectedGuid = EntityID;
 								}
-							}
-						}
+						});
 
-						Clipper.End();
-
-						ImGui::EndListBox();
+						ImGui::EndCombo();
 					}
 					ImGui::PopItemWidth();
 
 					if (ImGui::Button("Add To Inventory"))
 					{
-						if(EARS::Modules::Item* NewItem = PlayerInventoryMgr->TrySpawnItem(SelectedItemGuid, LocalPlayer->GetStream()))
+						if (EARS::Modules::Item* NewItem = PlayerInventoryMgr->TrySpawnItem(InventoryAddItem_SelectedGuid, LocalPlayer->GetStream()))
 						{
 							const bool bExistingValue = NewItem->GetFanFareWhenAcquiredFlag();
 							NewItem->SetFanFareWhenAcquiredFlag(false);
@@ -323,16 +314,6 @@ void ImGuiManager::DrawTab_PlayerSettings()
 					{
 						SetVehicleGodMode(CurrentCar, bNewVehicleGodModeActive);
 						bPlayerVehicleGodModeActive = bNewVehicleGodModeActive;
-					}
-
-					if (ImGui::Button("Duplicate"))
-					{
-						const EARS::Common::guid128_t CarID = CurrentCar->InqInstanceID();
-						if (OurObjectMgr)
-						{
-							const RwV3d CarPosition = CurrentCar->GetPosition();
-							OurObjectMgr->Spawn(CarID, CarPosition);
-						}
 					}
 				}
 				else
@@ -661,195 +642,15 @@ void ImGuiManager::DrawTab_UIHUDSettings()
 
 void ImGuiManager::DrawTab_ObjectMgrSettings()
 {
-#if SHOW_OBJECTMANAGER_TAB
 	if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 	{
 		if (ImGui::BeginTabItem("Object Manager"))
 		{
-			EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
-
-			if (ImGui::Button("Populate lists"))
-			{
-				VehicleEntries.clear();
-				NPCEntries.clear();
-				ItemEntries.clear();
-
-				SimMgr->ForEachPacket([&](RWS::CAttributePacket& Packet)
-					{
-						const uint32_t ClassID = Packet.GetIdOfClassToCreate();
-						if (ClassID == 0xD7E44D6A)
-						{
-							EntityEntry NewEntry = {};
-							NewEntry.GUID = Packet.GetInstanceID();
-
-							// We need to get NPC name from active SimNPC
-							const auto& EntityIt = Packet.GetEntityIterator();
-							if (EntityIt.IsFinished() == false)
-							{
-								const RWS::CAttributeHandler* CurrentEntity = EntityIt.GetEntity();
-								assert(CurrentEntity->HasAttributeHandlerFlag(0x8000000));
-
-								const EARS::Framework::Base* AsBase = reinterpret_cast<const EARS::Framework::Base*>(CurrentEntity);
-								EARS::Modules::SimNPC* AsSimNPC = EARS::Framework::_QueryInterface<EARS::Modules::SimNPC>(AsBase, 0xD7E44D6A);
-								String* NPCName = AsSimNPC->GetName();
-
-								NewEntry.Name = NPCName->c_str();
-							}
-							else
-							{
-								// TODO: If the SimNPC does not exist, perhaps we should fetch the NPC name from the NPC packet?
-							}
-
-							NPCEntries.push_back(NewEntry);
-						}
-						else if (ClassID == 0x10E5319E)
-						{
-							RWS::CAttributeCommandIterator AnimatedIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0xAE986323);
-							AnimatedIt.SeekTo(5);
-
-							// NB: This is Stream GUID!
-							// TODO: We should figure out how to stream the file and await loading
-							const EARS::Common::guid128_t* RWSGuid = AnimatedIt->GetAs_RWS_GUID();
-							const uint32_t AsGuid32 = RWSGuid->GetGuid32();
-
-							RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0xA5975EB2);
-							PacketIt.SeekTo(0x55); // seek straight to parts name
-
-							// create entity and fetch name
-							EntityEntry NewEntry = {};
-							NewEntry.GUID = Packet.GetInstanceID();
-							NewEntry.Name = PacketIt->GetAs_char_ptr();
-
-							VehicleEntries.push_back(NewEntry);
-						}
-						else if (ClassID == 0xF26FB813 || ClassID == 0x332D5A20 || ClassID == 0x4ECFBE13)
-						{
-							RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0x4ECFBE13);
-							PacketIt.SeekTo(0); // seek straight to item name
-
-							EntityEntry NewEntry = {};
-							NewEntry.GUID = Packet.GetInstanceID();
-							NewEntry.Name = PacketIt->GetAs_char_ptr();
-
-							ItemEntries.push_back(NewEntry);
-						}
-					});
-			}
-
-			ImGui::PushItemWidth(-1.0f);
-			if (ImGui::BeginListBox("##spawner_cars", ImVec2(0.0f, 0.0f)))
-			{
-				ImGuiListClipper Clipper;
-				Clipper.Begin(VehicleEntries.size());
-				while (Clipper.Step())
-				{
-					for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
-					{
-						const EntityEntry& CurrentEntry = VehicleEntries[i];
-						if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedVehicleGuid == CurrentEntry.GUID)))
-						{
-							SelectedVehicleGuid = CurrentEntry.GUID;
-						}
-					}
-				}
-
-				Clipper.End();
-
-				ImGui::EndListBox();
-			}
-			ImGui::PopItemWidth();
-
-			if (ImGui::Button("Spawn Car"))
-			{
-				if (OurObjectMgr)
-				{
-					const RwMatrixTag PlayerMatrix = LocalPlayer->GetMatrix();
-					const RwV3d SpawnPosition = PlayerMatrix.m_Pos + (PlayerMatrix.m_At * 5.0f);
-					OurObjectMgr->Spawn(SelectedVehicleGuid, SpawnPosition);
-				}
-			}
-
-			ImGui::PushItemWidth(-1.0f);
-			if (ImGui::BeginListBox("##spawner_npcs", ImVec2(0.0f, 0.0f)))
-			{
-				ImGuiListClipper Clipper;
-				Clipper.Begin(NPCEntries.size());
-				while (Clipper.Step())
-				{
-					for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
-					{
-						const EntityEntry& CurrentEntry = NPCEntries[i];
-						if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedNPCGuid == CurrentEntry.GUID)))
-						{
-							SelectedNPCGuid = CurrentEntry.GUID;
-						}
-					}
-				}
-
-				Clipper.End();
-
-				ImGui::EndListBox();
-			}
-			ImGui::PopItemWidth();
-
-			if (ImGui::Button("Spawn NPC"))
-			{
-				const RWS::CAttributeHandler* ActiveSimNPC = SimMgr->Find(SelectedNPCGuid, nullptr);
-				assert(ActiveSimNPC->HasAttributeHandlerFlag(0x8000000));
-
-				if (OurObjectMgr && ActiveSimNPC)
-				{
-					const EARS::Framework::Base* AsBase = reinterpret_cast<const EARS::Framework::Base*>(ActiveSimNPC);
-					const EARS::Modules::SimNPC* AsSimNPC = EARS::Framework::_QueryInterface<EARS::Modules::SimNPC>(AsBase, 0xD7E44D6A);
-					const EARS::Common::guid128_t NPCGuid = AsSimNPC->GetNPCGuid();
-
-					const RwMatrixTag PlayerMatrix = LocalPlayer->GetMatrix();
-					const RwV3d SpawnPosition = PlayerMatrix.m_Pos + (PlayerMatrix.m_At * 5.0f);
-					OurObjectMgr->Spawn(NPCGuid, SpawnPosition);
-				}
-			}
-
-			ImGui::PushItemWidth(-1.0f);
-			if (ImGui::BeginListBox("##spawner_items", ImVec2(0.0f, 0.0f)))
-			{
-				ImGuiListClipper Clipper;
-				Clipper.Begin(ItemEntries.size());
-				while (Clipper.Step())
-				{
-					for (int i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
-					{
-						// TODO: std::format has proved to be too costly, we need an alternative method for names
-						// could we load a name from the file perhaps?
-						const EntityEntry& CurrentEntry = ItemEntries[i];
-						if (ImGui::Selectable(CurrentEntry.Name.data(), (SelectedItemGuid == CurrentEntry.GUID)))
-						{
-							SelectedItemGuid = CurrentEntry.GUID;
-						}
-					}
-				}
-
-				Clipper.End();
-
-				ImGui::EndListBox();
-			}
-			ImGui::PopItemWidth();
-
-			ImGui::PushItemWidth(-1.0f);
-			if (ImGui::Button("Spawn Item"))
-			{
-				if (OurObjectMgr)
-				{
-					const RwMatrixTag PlayerMatrix = LocalPlayer->GetMatrix();
-					const RwV3d SpawnPosition = PlayerMatrix.m_Pos + (PlayerMatrix.m_At * 5.0f);
-					OurObjectMgr->SpawnItem(SelectedItemGuid, SpawnPosition);
-				}
-			}
-			ImGui::PopItemWidth();
+			OurObjectMgr->ImGuiDrawContents();
 
 			ImGui::EndTabItem();
 		}
 	}
-#endif // SHOW_OBJECTMANAGER_TAB
 }
 
 void ImGuiManager::DrawTab_Support()
@@ -970,9 +771,7 @@ void ImGuiManager::OnTick()
 				DrawTab_DemographicSettings();
 #endif // SHOW_DEMOGRAPHICS_TAB
 
-#if SHOW_OBJECTMANAGER_TAB
 				DrawTab_ObjectMgrSettings();
-#endif // SHOW_OBJECTMANAGER_TAB
 
 				DrawTab_CitiesSettings();
 

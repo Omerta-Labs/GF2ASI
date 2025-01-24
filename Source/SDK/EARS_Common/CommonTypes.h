@@ -42,5 +42,21 @@ namespace EARS
 		};
 
 		uint32_t HashMem_SDBM(const void* pVoidData, uint32_t dataLen);
+
+		// TODO: Make inline
+		template<>
+		struct CompareFunc<uint32_t>
+		{
+			static bool Equal(const uint32_t& Left, const uint32_t& Right) { return Left == Right; }
+		};
+
+		template<>
+		struct HashFunc<uint32_t>
+		{
+			static uint32_t Hash(const uint32_t& Value)
+			{
+				return Value;
+			}
+		};
 	}
 }
