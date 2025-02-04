@@ -15,7 +15,8 @@ EARS::Modules::PlayerFamilyTree::FamilyTreeSlot EARS::Modules::PlayerFamilyTree:
 {
 	// NB: This is completed implementation of the engine function
 
-	for (uint32_t i = 0; i < 7; i++)
+	constexpr uint32_t MAX_SLOTS = (uint32_t)PlayerFamilyTree::FamilyTreeSlot::FAMILYTREE_NUM_SLOTS;
+	for (uint32_t i = 0; i < MAX_SLOTS; i++)
 	{
 		const EARS::Modules::PlayerFamilyMember& Member = m_FamilyMembers[i];
 		if (Member.IsSlotFilled() && Member.GetSimNPC() == InSimNPC)
@@ -27,9 +28,15 @@ EARS::Modules::PlayerFamilyTree::FamilyTreeSlot EARS::Modules::PlayerFamilyTree:
 	return FamilyTreeSlot::FAMILYTREE_SLOT_INVALID;
 }
 
+void EARS::Modules::PlayerFamilyTree::SetCurrentTreeType(const FamilyTreeType InTreeType) const
+{
+	MemUtils::CallClassMethod<void, const PlayerFamilyTree*, FamilyTreeType>(0x90B8E0, this, InTreeType);
+}
+
 void EARS::Modules::PlayerFamilyTree::ForEachMember(const TVisitFamilyMemberFunctor& InFunction)
 {
-	for (uint32_t i = 0; i < 7; i++)
+	constexpr uint32_t MAX_SLOTS = (uint32_t)PlayerFamilyTree::FamilyTreeSlot::FAMILYTREE_NUM_SLOTS;
+	for (uint32_t i = 0; i < MAX_SLOTS; i++)
 	{
 		InFunction(m_FamilyMembers[i]);
 	}

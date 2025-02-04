@@ -131,6 +131,22 @@ namespace EARS
 				FAMILYTREE_NUM_SLOTS = 0x7,
 			};
 
+			enum class FamilyTreeType : uint32_t
+			{
+				FAMILYTREE_TYPE_INVALID = 0xFFFFFFFF,
+				FAMILYTREE_TYPE_EMPTY = 0x0,
+				FAMILYTREE_TYPE_1SOLDIER = 0x1,
+				FAMILYTREE_TYPE_2SOLDIERS = 0x2,
+				FAMILYTREE_TYPE_3SOLDIERS = 0x3,
+				FAMILYTREE_TYPE_1CAPO_3SOLDIERS = 0x4,
+				FAMILYTREE_TYPE_1CAPO_4SOLDIERS = 0x5,
+				FAMILYTREE_TYPE_CONSIGLIORE_1CAPO_4SOLDIERS = 0x6,
+				FAMILYTREE_TYPE_CONSIGLIORE_2CAPOS_4SOLDIERS = 0x7,
+				FAMILYTREE_TYPE_CONSIGLIORE_UNDERBOSS_2CAPOS_4SOLDIERS = 0x8,
+				FAMILYTREE_NUM_TYPES = 0x9,
+			};
+
+
 			/**
 			 * Find the Tree Slot this SimNPC is currently filling.
 			 * If they aren't filling any, then assume FAMILYTREE_SLOT_INVALID.
@@ -138,6 +154,13 @@ namespace EARS
 			 * @return FamilyTreeSlot - The slot index this SimNPC is filling
 			 */
 			FamilyTreeSlot FindTreeSlotIndex(const EARS::Modules::SimNPC* InSimNPC) const;
+
+			/**
+			 * Update the Family Tree to a desired type. This also updates other specific behaviors
+			 * the game need to do internally, to ensure persistence.
+			 * @param InTreeType - The desired Tree Type we should be using.
+			 */
+			void SetCurrentTreeType(const FamilyTreeType InTreeType) const;
 
 			/**
 			 * Utility function to iterate through all loaded Cities

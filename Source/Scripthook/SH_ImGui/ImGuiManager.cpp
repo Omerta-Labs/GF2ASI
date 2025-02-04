@@ -513,6 +513,8 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 					});
 			}
 
+			ImGui::SameLine();
+
 			if (ImGui::Button("Remove all members from crew"))
 			{
 				FamilyTreeData->ForEachMember([&](EARS::Modules::PlayerFamilyMember& InMember) {
@@ -524,6 +526,13 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 						}
 					}
 					});
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Unlock Full Tree"))
+			{
+				FamilyTreeData->SetCurrentTreeType(EARS::Modules::PlayerFamilyTree::FamilyTreeType::FAMILYTREE_TYPE_CONSIGLIORE_UNDERBOSS_2CAPOS_4SOLDIERS);
 			}
 		}
 
