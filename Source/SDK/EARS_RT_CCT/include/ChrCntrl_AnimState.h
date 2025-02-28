@@ -18,7 +18,7 @@ namespace EA
 
 				virtual ~AnimState() { /* filled in by game code */ }
 
-			private:
+			protected:
 
 				char pad_0000[16]; //0x0000 (flags in here somewhere, maybe 0x10)
 				uint32_t m_StateID = 0; //0x0014

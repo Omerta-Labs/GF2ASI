@@ -10,9 +10,13 @@ public:
 	String(const char* InSrc);
 	~String();
 
-	const char* c_str() const { return m_pCStr; }
-
 	void assign(const char* InSrc);
+
+	// inline
+	const char* c_str() const { return m_pCStr; }
+	bool IsValid() const { return m_Length != 0; }
+
+	operator bool() const { return IsValid(); }
 
 private:
 

@@ -71,6 +71,8 @@ private:
 
 	void DrawTab_CitiesSettings();
 
+	void DrawTab_FamiliesSettings();
+
 	void DrawTab_PlayerFamilyTreeSettings();
 
 	void DrawTab_UIHUDSettings();

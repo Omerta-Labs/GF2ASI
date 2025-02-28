@@ -46,8 +46,10 @@
 
 #if DEBUG
 #define SHOW_DEMOGRAPHICS_TAB 0
+#define SHOW_FAMILY_TAB 0
 #else
 #define SHOW_DEMOGRAPHICS_TAB 0
+#DEFINE SHOW_FAMILY_TAB 0
 #endif // DEBUG
 
 #if ENABLE_ENTITY_SPAWN_DEBUG
@@ -189,9 +191,6 @@ void ImGuiManager::DrawTab_PlayerSettings()
 
 			if (ImGui::CollapsingHeader("Players State", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				const RwV3d PlayerPosition = LocalPlayer->GetPosition();
-				ImGui::Text("Position: %f %f %f", PlayerPosition.m_X, PlayerPosition.m_Y, PlayerPosition.m_Z);
-
 				ImGui::TextWrapped("Toggle settings such as NoClip and GodMode");
 
 				bool bNewFlyModeState = bPlayerFlyModeActive;
@@ -474,6 +473,41 @@ void ImGuiManager::DrawTab_CitiesSettings()
 
 		ImGui::EndTabItem();
 	}
+}
+
+void ImGuiManager::DrawTab_FamiliesSettings()
+{
+#if SHOW_FAMILY_TAB
+	EARS::Modules::FamilyManager* FamilyMgr = EARS::Modules::FamilyManager::GetInstance();
+	if (!FamilyMgr)
+	{
+		return;
+	}
+
+	if (ImGui::BeginTabItem("Families", nullptr, ImGuiTabItemFlags_None))
+	{
+		if (ImGui::TreeNode("Registered Families"))
+		{
+			FamilyMgr->ForEachFamily([&](EARS::Modules::Family& InFamily) {
+				if (ImGui::TreeNodeEx((void*)InFamily.GetFamilyID(), ImGuiTreeNodeFlags_DefaultOpen, "%s", InFamily.GetInternalName()->c_str()))
+				{
+					for (uint32_t i = 0; i < InFamily.GetNumAllies(); i++)
+					{
+						const uint32_t AllyId = InFamily.GetAllyFamilyID(i);
+						const EARS::Modules::Family* AllyFamily = FamilyMgr->GetFamily(AllyId);
+						ImGui::BulletText("Ally: %u -> %s", AllyId, AllyFamily->GetInternalName()->c_str());
+					}
+
+					ImGui::TreePop();
+				}
+				});
+
+			ImGui::TreePop();
+		}
+
+		ImGui::EndTabItem();
+	}
+#endif // SHOW_FAMILY_TAB
 }
 
 void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
@@ -783,6 +817,11 @@ void ImGuiManager::OnTick()
 				DrawTab_ObjectMgrSettings();
 
 				DrawTab_CitiesSettings();
+
+
+#if SHOW_FAMILY_TAB
+				DrawTab_FamiliesSettings();
+#endif // SHOW_FAMILY_TAB
 
 				DrawTab_PlayerFamilyTreeSettings();
 

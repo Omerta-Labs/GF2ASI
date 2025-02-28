@@ -13,6 +13,13 @@ namespace EA
 
 			virtual ~AnimView() { /* filled in by game code */ }
 
+			/**
+			 * Determine whether the Anim State is running a specific animation
+			 * @param AnimID The Animation we want to check is playing
+			 * @bool Whether or not the Animation is playing.
+			 */
+			bool IsPlayingAnim(const uint32_t AnimID) const { return m_RootStateID == AnimID; }
+
 		private:
 
 			void* m_Character = nullptr;

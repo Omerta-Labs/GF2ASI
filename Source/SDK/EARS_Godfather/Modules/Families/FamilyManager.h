@@ -4,6 +4,7 @@
 #include "SDK/EARS_Common/Array.h"
 
 // CPP
+#include <functional>
 #include <stdint.h>
 
 namespace EARS
@@ -19,10 +20,16 @@ namespace EARS
 		{
 		public:
 
-			// TEMP -> Debug only
-			void Test();
-
 			const EARS::Modules::Family* GetFamily(const uint32_t FamilyID) const;
+
+			/**
+			 * Utility function to iterate through all loaded Families
+			 * All headers pass-by-ref, so none of them should be nullptr.
+			 * Function does not exist in GF2 exe, merely utility header for us to use.
+			 */
+			typedef std::function<void(Family&)> TVisitFamilyFunctor;
+			void ForEachFamily(const TVisitFamilyFunctor& InFunction);
+			void ForEachStrategyFamily(const TVisitFamilyFunctor& InFunction);
 
 			// Fetch the instance of the Family Manager
 			static FamilyManager* GetInstance();

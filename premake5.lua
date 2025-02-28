@@ -12,9 +12,9 @@ project "GF2ASI"
    staticruntime "on"
    characterset "MBCS"
    targetextension ".asi"
-   targetdir "E:/Games/Godfather 2/The Godfather II/scripts"
-   debugcommand "E:/Games/Godfather 2/The Godfather II/godfather2.exe"
-   debugdir "E:/Games/Godfather 2/The Godfather II/"
+   targetdir "C:/Users/conno/Documents/My Games/Godfather 2/scripts"
+   debugcommand "C:/Users/conno/Documents/My Games/Godfather 2/godfather2.exe"
+   debugdir "C:/Users/conno/Documents/My Games/Godfather 2/"
    includedirs { 
    "$(ProjectDir)" ,
    "$(ProjectDir)Source",
@@ -22,6 +22,8 @@ project "GF2ASI"
    "vendors/detours",
    "vendors/polyhook/include",
    "vendors/libcurl/include",
+   "vendors/lua/include",
+   "vendors/sol/"
    }
 
    libdirs {
@@ -48,7 +50,8 @@ project "GF2ASI"
 	  "vendors/polyhook/libs/debug/Zycore.lib",
 	  "vendors/polyhook/libs/debug/Zydis.lib",
 	  "vendors/discord/libs/discord_game_sdk.dll.lib",
-	  "vendors/libcurl/debug/libcurl-d.lib"
+	  "vendors/libcurl/debug/libcurl-d.lib",
+          "vendors/lua/libs/lua_debug.lib"
       }
 
    filter "configurations:Release"
@@ -63,5 +66,6 @@ project "GF2ASI"
 	  "vendors/polyhook/libs/release/Zycore.lib",
 	  "vendors/polyhook/libs/release/Zydis.lib",
 	  "vendors/discord/libs/discord_game_sdk.dll.lib",
-	  "vendors/libcurl/release/libcurl.lib"
+	  "vendors/libcurl/release/libcurl.lib",
+          "vendors/lua/libs/lua_release.lib"
       }

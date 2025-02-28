@@ -20,6 +20,8 @@
 #include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
 #include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
 
+#include <sol.hpp>
+
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0

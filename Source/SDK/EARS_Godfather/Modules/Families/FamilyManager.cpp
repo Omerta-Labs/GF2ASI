@@ -3,19 +3,6 @@
 // SDK
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 
-void EARS::Modules::FamilyManager::Test()
-{
-	for (const EARS::Modules::Family* CurrentFamily : m_Families)
-	{
-		int z = 0;
-	}
-
-	for (const EARS::Modules::Family* CurrentFamily : m_StrategyFamilies)
-	{
-		int z = 0;
-	}
-}
-
 const EARS::Modules::Family* EARS::Modules::FamilyManager::GetFamily(const uint32_t FamilyID) const
 {
 	for (const EARS::Modules::Family* CurrentFamily : m_Families)
@@ -27,6 +14,22 @@ const EARS::Modules::Family* EARS::Modules::FamilyManager::GetFamily(const uint3
 	}
 
 	return nullptr;
+}
+
+void EARS::Modules::FamilyManager::ForEachFamily(const TVisitFamilyFunctor& InFunction)
+{
+	for (EARS::Modules::Family* CurrentFamily : m_Families)
+	{
+		InFunction(*CurrentFamily);
+	}
+}
+
+void EARS::Modules::FamilyManager::ForEachStrategyFamily(const TVisitFamilyFunctor& InFunction)
+{
+	for (EARS::Modules::Family* CurrentFamily : m_StrategyFamilies)
+	{
+		InFunction(*CurrentFamily);
+	}
 }
 
 EARS::Modules::FamilyManager* EARS::Modules::FamilyManager::GetInstance()

@@ -52,8 +52,20 @@ namespace EARS
 			 */
 			float ModifyBalance(const float Modifier, const LedgerItemType LedgerType);
 
+			/**
+			 * Get the Ally ID from a specific index, if available.
+			 * Note that this will cause a crash if Index is beyond current Ally count.
+			 * @param Index - The Index to use when accessing Ally Family array (max 3).
+			 * @return uint32_t The Ally Family ID.
+			 */
+			uint32_t GetAllyFamilyID(const uint32_t Index) const;
+
 			// getters
 			inline uint32_t GetFamilyID() const { return m_FamilyID; }
+			inline uint32_t GetNumAllies() const { return m_NumAllyFamilies; }
+			const String* GetInternalName() const;
+			const String* GetSingularName() const;
+			const String* GetPluralName() const;
 
 		private:
 
