@@ -55,6 +55,9 @@ namespace EARS
 			int32_t m_PlayerDisableCount = 0;
 			uint32_t m_EventHashNames[EARS::Modules::PlayerActionEvents::kEvent_NumEvents];
 			uint32_t m_VibrationHashNames[EARS::Modules::PlayerVibrationEvents::kVib_NumEvents];
+			char m_Player_Padding_5[0x6BC];
 		};
+
+		static_assert(sizeof(Player) == 0x31D0, "EARS::Modules::Player must equal 0x31D0");
 	} // Modules
 } // EARS

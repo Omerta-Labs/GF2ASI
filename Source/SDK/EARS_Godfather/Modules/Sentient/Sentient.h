@@ -28,7 +28,7 @@ namespace EARS
 
 		protected:
 
-			char m_Padding_Sentient_1[0xCC];
+			char m_Padding_Sentient_1[0x30];
 			EARS::Havok::CharacterProxy m_CharacterProxy;		// 0x3C0 - 0x4AC // (EARS::Modules::Sentient)
 			char m_Padding_Sentient_2[0x148];
 			EARS::Modules::StandardDamageComponent* m_Damage = nullptr; // 0x5F4 - 0x5F8 (EARS::Modules::Sentient)

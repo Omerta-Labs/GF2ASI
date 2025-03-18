@@ -61,7 +61,11 @@ namespace EARS
 			// Then entity finishes with one byte? TODO
 
 			// 0x150 alpha value
-			// 0x15E flags
+			// 0x15E flags			
+
+			char m_Entity_Padding_4[0x10];
 		};
+
+		static_assert(sizeof(Entity) == 0x180, "EARS::Framework::Entity must equal 0x180");
 	} // Modules
 } // EARS

@@ -22,7 +22,7 @@ namespace EARS
 
 		private:
 
-			char m_WhiteboxCar_Padding0[0x650];
+			char m_WhiteboxCar_Padding0[0x640];
 			EARS::Modules::VehicleDamageComponent* m_DamageComponent = nullptr; // 0x7C0
 			char m_WhiteboxCar_Padding1[0x698];
 			String m_PartsPresetName;											// 0xE5C
@@ -30,7 +30,9 @@ namespace EARS
 			EARS::Modules::PresetInstance* m_PresetInstance = nullptr;			// 0xE7C
 			char m_WhiteboxCar_Padding2[0x88];
 			EARS::Common::guid128_t m_ModelStrGuid;
-
+			char m_WhiteboxCar_Padding3[0x8];
 		};
+
+		static_assert(sizeof(WhiteboxCar) == 0xF20, "EARS::Vehicles::WhiteboxCar must equal 0xF20");
 	} // Vehicles
 } // EARS

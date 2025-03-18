@@ -33,10 +33,13 @@ namespace EARS
 
 		private:
 
-			char m_Animated_Padding[0x9C];
+			char m_Animated_Padding[0x8C];
 			void* m_CctInfo = nullptr;		// 0x20C
 			RWS::CEventId m_MsgSetAnimTrigger;
 			EA::CCT::AnimView* m_AnimViewInfo = nullptr;
+			char m_Animated_Padding2[0x94];
 		};
+
+		static_assert(sizeof(Animated) == 0x2B0, "EARS::Framework::Animated must equal 0x2B0");
 	} // Modules
 } // EARS

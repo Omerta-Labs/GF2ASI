@@ -39,5 +39,7 @@ namespace EARS
 
 			return nullptr;
 		}
+
+		static_assert(sizeof(Base) == 0x50, "EARS::Framework::Base must equal 0x50");
 	} // Framework
 } // EARS

@@ -107,7 +107,7 @@ namespace EARS
 
 		private:
 
-			char m_Item_Padding[0x38];
+			char m_Item_Padding[0x28];
 			uint8_t m_ItemCategory = 0;		// 0x1A8
 			uint8_t m_CombatAnimType = 0;
 			uint8_t m_ItemHandUse = 0;
