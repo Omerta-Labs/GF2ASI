@@ -69,6 +69,13 @@ void ImGuiNPCInspector::DrawTab_GeneralState()
 		const RwV3d EntityPos = ActiveObject->GetPosition();
 		ImGui::Text("Position: %f %f %f", EntityPos.m_X, EntityPos.m_Y, EntityPos.m_Z);
 
+		ImGui::Separator();
+
+		EARS::Havok::CharacterProxy& Proxy = ActiveObject->GetCharacterProxyChecked();
+		ImGui::Text("Supporting Material Type: %u", Proxy.GetSupportingSurfaceMaterialType());
+		ImGui::Text("Supporting Material Flags: %X", Proxy.GetSupportingSurfaceMaterialFlags());
+		ImGui::Text("Supporting Entity: %X", Proxy.GetSupportingEntity());
+
 		ImGui::EndTabItem();
 	}
 }

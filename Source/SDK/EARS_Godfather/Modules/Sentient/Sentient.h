@@ -22,6 +22,7 @@ namespace EARS
 
 			// Getters
 			EARS::Havok::CharacterProxy* GetCharacterProxy() { return &m_CharacterProxy; }
+			EARS::Havok::CharacterProxy& GetCharacterProxyChecked() { return m_CharacterProxy; }
 			EARS::Modules::Family* GetFamily() const { return m_Family.GetPtr(); }
 			EARS::Modules::StandardDamageComponent* GetDamageComponent() const { return m_Damage; }
 			EARS::Vehicles::WhiteboxCar* GetVehicle() const { return m_Vehicle.GetPtr(); }

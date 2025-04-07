@@ -9,6 +9,11 @@
 // Forward declaring here
 namespace EARS
 {
+	namespace Framework
+	{
+		class Entity;
+	}
+
 	namespace Modules
 	{
 		class Family;
@@ -25,6 +30,17 @@ namespace EARS
 
 // Explicit defines here
 // TODO: We could macro this
+template<>
+inline EARS::Framework::Entity* SafePtr<EARS::Framework::Entity>::GetPtr() const
+{
+	if (m_Obj)
+	{
+		return (EARS::Framework::Entity*)(m_Obj - 0x9);
+	}
+
+	return nullptr;
+}
+
 template<>
 inline EARS::Modules::SimNPC* SafePtr<EARS::Modules::SimNPC>::GetPtr() const
 {

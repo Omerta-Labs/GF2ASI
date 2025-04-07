@@ -2,9 +2,16 @@
 
 // GF2
 #include <SDK/EARS_Common/Bitflags.h>
+#include <SDK/EARS_Common/SafePtr.h>
 
 namespace EARS
 {
+	// forward declares
+	namespace Framework
+	{
+		class Entity;
+	}
+
 	namespace Havok
 	{
 		class CharacterProxy
@@ -23,6 +30,11 @@ namespace EARS
 			void EnableGravity(bool bValue);
 
 			void SetCollisionState(const CollisionState NewCollisionState);
+
+			// accessors
+			EARS::Framework::Entity* GetSupportingEntity() const { return m_SupportingEntity.GetPtr(); }
+			int32_t GetSupportingSurfaceMaterialFlags() const { return m_SupportingEAMaterialFlags; }
+			int32_t GetSupportingSurfaceMaterialType() const { return m_SupportingEAMaterialType; }
 
 		private:
 
@@ -43,7 +55,12 @@ namespace EARS
 			};
 
 			void* m_CharacterProxy_VTABLE = nullptr;
-			char m_Padding_0[0xE0];
+			char m_Padding_0[0xC8];
+			int32_t m_SupportingEAMaterialType = 0;
+			int32_t m_SupportingEAMaterialFlags = 0;
+			uint32_t m_DefaultCollisionFilterInfo = 0;
+			SafePtr<EARS::Framework::Entity> m_SupportingEntity;
+			uint32_t m_RaycastCharacterTouchLayerMask = 0;
 			Flags32 m_Flags;
 			CollisionState m_CurrentCollisionState;
 		};
