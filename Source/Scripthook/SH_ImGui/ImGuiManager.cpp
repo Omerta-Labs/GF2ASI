@@ -16,6 +16,7 @@
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
+#include "SDK/EARS_Godfather/Modules/Families/MadeMan.h"
 #include "SDK/EARS_Godfather/Modules/Item/Inventory.h"
 #include "SDK/EARS_Godfather/Modules/Item/InventoryManager.h"
 #include "SDK/EARS_Godfather/Modules/Item/Item.h"
@@ -516,16 +517,17 @@ void ImGuiManager::DrawTab_FamiliesSettings()
 
 	if (ImGui::BeginTabItem("Families", nullptr, ImGuiTabItemFlags_None))
 	{
+		ImGui::BeginChild("family_contents");
 		if (ImGui::TreeNode("Registered Families"))
 		{
 			FamilyMgr->ForEachFamily([&](EARS::Modules::Family& InFamily) {
 				if (ImGui::TreeNodeEx((void*)InFamily.GetFamilyID(), ImGuiTreeNodeFlags_DefaultOpen, "%s", InFamily.GetInternalName()->c_str()))
 				{
-					for (uint32_t i = 0; i < InFamily.GetNumAllies(); i++)
+					for (uint32_t i = 0; i < InFamily.GetNumMadeMen(); i++)
 					{
-						const uint32_t AllyId = InFamily.GetAllyFamilyID(i);
-						const EARS::Modules::Family* AllyFamily = FamilyMgr->GetFamily(AllyId);
-						ImGui::BulletText("Ally: %u -> %s", AllyId, AllyFamily->GetInternalName()->c_str());
+						const EARS::Modules::MadeMan* CurMadeMan = InFamily.GetMadeManByIndex(i);
+						const String* Name = CurMadeMan->GetSimNPC()->GetName();
+						ImGui::BulletText("CurMadeMan: %s -> %u", Name->c_str(), CurMadeMan->GetState());
 					}
 
 					ImGui::TreePop();
@@ -534,6 +536,7 @@ void ImGuiManager::DrawTab_FamiliesSettings()
 
 			ImGui::TreePop();
 		}
+		ImGui::EndChild();
 
 		ImGui::EndTabItem();
 	}

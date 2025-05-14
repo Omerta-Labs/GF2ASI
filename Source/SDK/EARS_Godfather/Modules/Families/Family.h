@@ -4,6 +4,7 @@
 #include "SDK/EARS_Framework/Core/Base/Base.h"
 
 // SDK Common
+#include "SDK/EARS_Common/Array.h"
 #include "SDK/EARS_Common/Bitflags.h"
 #include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/String.h"
@@ -17,6 +18,7 @@ namespace EARS
 	namespace Modules
 	{
 		class Sentient;
+		class MadeMan;
 
 		enum class FamilyCategory : uint32_t
 		{
@@ -59,10 +61,13 @@ namespace EARS
 			 * @return uint32_t The Ally Family ID.
 			 */
 			uint32_t GetAllyFamilyID(const uint32_t Index) const;
+			
+			EARS::Modules::MadeMan* GetMadeManByIndex(const uint32_t Index) const;
 
 			// getters
 			inline uint32_t GetFamilyID() const { return m_FamilyID; }
 			inline uint32_t GetNumAllies() const { return m_NumAllyFamilies; }
+			inline uint32_t GetNumMadeMen() const { return m_MadeMen.Size(); }
 			const String* GetInternalName() const;
 			const String* GetSingularName() const;
 			const String* GetPluralName() const;
@@ -87,7 +92,7 @@ namespace EARS
 				Array<EARS::Modules::SimNPC*> m_RespondersToUse;
 			};
 
-			EARS::Modules::FamilyCategory m_Category = FamilyCategory::FamilyCategory_REF;
+			EARS::Modules::FamilyCategory m_Category = FamilyCategory::FamilyCategory_REF;				// 0x50
 			uint32_t m_FamilyID = 0;
 			uint32_t m_FamilyAllyID[3];
 			uint32_t m_NumAllyFamilies = 0;
@@ -108,7 +113,8 @@ namespace EARS
 			uint32_t m_FamilyMemberDefeatedScoreEvent = 0;
 			uint32_t m_BuildingTintColor = 0; // RwRGBATag
 			uint32_t m_SelectedBuildingTintColor = 0; // RwRGBATag
-			//float m_Balance = 0;
+			float m_Balance = 0;																		// 0x100
+			char m_FamilyPadding_1[0xA0];
 			//float m_Income = 0;
 			//Array<void*> m_OwnedRackets; // EARS::Modules::BuildingStore
 			//Array<void*> m_OwnedFronts; // EARS::Modules::BuildingStore
@@ -129,7 +135,8 @@ namespace EARS
 			//float m_fMaxOmerta;
 			//EARS::Modules::BuildingStore* m_pVenueConsidering;
 			//EARS::Modules::Family* m_pFamilyConsidering;
-			//Array<EARS::Modules::MadeMan*> m_apMadeMen;
+			Array<EARS::Modules::MadeMan*> m_MadeMen;													// 0x1A4 - 0x1B0		
+			char m_FamilyPadding_2[0x80];
 			//float m_aRankPowerMappings[8];
 			//const EARS::Modules::FamilyData* m_pData;
 			//float m_fHospitalTime;
@@ -146,8 +153,9 @@ namespace EARS
 			//RWS::CEventId m_gainedMonopolyMsg;
 			//RWS::CEventId m_lostMonopolyMsg;
 			//unsigned int m_uCompoundVenueID;
-			char m_FamilyPadding[0x130];
-			EARS::Modules::MoneyLedger* m_MoneyLedger = nullptr;
+			EARS::Modules::MoneyLedger* m_MoneyLedger = nullptr;										// 0x230
 		};
+
+		static_assert(sizeof(EARS::Modules::Family) == 0x234, "Expected EARS::Modules::Family to have a size of 0x234");
 	}
 }

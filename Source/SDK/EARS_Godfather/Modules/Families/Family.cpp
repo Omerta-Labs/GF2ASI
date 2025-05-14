@@ -23,6 +23,13 @@ uint32_t EARS::Modules::Family::GetAllyFamilyID(const uint32_t Index) const
 	return m_FamilyAllyID[Index];
 }
 
+EARS::Modules::MadeMan* EARS::Modules::Family::GetMadeManByIndex(const uint32_t Index) const
+{
+	assert(m_MadeMen.Size() > Index && "Expected to be less than number of current size of m_MadeMen!");
+
+	return m_MadeMen[Index];
+}
+
 const String* EARS::Modules::Family::GetInternalName() const
 {
 	if (m_InternalName)
