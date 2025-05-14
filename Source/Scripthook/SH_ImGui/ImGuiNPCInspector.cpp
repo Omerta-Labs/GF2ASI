@@ -84,7 +84,20 @@ void ImGuiNPCInspector::DrawTab_Animation()
 {
 	if (ImGui::BeginTabItem("Animations", nullptr, ImGuiTabItemFlags_None))
 	{
-		EA::CCT::AnimView* SentientAnimView = ActiveObject->GetAnimViewInfo();
+		if (EA::CCT::AnimView* SentientAnimView = ActiveObject->GetAnimViewInfo())
+		{
+			ImGui::Text("Active State: %u", SentientAnimView->GetStateId());
+			ImGui::Text("State Name: %s", ActiveObject->GetCharacterStateName());
+			ImGui::Text("Frames: %f/%f", SentientAnimView->GetFrameNum(), SentientAnimView->GetNumFrames());
+
+			// Doesn't work but used as an example
+			//if (ImGui::Button("Play Animation"))
+			//{
+			//	EARS::Modules::PlayerMasterSM* PlayerSM = LocalPlayer->GetPlayerMasterStateMachine();
+			//	PlayerSM->PlayAnim(0x3FCAD2F5, true, true, false, 1.0f, true);
+			//}
+		}
+
 		ImGui::EndTabItem();
 	}
 }

@@ -184,6 +184,16 @@ namespace EARS
 				return nullptr;
 			}
 
+			TValue* Lookup(const TKey& KeyToFind) const
+			{
+				if (Entry* FoundEntry = FindEntry(KeyToFind))
+				{
+					return &FoundEntry->m_Obj;
+				}
+
+				return nullptr;
+			}
+
 		private:
 
 			Entry** m_BinArr = nullptr;

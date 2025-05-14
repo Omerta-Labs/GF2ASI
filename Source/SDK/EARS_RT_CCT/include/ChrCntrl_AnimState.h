@@ -18,6 +18,11 @@ namespace EA
 
 				virtual ~AnimState() { /* filled in by game code */ }
 
+				// getters
+				uint32_t GetStateId() const { return m_StateID; }
+				float GetFrameNum() const { return m_FrameNum; }
+				float GetNumFrames() const { return m_NumFrames; }
+
 			protected:
 
 				char pad_0000[16]; //0x0000 (flags in here somewhere, maybe 0x10)

@@ -22,7 +22,6 @@
 #include "SDK/EARS_Godfather/Modules/Item/Item.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/Player/PlayerDebug.h"
-#include "SDK/EARS_Godfather/Modules/Player/PlayerMasterSM.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
 #include "SDK/EARS_Godfather/Modules/Turf/City.h"
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
@@ -226,12 +225,6 @@ void ImGuiManager::DrawTab_PlayerSettings()
 			}
 
 			ImGui::SameLine();
-
-			if(ImGui::Button("Play Animation"))
-			{
-				EARS::Modules::PlayerMasterSM* PlayerSM = LocalPlayer->GetPlayerMasterStateMachine();
-				PlayerSM->PlayAnim(0x3FCAD2F5, true, true, false, 1.0f, true);
-			}
 
 			if (ImGui::CollapsingHeader("Players State", ImGuiTreeNodeFlags_DefaultOpen))
 			{

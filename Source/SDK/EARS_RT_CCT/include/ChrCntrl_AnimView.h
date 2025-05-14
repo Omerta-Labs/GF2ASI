@@ -3,6 +3,9 @@
 // CCT
 #include "ChrCntrl_AnimState.h"
 
+// forward declares
+class ChrCntl_ChrInfo_s;
+
 namespace EA 
 {
 	namespace CCT
@@ -20,9 +23,12 @@ namespace EA
 			 */
 			bool IsPlayingAnim(const uint32_t AnimID) const { return m_RootStateID == AnimID; }
 
+			// getters
+			const ChrCntl_ChrInfo_s* GetCharacter() const { return m_Character; }
+
 		private:
 
-			void* m_Character = nullptr;
+			ChrCntl_ChrInfo_s* m_Character = nullptr;
 			uint16_t m_ModelIndex = 0;
 			uint16_t m_SkelIndex = 0;
 			float m_CurTime = 0.0f;

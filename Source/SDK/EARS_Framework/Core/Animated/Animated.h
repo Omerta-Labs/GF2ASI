@@ -25,6 +25,9 @@ namespace EARS
 
 			void SetSecondaryAnimSlots(uint32_t NumSlots);
 
+			/** Fetch the characters current anim state from CCT */
+			const char* GetCharacterStateName() const;
+
 			// getters
 			EA::CCT::AnimView* GetAnimViewInfo() const { return m_AnimViewInfo; }
 
