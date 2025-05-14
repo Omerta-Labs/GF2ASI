@@ -20,6 +20,8 @@
 #include "SDK/EARS_Godfather/Modules/Item/InventoryManager.h"
 #include "SDK/EARS_Godfather/Modules/Item/Item.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
+#include "SDK/EARS_Godfather/Modules/Player/PlayerDebug.h"
+#include "SDK/EARS_Godfather/Modules/Player/PlayerMasterSM.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
 #include "SDK/EARS_Godfather/Modules/Turf/City.h"
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
@@ -182,6 +184,39 @@ void ImGuiManager::DrawTab_PlayerSettings()
 {
 	if (ImGui::BeginTabItem("Player", nullptr, ImGuiTabItemFlags_None))
 	{
+		/* DEBUG - MOVE TO DIFFERENT PLACE IF VENTURE INTO RENDERING
+		if(ImGui::Button("Dump Shaders"))
+		{
+			struct SM_Shader_Base
+			{
+				virtual ~SM_Shader_Base() = 0;
+
+				virtual const char* GetName() = 0;
+
+				SM_Shader_Base* pNext;
+				unsigned int lowerNameHash;
+				unsigned int shaderNumber;
+				unsigned int vsHandle;
+				unsigned int psHandle;
+			};
+
+			hook::Type<SM_Shader_Base*> ShaderList = hook::Type<SM_Shader_Base*>(0x12058EC);
+
+			std::ofstream myfile;
+			myfile.open("example.txt");
+
+			SM_Shader_Base* CurrentShader = ShaderList.get();
+			while(CurrentShader != nullptr)
+			{
+				const char* Name = CurrentShader->GetName();
+				CurrentShader = CurrentShader->pNext;
+
+				myfile << "CalculateHashAndAdd(\"" << Name << "\");" << std::endl;
+			}
+
+			myfile.close();
+		} */
+
 		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
 		{
 			if (ImGui::Button("Inspect Player"))
@@ -189,31 +224,26 @@ void ImGuiManager::DrawTab_PlayerSettings()
 				InitialiseNPCInspector(LocalPlayer, true);
 			}
 
+			ImGui::SameLine();
+
+			if(ImGui::Button("Play Animation"))
+			{
+				EARS::Modules::PlayerMasterSM* PlayerSM = LocalPlayer->GetPlayerMasterStateMachine();
+				PlayerSM->PlayAnim(0x3FCAD2F5, true, true, false, 1.0f, true);
+			}
+
 			if (ImGui::CollapsingHeader("Players State", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::TextWrapped("Toggle settings such as NoClip and GodMode");
 
-				bool bNewFlyModeState = bPlayerFlyModeActive;
-				if (ImGui::Checkbox("Fly Mode", &bNewFlyModeState))
-				{
-					// only change state if updated
-					if (bPlayerFlyModeActive != bNewFlyModeState)
-					{
-						if (bNewFlyModeState)
-						{
-							EARS::Havok::CharacterProxy* PlayerProxy = LocalPlayer->GetCharacterProxy();
-							PlayerProxy->EnableGravity(false);
-							PlayerProxy->SetCollisionState(EARS::Havok::CharacterProxy::CollisionState::CS_ALL_DISABLED);
-						}
-						else
-						{
-							EARS::Havok::CharacterProxy* PlayerProxy = LocalPlayer->GetCharacterProxy();
-							PlayerProxy->EnableGravity(true);
-							PlayerProxy->SetCollisionState(EARS::Havok::CharacterProxy::CollisionState::CS_ENABLED);
-						}
+				ImGui::Text("Current Controller ID: %u", LocalPlayer->GetControllerID());
 
-						bPlayerFlyModeActive = bNewFlyModeState;
-					}
+				EARS::Modules::PlayerDebugOptions& DebugOptions = *EARS::Modules::PlayerDebugOptions::GetInstance();
+
+				bool bIsFlyActive = DebugOptions.IsInDebugFly();
+				if (ImGui::Checkbox("Fly Mode", &bIsFlyActive))
+				{
+					DebugOptions.SetIsInDebugFly(bIsFlyActive);
 				}
 
 				bool bNewGodModeActive = bPlayerGodModeActive;
@@ -744,22 +774,6 @@ void ImGuiManager::OnTick()
 	if (GetAsyncKeyState(OurSettings.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
 	{
 		bShowModMenuWindow = !bShowModMenuWindow;
-	}
-
-	if (bPlayerFlyModeActive)
-	{
-		if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
-		{
-			if (GetAsyncKeyState(OurSettings.GetFlyModeUpInput()) & 1)
-			{
-				LocalPlayer->Translate(RwV3d(0.0f, 10.0f, 0.0f));
-			}
-
-			if (GetAsyncKeyState(OurSettings.GetFlyModeDownInput()) & 1)
-			{
-				LocalPlayer->Translate(RwV3d(0.0f, -10.0f, 0.0f));
-			}
-		}
 	}
 
 	// Update cursor visibility

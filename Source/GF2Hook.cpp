@@ -12,6 +12,7 @@
 #include "Scripthook/ScripthookEvents.h"
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
 #include "Scripthook/SH_Discord/DiscordManager.h"
+#include "Scripthook/HookMods.h"
 
 #include "SDK/EARS_Godfather/Modules/PartedAnimated/PartedAnimated.h"
 #include "SDK/EARS_Common/Guid.h"
@@ -19,6 +20,7 @@
 #include "SDK/EARS_Godfather/Modules/Scoring/ScoreKeeper.h"
 #include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
 #include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
+#include "SDK/EARS_Godfather/Modules/Player/PlayerDebug.h"
 
 #include <sol.hpp>
 
@@ -359,6 +361,9 @@ void __cdecl Hook_OpenLevelServices()
 {
 	PLH::FnCast(OpenLevelServices_Old, &Hook_OpenLevelServices)();
 
+	// PURPOSE: Implement PlayerDebugOptions from xbox
+	EARS::Modules::PlayerDebugOptions* NewOptions = new EARS::Modules::PlayerDebugOptions();
+
 	OurImGuiManager = new ImGuiManager();
 	OurImGuiManager->Open();
 
@@ -381,6 +386,13 @@ void __cdecl Hook_CloseLevelServices()
 		OurDiscordManager = nullptr;
 	}
 
+	// PURPOSE: Implement PlayerDebugOptions from xbox
+	if (EARS::Modules::PlayerDebugOptions* DebugOptions = EARS::Modules::PlayerDebugOptions::GetInstance())
+	{
+		delete DebugOptions;
+		DebugOptions = nullptr;
+	}
+
 	PLH::FnCast(CloseLevelServices_Old, &Hook_CloseLevelServices)();
 }
 
@@ -390,6 +402,8 @@ void GF2Hook::Init()
 	tConsole::fCreate("GF2SE");
 
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
+
+	Mod::ApplyHooks();
 
 #if ENABLE_GF2_MULTIPLAYER
 	// TODO: Adjust all addresses to use Steam EXE addresses

@@ -11,6 +11,7 @@ namespace EARS
 {
 	namespace Framework
 	{
+		class Animated;
 		class Entity;
 	}
 
@@ -36,6 +37,17 @@ inline EARS::Framework::Entity* SafePtr<EARS::Framework::Entity>::GetPtr() const
 	if (m_Obj)
 	{
 		return (EARS::Framework::Entity*)(m_Obj - 0x9);
+	}
+
+	return nullptr;
+}
+
+template<>
+inline EARS::Framework::Animated* SafePtr<EARS::Framework::Animated>::GetPtr() const
+{
+	if (m_Obj)
+	{
+		return (EARS::Framework::Animated*)(m_Obj - 0x9);
 	}
 
 	return nullptr;

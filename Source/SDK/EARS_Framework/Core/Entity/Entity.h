@@ -13,6 +13,8 @@ namespace EARS
 		{
 		public:
 
+			virtual ~Entity() = 0;
+
 			virtual void SetPosition(const RwV3d& InPosition) = 0;
 			virtual void SetRotation(const RwMatrixTag& InMatrix) = 0;
 			virtual void SetRotation(const RwV3d& InRotation) = 0;
@@ -32,6 +34,10 @@ namespace EARS
 			virtual void Unknown_8() = 0; // TODO
 			virtual void Rotate(const RwV3d& InOffset) = 0;
 			virtual void Translate(const RwV3d& InOffset) = 0;
+
+			void SetHeadingToPosition(const RwV3d& TargetPosition, const RwV3d* UpDirection);
+
+			void SetHeadingToDirection(const RwV3d& TargetDir, const RwV3d* UpDirection);
 
 			// Get the world position of this Entity
 			// TODO: Is this actually local or world??

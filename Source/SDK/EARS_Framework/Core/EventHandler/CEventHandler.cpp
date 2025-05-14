@@ -19,11 +19,13 @@ RWS::CEventHandler::CEventHandler()
 	, m_SomeMsgUnion(nullptr)
 {
 	//m_SomeShit = MemUtils::CallCdeclMethod<void*>(0x409510);
+	// TODO: This should match engine code
 }
 
 RWS::CEventHandler::~CEventHandler()
 {
-
+	// TODO: This should match engine code
+	MemUtils::CallClassMethod<void, RWS::CEventHandler*>(0x8517B230, this);
 }
 
 void RWS::CEventHandler::DisableMessages()

@@ -40,6 +40,21 @@ namespace EARS
 			return nullptr;
 		}
 
+		// utility functions for EARS::Framework::Base
+		// NB: Ensure type safety because this does not!
+		// This exists in engine code too (excluding the assert)
+		template<typename T>
+		T* _GetInterface(const EARS::Framework::Base* InBase, const uint32_t InClassID)
+		{
+			void* ObjectPtr;
+			if (InBase->QueryInterface(InClassID, &ObjectPtr))
+			{
+				return reinterpret_cast<T*>(ObjectPtr);
+			}
+
+			return nullptr;
+		}
+
 		static_assert(sizeof(Base) == 0x50, "EARS::Framework::Base must equal 0x50");
 	} // Framework
 } // EARS

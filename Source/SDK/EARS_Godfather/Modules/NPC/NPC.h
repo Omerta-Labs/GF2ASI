@@ -23,9 +23,6 @@ namespace EARS
 		{
 		public:
 
-			/** Checks whether or not this NPC is considered to be suspended. */
-			bool IsSuspended() const;
-
 			// Getters
 			EARS::Modules::NPCCrewComponent* GetCrewComponent() const;
 			EARS::Modules::NPCUpgradeComponent* GetUpgradeComponent() const;
@@ -33,18 +30,10 @@ namespace EARS
 
 		private:
 
-			char m_Padding_NPC_0[0x2C];
-			char m_DebugName[64];
-			float m_LastMovementBlockedTime = 0.0f;
-			void* m_PressureComponent = nullptr; // EARS::Modules::PressureComponent
-			Flags32 m_RWSFlags;
-			Flags32 m_Flags1;
-			Flags32 m_Flags2;
-			Flags32 m_RaycastLockFlags;
-			char m_Padding_NPC_1[0x1BC];
-			void* m_CrewSpecialtyIndicator = nullptr;
+			char m_Padding_NPC_1[0x1F0];
+			void* m_CrewSpecialtyIndicator = nullptr;					// 0x2120
 			char m_Padding_NPC_2[0x54];
-			SafePtr<EARS::Modules::SimNPC> m_OwnerSimNPC;
+			SafePtr<EARS::Modules::SimNPC> m_OwnerSimNPC;				// 0x2178
 
 		};
 	} // Modules

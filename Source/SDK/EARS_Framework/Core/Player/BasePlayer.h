@@ -12,7 +12,7 @@ namespace EARS
 		{
 		private:
 
-			void* VTABLE = nullptr; // BasePlayer VTABLE
+			virtual ~BasePlayer() = 0;
 		};
 	} // Framework
 } // EARS

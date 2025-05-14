@@ -21,6 +21,9 @@ public:
 	// copies the values from the other RwV3d
 	RwV3d(const RwV3d& Other);
 
+	// checks whether this vector3 equals another, using a specific threshold
+	bool Equal(const RwV3d& Other, const float Threshold) const;
+
 	// operator overloads
 
 	// addition
@@ -60,3 +63,4 @@ void RwV3dAdd(RwV3d& Out, const RwV3d& InA, const RwV3d& InB);
 void RwV3dAssign(RwV3d& Out, const RwV3d& InA);
 void RwV3dSub(RwV3d& Out, const RwV3d& InA, const RwV3d& InB);
 void RwV3dScale(RwV3d& Out, const RwV3d& InA, const RwV3d& InB);
+void RwV3dAddScale(RwV3d& Out, const RwV3d& InA, const RwV3d& InB, const float InScale);

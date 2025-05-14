@@ -29,6 +29,8 @@ namespace EARS
 
 			void EnableGravity(bool bValue);
 
+			bool IsGravityEnabled() const;
+
 			void SetCollisionState(const CollisionState NewCollisionState);
 
 			// accessors

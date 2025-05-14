@@ -19,6 +19,8 @@ namespace EARS
 		{
 		public:
 
+			virtual ~PartedAnimated() = 0;
+
 			/**
 			 * Rebuild the PartedAnimated object using the Parts described within the class.
 			 * (NB: PART OF ENGINE CODE)

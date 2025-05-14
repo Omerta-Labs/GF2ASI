@@ -100,8 +100,6 @@ private:
 	// In this state, we disable Player inputs, and get ImGui to visualise a cursor.
 	bool bTakeoverCursor = false;
 
-	bool bPlayerFlyModeActive = false;
-
 	bool bPlayerGodModeActive = false;
 
 	bool bPlayerVehicleGodModeActive = false;

@@ -4,9 +4,9 @@
 #include "Addons/tConsole.h"
 
 // Framework
-#include "SDK/EARS_Godfather/Framework/Core/Player/BasePlayer.h"
-#include "SDK/EARS_Godfather/Framework/Core/Player/PlayerManager.h"
+#include "SDK/EARS_Framework/Core/Player/PlayerManager.h"
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
+#include "SDK/EARS_Godfather/Modules/Player/PlayerMasterSM.h"
 
 // Hook
 #include <Addons/Hook.h>
@@ -20,6 +20,20 @@ namespace EARS
 		{
 			EARS::Framework::Component* FoundComp = MemUtils::CallClassMethod<EARS::Framework::Component*, const EARS::Modules::Player*, uint32_t>(0x043B870, this, EARS::Modules::PlayerUpgradeComponent::GetComponentIndex());
 			return (EARS::Modules::PlayerUpgradeComponent*)FoundComp;
+		}
+
+		EARS::Modules::PlayerMasterSM* Player::GetPlayerMasterStateMachine()
+		{
+			if (EARS::StateMachineSys::StateMachine* TreeSM = GetRootStateMachine())
+			{
+				const uint32_t MachineID = TreeSM->GetStateMachineID();
+				if (MachineID == 0xB08AE1F6)
+				{
+					return reinterpret_cast<EARS::Modules::PlayerMasterSM*>(TreeSM);
+				}
+			}
+
+			return nullptr;
 		}
 
 		Player* Player::GetLocalPlayer()

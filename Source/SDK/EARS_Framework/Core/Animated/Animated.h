@@ -1,6 +1,7 @@
 #pragma once
 
 // SDK
+#include "SDK/EARS_Common/Array.h"
 #include "SDK/EARS_Framework/Core/Entity/Entity.h"
 
 // forward declares
@@ -20,6 +21,10 @@ namespace EARS
 		{
 		public:
 
+			virtual ~Animated() = 0;
+
+			void SetSecondaryAnimSlots(uint32_t NumSlots);
+
 			// getters
 			EA::CCT::AnimView* GetAnimViewInfo() const { return m_AnimViewInfo; }
 
@@ -34,10 +39,12 @@ namespace EARS
 		private:
 
 			char m_Animated_Padding[0x8C];
-			void* m_CctInfo = nullptr;		// 0x20C
+			void* m_CctInfo = nullptr;							// 0x20C
 			RWS::CEventId m_MsgSetAnimTrigger;
-			EA::CCT::AnimView* m_AnimViewInfo = nullptr;
-			char m_Animated_Padding2[0x94];
+			EA::CCT::AnimView* m_AnimViewInfo = nullptr;		// 0x218
+			Array<void*> m_CollisionBindings;
+			int32_t m_NumSecondaryAnimSlots = 0;				// 0x228
+			char m_Animated_Padding2[0x84];
 		};
 
 		static_assert(sizeof(Animated) == 0x2B0, "EARS::Framework::Animated must equal 0x2B0");
