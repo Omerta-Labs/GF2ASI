@@ -35,8 +35,16 @@ namespace EARS
 			virtual void Rotate(const RwV3d& InOffset) = 0;
 			virtual void Translate(const RwV3d& InOffset) = 0;
 
+			/**
+			 * Update entity forward direction towards a target position
+			 * If UpDirection == nullptr, then the default Up (0, 1, ) will be used.
+			 */
 			void SetHeadingToPosition(const RwV3d& TargetPosition, const RwV3d* UpDirection);
 
+			/**
+			 * Update entity forward direction towards the desired direction
+			 * If UpDirection == nullptr, then the default Up (0, 1, ) will be used.
+			 */
 			void SetHeadingToDirection(const RwV3d& TargetDir, const RwV3d* UpDirection);
 
 			// Get the world position of this Entity

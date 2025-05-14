@@ -31,8 +31,8 @@ void EARS::Framework::Entity::SetHeadingToDirection(const RwV3d& TargetDir, cons
 		NewHeading.m_Up.m_Z = (NewHeading.m_At.m_X * NewHeading.m_Right.m_Y) - (NewHeading.m_At.m_Y * NewHeading.m_Right.m_X);
 		MemUtils::CallCdeclMethod<RwMatrixTag*, RwMatrixTag&, RwMatrixTag&>(0x043A2A0, NewHeading, NewHeading); // RwMatrixOrthoNormalize
 
-		// TODO: Not working
-		//SetRotation(NewHeading);
+		// TODO: This should be valling the VTable version but for some reason that doesnt work!!
+		MemUtils::CallClassMethod<void, Entity*, const RwMatrixTag*>(0x046F9C0, this, &NewHeading);
 	}
 }
 
