@@ -12,8 +12,9 @@ namespace EARS
 		{
 		public:
 
+			// Custom Function (Not present in the game engine)
 			// Get the string of language with the 2-letter code
-			char* GetLanguageName(const char* code);
+			std::string GetLanguageName(const char* code);
 
 			// Get the number of languages
 			int GetNumLanguages();
@@ -25,7 +26,7 @@ namespace EARS
 			bool GetTextLanguageIsUserSelectable(int index);
 
 			// Get the 2-letter code of the language
-			char* GetTextLanguageCode(int index);
+			const char* GetTextLanguageCode(int index);
 
 			// Set the current language
 			void SetCurrentLanguage(int index);

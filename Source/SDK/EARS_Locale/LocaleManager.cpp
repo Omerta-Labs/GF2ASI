@@ -14,12 +14,12 @@ const std::unordered_map<std::string, std::string> EARS::Locale::LocaleManager::
 	{"de", "German"}
 };
 
-char* EARS::Locale::LocaleManager::GetLanguageName(const char* code)
+std::string EARS::Locale::LocaleManager::GetLanguageName(const char* code)
 {
 	auto it = languageMap.find(code);
-	const char* resultStr = (it != languageMap.end()) ? it->second.c_str() : "Unknown";
+	const std::string resultStr = (it != languageMap.end()) ? it->second.c_str() : "Unknown";
 
-	return const_cast<char*>(resultStr);
+	return resultStr;
 }
 
 int EARS::Locale::LocaleManager::GetNumLanguages()
@@ -32,7 +32,7 @@ bool EARS::Locale::LocaleManager::GetTextLanguageIsUserSelectable(int index)
 	return MemUtils::CallClassMethod<bool, EARS::Locale::LocaleManager*, int>(0x602F00, this, index);
 }
 
-char* EARS::Locale::LocaleManager::GetTextLanguageCode(int index)
+const char* EARS::Locale::LocaleManager::GetTextLanguageCode(int index)
 {
 	return MemUtils::CallClassMethod<char*, EARS::Locale::LocaleManager*, int>(0x602E60, this, index);
 }

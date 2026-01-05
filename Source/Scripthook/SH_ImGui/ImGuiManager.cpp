@@ -864,27 +864,25 @@ void ImGuiManager::DrawTab_UIHUDSettings()
 
 		if (EARS::Locale::LocaleManager* LocaleMgr = EARS::Locale::LocaleManager::GetInstance())
 		{
-			if (ImGui::CollapsingHeader("Select Language", ImGuiTreeNodeFlags_DefaultOpen))
+			if (ImGui::BeginCombo("###select_language", "Select Language"))
 			{
 				for (uint32_t i = 0; i < LocaleMgr->GetNumLanguages(); i++)
 				{
 					if (LocaleMgr->GetTextLanguageIsUserSelectable(i))
 					{
 						const char* LanguageCode = LocaleMgr->GetTextLanguageCode(i);
-						const char* Label = LocaleMgr->GetLanguageName(LanguageCode);
+						const std::string Label = LocaleMgr->GetLanguageName(LanguageCode);
 						const int AudioIndex = LocaleMgr->FindAudioLanguageIndex(LanguageCode);
 
-						ImGui::Bullet();
-						if (ImGui::Selectable(Label))
+						if (ImGui::Selectable(Label.c_str()))
 						{
 							LocaleMgr->SetCurrentLanguage(i);
 						}
 
 						if (AudioIndex != -1)
 						{
-							const std::string AudioLabel = std::string(Label) + " (Audio)";
+							const std::string AudioLabel = Label + " (Audio)";
 
-							ImGui::Bullet();
 							if (ImGui::Selectable(AudioLabel.c_str()))
 							{
 								LocaleMgr->SetCurrentAudioLanguage(AudioIndex);
@@ -892,6 +890,8 @@ void ImGuiManager::DrawTab_UIHUDSettings()
 						}
 					}
 				}
+
+				ImGui::EndCombo();
 			}
 		}
 
