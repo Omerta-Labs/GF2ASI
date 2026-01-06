@@ -890,11 +890,12 @@ void ImGuiManager::DrawTab_UIHUDSettings()
 					if (LocaleMgr->GetTextLanguageIsUserSelectable(i))
 					{
 						const char* LanguageCode = LocaleMgr->GetTextLanguageCode(i);
-						const std::string Label = LocaleMgr->GetLanguageName(LanguageCode);
 						const int AudioIndex = LocaleMgr->FindAudioLanguageIndex(LanguageCode);
 
 						if (AudioIndex != -1)
 						{
+							const std::string Label = LocaleMgr->GetLanguageName(LanguageCode);
+
 							if (ImGui::Selectable(Label.c_str()))
 							{
 								LocaleMgr->SetCurrentAudioLanguage(AudioIndex);
