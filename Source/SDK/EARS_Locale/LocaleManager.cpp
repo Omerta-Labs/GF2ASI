@@ -17,9 +17,7 @@ const std::unordered_map<std::string, std::string> EARS::Locale::LocaleManager::
 std::string EARS::Locale::LocaleManager::GetLanguageName(const char* code)
 {
 	auto it = languageMap.find(code);
-	const std::string resultStr = (it != languageMap.end()) ? it->second.c_str() : "Unknown";
-
-	return resultStr;
+	return (it != languageMap.end()) ? it->second.c_str() : "Unknown";
 }
 
 int EARS::Locale::LocaleManager::GetNumLanguages()
