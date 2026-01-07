@@ -36,6 +36,7 @@
 #include "SDK/EARS_Godfather/Modules/Vehicles/Behaviours/WhiteboxCar/WhiteboxCar.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/VehicleDamageComponent.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
+#include "SDK/EARS_Locale/LocaleManager.h"
 
 #include "SDK/EARS_RT_LLRender/include/ShaderManager.h"
 
@@ -859,6 +860,52 @@ void ImGuiManager::DrawTab_UIHUDSettings()
 		else
 		{
 			ImGui::Text("City Manager is missing!");
+		}
+
+		if (EARS::Locale::LocaleManager* LocaleMgr = EARS::Locale::LocaleManager::GetInstance())
+		{
+			if (ImGui::BeginCombo("###select_language_text", "Select Language"))
+			{
+				for (uint32_t i = 0; i < LocaleMgr->GetNumLanguages(); i++)
+				{
+					if (LocaleMgr->GetTextLanguageIsUserSelectable(i))
+					{
+						const char* LanguageCode = LocaleMgr->GetTextLanguageCode(i);
+						const std::string Label = LocaleMgr->GetLanguageName(LanguageCode);
+
+						if (ImGui::Selectable(Label.c_str()))
+						{
+							LocaleMgr->SetCurrentLanguage(i);
+						}
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+
+			if (ImGui::BeginCombo("###select_language_audio", "Select Audio Language"))
+			{
+				for (uint32_t i = 0; i < LocaleMgr->GetNumLanguages(); i++)
+				{
+					if (LocaleMgr->GetTextLanguageIsUserSelectable(i))
+					{
+						const char* LanguageCode = LocaleMgr->GetTextLanguageCode(i);
+						const int AudioIndex = LocaleMgr->FindAudioLanguageIndex(LanguageCode);
+
+						if (AudioIndex != -1)
+						{
+							const std::string Label = LocaleMgr->GetLanguageName(LanguageCode);
+
+							if (ImGui::Selectable(Label.c_str()))
+							{
+								LocaleMgr->SetCurrentAudioLanguage(AudioIndex);
+							}
+						}
+					}
+				}
+
+				ImGui::EndCombo();
+			}
 		}
 
 		ImGui::EndTabItem();
