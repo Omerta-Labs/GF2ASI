@@ -11,7 +11,9 @@ const std::unordered_map<std::string, std::string> EARS::Locale::LocaleManager::
 	{"nl", "Dutch"},
 	{"pl", "Polish"},
 	{"fr", "French"},
-	{"de", "German"}
+	{"de", "German"},
+	{"it", "Italian"},
+	{"jp", "Japanese"}
 };
 
 std::string EARS::Locale::LocaleManager::GetLanguageName(const char* code)
