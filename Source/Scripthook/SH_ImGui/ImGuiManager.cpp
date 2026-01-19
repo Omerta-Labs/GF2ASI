@@ -36,6 +36,7 @@
 #include "SDK/EARS_Godfather/Modules/Vehicles/Behaviours/WhiteboxCar/WhiteboxCar.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/VehicleDamageComponent.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
+#include "SDK/EARS_Physics/Vehicles/ground/wheeled/HavokWheeledVehicle.h"
 
 #include "SDK/EARS_RT_LLRender/include/ShaderManager.h"
 
@@ -47,6 +48,8 @@
 #include <sstream>
 
 #define ENABLE_ENTITY_SPAWN_DEBUG 0
+
+#define SHOW_ATTRIBUTEPACKET_WINDOW 0
 
 #if DEBUG
 #define SHOW_DEMOGRAPHICS_TAB 0
@@ -78,6 +81,8 @@ public:
 namespace DefinedEvents
 {
 	static hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
+	static hook::Type<RWS::CEventId> DoRenderEvent = hook::Type<RWS::CEventId>(0x01206970);
+	static hook::Type<RWS::CEventId> PreRenderEvent = hook::Type<RWS::CEventId>(0x01206980);
 	static hook::Type<RWS::CEventId> PlayerAsDriverEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E030);
 	static hook::Type<RWS::CEventId> PlayerAsPassengerEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E11C);
 	static hook::Type<RWS::CEventId> PlayerExitVehicleEvent = hook::Type<RWS::CEventId>(0x112E018);
@@ -879,6 +884,52 @@ void ImGuiManager::DrawTab_ObjectMgrSettings()
 	}
 }
 
+void ImGuiManager::DrawTab_SimMgrSettings()
+{
+	if (ImGui::BeginTabItem("Sim Manager"))
+	{
+		EARS::Framework::SimManager& SimMgr = *EARS::Framework::SimManager::GetInstance();
+		EARS::Framework::StreamManager& StreamMgr = *EARS::Framework::StreamManager::GetInstance();
+
+		static RWS::CAttributePacket* FoundPacket = nullptr;
+
+		static EARS::Common::guid128_t PacketGUID;
+
+		ImGui::Text("Search for a Packet:");
+		ImGui::InputScalarN("###packet_search", ImGuiDataType_U32, &PacketGUID.a, 4);
+		if (ImGui::Button("Find"))
+		{
+			FoundPacket = SimMgr.GetAttributePacket(&PacketGUID, 0);
+		}
+
+		if (FoundPacket)
+		{
+			const EARS::Common::guid128_t PacketID = FoundPacket->GetInstanceID();
+			const uint32_t ClassID = FoundPacket->GetIdOfClassToCreate();
+			const uint32_t StreamHdl = FoundPacket->GetStreamHandle();
+
+			EARS::Framework::Stream* Str = StreamMgr.GetStreamFromHandle(StreamHdl);
+			const char* StrFilename = Str->GetFileName();
+
+			ImGui::Text("Parent Stream: %s (%u)", StrFilename, StreamHdl);
+			ImGui::Value("ClassID", ClassID);
+			
+			auto EntityIt = FoundPacket->GetEntityIterator();
+			while (EntityIt.IsFinished() == false)
+			{
+				ImGui::Text("%p", EntityIt.GetEntity());
+
+				EARS::Framework::Entity* AsEntity = reinterpret_cast<EARS::Framework::Entity*>(EntityIt.GetEntity_Mutable());
+
+				EntityIt++;
+			}
+
+		}
+
+		ImGui::EndTabItem();
+	}
+}
+
 void ImGuiManager::DrawTab_Support()
 {
 	auto AddUnderLine = [](ImColor col_)
@@ -983,6 +1034,10 @@ void ImGuiManager::OnTick()
 #endif // SHOW_DEMOGRAPHICS_TAB
 
 				DrawTab_ObjectMgrSettings();
+
+#if SHOW_ATTRIBUTEPACKET_WINDOW
+				DrawTab_SimMgrSettings();
+#endif // SHOW_ATTRIBUTEPACKET_WINDOW
 
 				DrawTab_CitiesSettings();
 

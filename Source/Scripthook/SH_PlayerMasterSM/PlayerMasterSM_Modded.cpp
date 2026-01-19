@@ -59,7 +59,7 @@ namespace SH
 	{
 		const EARS::Modules::PlayerDebugOptions& DebugOptions = *EARS::Modules::PlayerDebugOptions::GetInstance();
 		const bool bWantsFlyMode = DebugOptions.IsInDebugFly();
-		const bool bIsFlying = (CurrentState == EActiveState::FlyMode);
+		bool bIsFlying = (CurrentState == EActiveState::FlyMode);
 
 		// check if the state is mismatched
 		if (bIsFlying != bWantsFlyMode)
@@ -70,7 +70,12 @@ namespace SH
 				const EARS::Havok::CharacterProxy::CollisionState NewState = (bWantsFlyMode ? EARS::Havok::CharacterProxy::CollisionState::CS_TRIGGERS_ONLY : EARS::Havok::CharacterProxy::CollisionState::CS_ENABLED);
 				CharProxy.SetCollisionState(NewState);
 			}
+
+			CurrentState = (bWantsFlyMode ? EActiveState::FlyMode : EActiveState::Game);
 		}
+
+		// update flag
+		bIsFlying = (CurrentState == EActiveState::FlyMode);
 
 		// now listen for players inputs
 		if (bIsFlying)

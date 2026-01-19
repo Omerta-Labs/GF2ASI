@@ -219,10 +219,10 @@ void Mod::ObjectManager::ImGuiDrawContents()
 		if (ImGui::Button("Spawn NPC"))
 		{
 			const RWS::CAttributeHandler* ActiveSimNPC = SimMgr->Find(NPCSpawnList.GetSelectedGUID(), nullptr);
-			assert(ActiveSimNPC->HasAttributeHandlerFlag(0x8000000));
-
 			if (ActiveSimNPC)
 			{
+				assert(ActiveSimNPC->HasAttributeHandlerFlag(0x8000000));
+
 				const EARS::Framework::Base* AsBase = reinterpret_cast<const EARS::Framework::Base*>(ActiveSimNPC);
 				const EARS::Modules::SimNPC* AsSimNPC = EARS::Framework::_QueryInterface<EARS::Modules::SimNPC>(AsBase, 0xD7E44D6A);
 				const EARS::Common::guid128_t NPCGuid = AsSimNPC->GetNPCGuid();

@@ -95,6 +95,8 @@ private:
 
 	void DrawTab_ObjectMgrSettings();
 
+	void DrawTab_SimMgrSettings();
+
 	void DrawTab_Support();
 
 	bool SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, bool bGodModeActive) const;
