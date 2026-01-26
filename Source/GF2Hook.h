@@ -6,9 +6,11 @@ public:
 
 	void Init_Logging();
 
+	void Init_ModSystems();
+
 	void Init_AttachHooks();
 
-	void Init_Systems();
+	void Init_GameSystems();
 
 	void Tick();
 };

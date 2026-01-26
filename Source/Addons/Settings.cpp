@@ -17,6 +17,7 @@ void Settings::Init()
 		FlyModeUpInput = GetPrivateProfileIntW(L"Keybinds", L"flyup", VK_PRIOR, WidePath.data());
 		FlyModeDownInput = GetPrivateProfileIntW(L"Keybinds", L"flydown", VK_NEXT, WidePath.data());
 		bWantsPreOrderBonus = GetPrivateProfileIntW(L"Mods", L"UnlockPreOrderCrew", true, WidePath.data());
+		bApplyCPUFix = GetPrivateProfileIntW(L"Fixes", L"ApplyCpuFix", true, WidePath.data());
 	}
 }
 

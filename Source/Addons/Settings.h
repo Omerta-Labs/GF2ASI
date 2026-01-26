@@ -15,6 +15,7 @@ public:
 	int GetFlyModeUpInput() const;
 	int GetFlyModeDownInput() const;
 	bool WantsPreOrderBonus() const { return bWantsPreOrderBonus; }
+	bool ApplyCPUFix() const { return bApplyCPUFix; }
 
 private:
 
@@ -29,4 +30,7 @@ private:
 
 	// Whether or not the Player wants Pre-order bonus unlocked
 	bool bWantsPreOrderBonus = true;
+
+	// Whether or not we should try and limit CPU count
+	bool bApplyCPUFix = true;
 };

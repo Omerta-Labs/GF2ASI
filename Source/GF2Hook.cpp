@@ -30,6 +30,7 @@
 #include <SDK/EARS_RT_LLRender/include/ShaderManager.h>
 
 #include <sol.hpp>
+#include <thread>
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
@@ -381,8 +382,19 @@ void __fastcall HOOK_City_HandleAttributes(EARS::Modules::City* pThis, void* ecx
 uint64_t EARSJobScheduler_GetDefaultThreadCount_old;
 int _cdecl HOOK_EARSJobScheduler_GetDefaultThreadCount()
 {
-	auto r = PLH::FnCast(EARSJobScheduler_GetDefaultThreadCount_old, &HOOK_EARSJobScheduler_GetDefaultThreadCount)();
-	return r;
+	if (Settings::GetCheckedRef().ApplyCPUFix())
+	{
+		// Returns logical processor count (includes hyperthreads)
+		unsigned int coreCount = std::thread::hardware_concurrency();
+
+		const int UpperCoreCountLimit = min(10, coreCount);
+		const int LowerCoreCountLimit = max(0, UpperCoreCountLimit - 2);
+		return LowerCoreCountLimit;
+	}
+	else
+	{
+		return PLH::FnCast(EARSJobScheduler_GetDefaultThreadCount_old, &HOOK_EARSJobScheduler_GetDefaultThreadCount)();
+	}
 }
 
 uint64_t OpenLevelServices_Old;
@@ -466,6 +478,12 @@ void GF2Hook::Init_Logging()
 
 	tConsole::fCreate("GF2SE");
 #endif // DEBUG
+}
+
+void GF2Hook::Init_ModSystems()
+{
+	Settings* SettingsMgr = Settings::Get();
+	SettingsMgr->Init();
 }
 
 void GF2Hook::Init_AttachHooks()
@@ -562,11 +580,8 @@ void GF2Hook::Init_AttachHooks()
 	EARS::Modules::ScoreKeeper::StaticApplyHooks();
 }
 
-void GF2Hook::Init_Systems()
+void GF2Hook::Init_GameSystems()
 {
-	Settings* SettingsMgr = Settings::Get();
-	SettingsMgr->Init();
-
 	ImGuiManager* OurImGuiManager = ImGuiManager::Get();
 	OurImGuiManager->Open();
 

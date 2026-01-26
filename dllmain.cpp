@@ -10,6 +10,7 @@ void InitialiseHook()
     bool bHookInit = false;
 
     Hook.Init_Logging();
+    Hook.Init_ModSystems();
     Hook.Init_AttachHooks();
 
     while (true)
@@ -17,7 +18,7 @@ void InitialiseHook()
         hook::Type<IDirect3DDevice9*> class_index = hook::Type<IDirect3DDevice9*>(0x1205750);
         if (class_index != nullptr && bHookInit == false)
         {
-            Hook.Init_Systems();
+            Hook.Init_GameSystems();
             bHookInit = true;
         }
 
