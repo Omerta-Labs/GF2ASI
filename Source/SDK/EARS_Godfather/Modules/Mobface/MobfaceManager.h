@@ -42,6 +42,13 @@ namespace EARS
 			 */
 			bool HasSavedData(const PlayerFamilyTree::FamilyTreeSlot SlotIndex) const;
 
+			/**
+			 * Clear all MobFace data for this particular slot.
+			 * This is NOT part of the engine code.
+			 * @param SlotIndex - The Family Tree Slot we want to use when querying the Manager
+			 */
+			void ResetMobfaceForSlot(const PlayerFamilyTree::FamilyTreeSlot SlotIndex);
+
 			/* Build model from the saved data in the save game file */
 			void BuildModelFromSavedData(const PlayerFamilyTree::FamilyTreeSlot SlotIndex, EARS::Modules::PartedAnimated* TargetModel);
 
@@ -53,8 +60,11 @@ namespace EARS
 			bool HasMobFaceSaveData(const uint32_t BitIndex) const;
 			bool HasApparelSaveData(const uint32_t BitIndex) const;
 
+			void ClearMobFaceSaveData(const uint32_t BitIndex);
+			void ClearApparelSaveData(const uint32_t BitIndex);
+
 			// 0x40
-			char m_Mobface_Padding0[0x34];
+			char m_Mobface_Padding0[0x30];
 			EARS::Modules::MobFaceSaveHdr m_SaveHeader;
 
 		};

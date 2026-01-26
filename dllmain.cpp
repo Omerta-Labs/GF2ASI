@@ -9,12 +9,15 @@ void InitialiseHook()
     GF2Hook Hook;
     bool bHookInit = false;
 
+    Hook.Init_Logging();
+    Hook.Init_AttachHooks();
+
     while (true)
     {
         hook::Type<IDirect3DDevice9*> class_index = hook::Type<IDirect3DDevice9*>(0x1205750);
         if (class_index != nullptr && bHookInit == false)
         {
-            Hook.Init();
+            Hook.Init_Systems();
             bHookInit = true;
         }
 

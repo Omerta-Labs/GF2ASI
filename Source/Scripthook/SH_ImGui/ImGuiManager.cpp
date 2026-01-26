@@ -22,6 +22,7 @@
 #include "SDK/EARS_Godfather/Modules/Item/Item.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/Player/PlayerDebug.h"
+#include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
 #include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
 #include "SDK/EARS_Godfather/Modules/Turf/City.h"
 #include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
@@ -818,6 +819,10 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 								{
 									DesiredSpecialities = (uint32_t)EARS::Modules::Specialties::SPECIALITY_ARSONIST;
 								}
+
+								// We must release MobFace, otherwise we may risk a crash with non-mobface types.
+								EARS::Modules::MobfaceManager& MobFaceMgr = *EARS::Modules::MobfaceManager::GetInstance();
+								MobFaceMgr.ResetMobfaceForSlot(FoundSlotIndex);
 
 								// now replace with the new family member
 								FamilyTreeData->AddFamilyMember(

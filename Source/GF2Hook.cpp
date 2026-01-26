@@ -378,6 +378,13 @@ void __fastcall HOOK_City_HandleAttributes(EARS::Modules::City* pThis, void* ecx
 }
 #endif // ENABLE_GF2_SPAWN_ENTITY_HOOKS
 
+uint64_t EARSJobScheduler_GetDefaultThreadCount_old;
+int _cdecl HOOK_EARSJobScheduler_GetDefaultThreadCount()
+{
+	auto r = PLH::FnCast(EARSJobScheduler_GetDefaultThreadCount_old, &HOOK_EARSJobScheduler_GetDefaultThreadCount)();
+	return r;
+}
+
 uint64_t OpenLevelServices_Old;
 void __cdecl Hook_OpenLevelServices()
 {
@@ -452,24 +459,18 @@ void __cdecl Hook_CloseLevelServices()
 	PLH::FnCast(CloseLevelServices_Old, &Hook_CloseLevelServices)();
 }
 
-void GF2Hook::Init()
+void GF2Hook::Init_Logging()
 {
 #if DEBUG
 	C_Logger::Create("GF2_Hook.txt");
 
 	tConsole::fCreate("GF2SE");
 #endif // DEBUG
+}
 
+void GF2Hook::Init_AttachHooks()
+{
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
-
-	Settings* SettingsMgr = Settings::Get();
-	SettingsMgr->Init();
-
-	ImGuiManager* OurImGuiManager = ImGuiManager::Get();
-	OurImGuiManager->Open();
-
-	DiscordManager* OurDiscordManager = DiscordManager::Get();
-	OurDiscordManager->Open();
 
 	Mod::ApplyHooks();
 
@@ -554,9 +555,25 @@ void GF2Hook::Init()
 	PLH::x86Detour detour1555((char*)0x09BCB30, (char*)&HOOK_MobfaceManager_SetTargetModel, &MobfaceManager_SetTargetModel_Old, dis);
 	detour1555.hook();
 
-	Mod::ScripthookEvents_Open();
+	PLH::x86Detour detour1557((char*)0x0495010, (char*)&HOOK_EARSJobScheduler_GetDefaultThreadCount, &EARSJobScheduler_GetDefaultThreadCount_old, dis);
+	detour1557.hook();
+
 	EARS::Modules::DemographicRegion::StaticApplyHooks();
 	EARS::Modules::ScoreKeeper::StaticApplyHooks();
+}
+
+void GF2Hook::Init_Systems()
+{
+	Settings* SettingsMgr = Settings::Get();
+	SettingsMgr->Init();
+
+	ImGuiManager* OurImGuiManager = ImGuiManager::Get();
+	OurImGuiManager->Open();
+
+	DiscordManager* OurDiscordManager = DiscordManager::Get();
+	OurDiscordManager->Open();
+
+	Mod::ScripthookEvents_Open();
 }
 
 void GF2Hook::Tick()

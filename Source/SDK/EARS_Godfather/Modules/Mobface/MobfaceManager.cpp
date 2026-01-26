@@ -5,8 +5,18 @@
 
 bool EARS::Modules::MobfaceManager::HasSavedData(const EARS::Modules::PlayerFamilyTree::FamilyTreeSlot SlotIndex) const
 {
-	const uint32_t BitIndex = (uint32_t)((int32_t)SlotIndex + 1);
+	const int32_t SlotIndexAsInt = (int32_t)SlotIndex;
+	const uint32_t BitIndex = (uint32_t)(1 << (SlotIndexAsInt + 1));
 	return HasApparelSaveData(BitIndex) || HasMobFaceSaveData(BitIndex);
+}
+
+void EARS::Modules::MobfaceManager::ResetMobfaceForSlot(const PlayerFamilyTree::FamilyTreeSlot SlotIndex)
+{
+	const int32_t SlotIndexAsInt = (int32_t)SlotIndex;
+	const uint32_t BitIndex = (uint32_t)(1 << (SlotIndexAsInt + 1));
+
+	ClearMobFaceSaveData(BitIndex);
+	ClearApparelSaveData(BitIndex);
 }
 
 bool EARS::Modules::MobfaceManager::HasApparelSaveData(const uint32_t BitIndex) const
@@ -17,6 +27,16 @@ bool EARS::Modules::MobfaceManager::HasApparelSaveData(const uint32_t BitIndex) 
 bool EARS::Modules::MobfaceManager::HasMobFaceSaveData(const uint32_t BitIndex) const
 {
 	return (m_SaveHeader.m_EditedInMobFace & BitIndex) == BitIndex;
+}
+
+void EARS::Modules::MobfaceManager::ClearMobFaceSaveData(const uint32_t BitIndex)
+{
+	m_SaveHeader.m_EditedInMobFace &= ~BitIndex;
+}
+
+void EARS::Modules::MobfaceManager::ClearApparelSaveData(const uint32_t BitIndex)
+{
+	m_SaveHeader.m_EditedInApparel &= ~BitIndex;
 }
 
 void EARS::Modules::MobfaceManager::BuildModelFromSavedData(const PlayerFamilyTree::FamilyTreeSlot SlotIndex, EARS::Modules::PartedAnimated* TargetModel)
