@@ -6,6 +6,7 @@
 // C++
 #include <d3d9.h>
 #include <d3dx9shader.h>
+#include <format>
 
 // internal type to describe a registered shader
 struct LS_Shader
@@ -75,11 +76,70 @@ void TestLSShader()
 #if DEBUG
 	const LS_Shader* Shaders = LS_ShaderList.ptr();
 
+	typedef HRESULT(WINAPI* pfnDisasm)(const DWORD*, BOOL, const char*, ID3DXBuffer**);
+	pfnDisasm pDisasm = (pfnDisasm)GetProcAddress(GetModuleHandle("d3dx9_40.dll"), "D3DXDisassembleShader");
+
 	for (SM_Shader_Base* Shader = pShaderWrapperList.get(); Shader; Shader = Shader->pNext)
 	{
 		const char* Name = Shader->GetName();
 		const LS_Shader& VertexShader = Shaders[Shader->psHandle];
 		const LS_Shader& ProgramShader = Shaders[Shader->vsHandle];
+
+		const std::string ShaderPath = "J://GF2_Shaders//";
+
+		if (VertexShader.shader)
+		{
+			IDirect3DVertexShader9* AsVertexShader = reinterpret_cast<IDirect3DVertexShader9*>(VertexShader.shader);
+
+			uint32_t size = 0;
+			AsVertexShader->GetFunction(nullptr, &size);
+
+			uint8_t* vtxdata = new uint8_t[size];
+			AsVertexShader->GetFunction(vtxdata, &size);
+
+			const std::string Path = std::format("{}{}_Vertex.bin", ShaderPath, Name);
+			FILE* Stream = fopen(Path.data(), "wb");
+			fwrite(vtxdata, 1, size, Stream);
+			fclose(Stream);
+
+			const std::string Path2 = std::format("{}{}_Vertex_decomp.bin", ShaderPath, Name);
+
+			ID3DXBuffer* buf = NULL;
+			pDisasm((DWORD*)vtxdata, FALSE, NULL, &buf);
+			FILE* StreamR = fopen(Path2.data(), "w");
+			fwrite(buf->GetBufferPointer(), 1, buf->GetBufferSize(), StreamR);
+			fclose(StreamR);
+			buf->Release();
+
+			delete[] vtxdata;
+		}
+
+		if (ProgramShader.shader)
+		{
+			IDirect3DPixelShader9* AsPixelShader = reinterpret_cast<IDirect3DPixelShader9*>(ProgramShader.shader);
+
+			uint32_t size = 0;
+			AsPixelShader->GetFunction(nullptr, &size);
+
+			uint8_t* vtxdata = new uint8_t[size];
+			AsPixelShader->GetFunction(vtxdata, &size);
+
+			const std::string Path = std::format("{}{}_Pixel.bin", ShaderPath, Name);
+			FILE* Stream = fopen(Path.data(), "wb");
+			fwrite(vtxdata, 1, size, Stream);
+			fclose(Stream);
+
+			const std::string Path2 = std::format("{}{}_Pixel_decomp.bin", ShaderPath, Name);
+
+			ID3DXBuffer* buf = NULL;
+			pDisasm((DWORD*)vtxdata, FALSE, NULL, &buf);
+			FILE* StreamR = fopen(Path2.data(), "w");
+			fwrite(buf->GetBufferPointer(), 1, buf->GetBufferSize(), StreamR);
+			fclose(StreamR);
+			buf->Release();
+
+			delete[] vtxdata;
+		}
 
 		tConsole::fPrintf("START_SHADER");
 		tConsole::fWriteLine(Name);
