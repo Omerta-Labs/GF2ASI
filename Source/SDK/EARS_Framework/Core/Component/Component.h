@@ -32,6 +32,11 @@ namespace EARS
 
 		private:
 
+			enum class CEventHandlerFlags
+			{
+				CEVENTHANDLER_FLAG_COMPONENT = 0x20
+			};
+
 			RWS::CAttributeHandler* m_GameObject = nullptr;
 		};
 	} // Framework

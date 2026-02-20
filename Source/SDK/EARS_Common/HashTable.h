@@ -7,7 +7,7 @@ namespace EARS
 {
 	namespace Common
 	{
-		template<typename TKey, typename TValue, class TCompare = CompareFunc<TKey>, class THash = HashFunc<TKey>, class TGetKey = GetKeyFunc<TValue>, class TGetValue = HashNext<TValue>>
+		template<typename TKey, typename TValue, class TCompare = CompareFunc<TKey>, class THash = HashFunc<TKey>, class TGetKey = GetKeyFunc<TValue, TKey>, class TGetValue = HashNext<TValue>>
 		struct IntrusiveHashTable
 		{
 		public:
@@ -125,6 +125,119 @@ namespace EARS
 			uint32_t m_NumBins = 0;
 			uint32_t m_NumEntries = 0;
 			bool m_bGrowable = false;
+		};
+
+		template<typename TKey, typename TValue, int TBinCount, class TCompare = CompareFunc<TKey>, class THash = HashFunc<TKey>, class TGetKey = GetKeyFunc<TValue, TKey>, class TGetValue = HashNext<TValue>>
+		struct IntrusiveHashTableFast
+		{
+		public:
+
+			using THashTableType = IntrusiveHashTableFast<TKey, TValue, TBinCount, TCompare, THash, TGetKey, TGetValue>;
+
+			IntrusiveHashTableFast()
+			{
+				m_NumEntries = 0;
+				memset(this, 0, sizeof(TValue) * TBinCount);
+			}
+
+			uint32_t GetBin(const TKey& Key) const
+			{
+				return THash::Hash(Key);
+			}
+
+			uint32_t GetBin(const TValue& Value) const
+			{
+				const TKey& ValueKey = TGetKey::GetKey(&Value);
+				return GetBin(ValueKey);
+			}
+
+			TValue* FindEntry(const TKey& Key) const
+			{
+				int index = GetBin(Key) & 0xFFF;
+				for (auto i = m_BinArray[index]; i; i = TGetValue::GetHashNext(*i))
+				{
+					const TKey& ValueKey = TGetKey::GetKey(*i);
+					if (TCompare::Equal(ValueKey, Key))
+					{
+						return i;
+					}
+				}
+
+				return nullptr;
+			}
+
+			void Clear()
+			{
+				m_NumEntries = 0;
+				memset(this, 0, sizeof(TValue) * TBinCount);
+			}
+
+			uint32_t Size() const { m_NumEntries; }
+
+			struct Iterator
+			{
+			public:
+
+				Iterator(THashTableType* InHashTable)
+					: m_HashTable(InHashTable)
+					, m_NextBin(0)
+					, m_Entry(nullptr)
+				{
+					Reset();
+				}
+
+				void WalkToValidEntry()
+				{
+					if (const THashTableType* CurHashTable = m_HashTable)
+					{
+						while (!m_Entry && m_NextBin < CurHashTable->GetNumBins())
+						{
+							m_Entry = CurHashTable->m_BinArray[m_NextBin++];
+						}
+					}
+				}
+
+				void Reset()
+				{
+					m_NextBin = 0;
+					m_Entry = nullptr;
+
+					WalkToValidEntry();
+				}
+
+				bool IsFinshed() const { return m_Entry == nullptr; }
+
+				TValue* GetObject() const { return m_Entry; }
+
+				// operator overloads
+				TValue* operator*()
+				{
+					return GetObject();
+				}
+
+				Iterator& operator++(int a1)
+				{
+					m_Entry = TGetValue::GetHashNext(*m_Entry);
+					WalkToValidEntry();
+					return *this;
+				}
+
+			private:
+
+				THashTableType* m_HashTable = nullptr;
+				uint32_t m_NextBin = 0;
+				TValue* m_Entry = nullptr;
+			};
+
+			Iterator CreateIterator()
+			{
+				return Iterator(this);
+			}
+
+		private:
+
+			TValue* m_BinArray[TBinCount];
+			uint32_t m_NumEntries = 0;
 		};
 
 		template<typename TKey, typename TValue, size_t N, class TCompare = CompareFunc<TKey>, class THash = HashFunc<TKey>>

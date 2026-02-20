@@ -33,12 +33,12 @@ namespace EARS
 			static void SetHashNext(TType& Value, TType* Next) = 0;
 		};
 
-		template<class TType>
+		template<class TValue, typename TKey>
 		struct GetKeyFunc
 		{
 		public:
 
-			static TType* GetKey(const TType& Value) = 0;
+			static TKey* GetKey(const TValue& Value) = 0;
 		};
 
 		uint32_t HashMem_SDBM(const void* pVoidData, uint32_t dataLen);

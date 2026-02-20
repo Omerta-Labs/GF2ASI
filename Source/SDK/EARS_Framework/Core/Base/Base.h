@@ -15,13 +15,24 @@ namespace EARS
 		{
 		public:
 
+
+
 			virtual ~Base() = 0;
 
 			virtual bool QueryInterface(const uint32_t ClassID, void** OutObjectPtr) const = 0;
 			virtual void LinkTick() = 0;
 			virtual void UnLinkTick() = 0;
 
+			static bool IsEventHandlerBase(const RWS::CEventHandler& InHandler);
+
 		private:
+
+			// We add flag to EventHandler to determine type
+			enum class CEventHandlerFlags
+			{
+				CEVENTHANDLER_FLAG_BASE = 0x10
+			};
+
 			// I'm assuming this is 0x50 in size
 		};
 
