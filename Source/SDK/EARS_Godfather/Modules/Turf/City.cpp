@@ -27,7 +27,7 @@ void EARS::Modules::City::RevealToPlayer()
 
 void EARS::Modules::City::RequestTeleport() const
 {
-	RWS::LinkedEventHandlerIterator TestIt = RWS::LinkedEventHandlerIterator(m_TeleportMsg);
+	/*RWS::LinkedEventHandlerIterator TestIt = RWS::LinkedEventHandlerIterator(m_TeleportMsg);
 	while (!TestIt.IsFinished())
 	{
 		const RWS::CLinkedMsg* result = *TestIt;
@@ -50,7 +50,7 @@ void EARS::Modules::City::RequestTeleport() const
 		}
 
 		TestIt++;
-	}
+	}*/
 
 	// RWS::SendMsg
 	MemUtils::CallCdeclMethod<void, RWS::CEventId*, bool>(0x0402050, &m_TeleportMsg, false);

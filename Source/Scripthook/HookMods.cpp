@@ -20,7 +20,7 @@
 #define IMPLEMENT_DEBUG_FLY_SM 0
 #define IMPLEMENT_ANIM_VIEWER_SM 0
 #define IMPLEMENT_PHOTO_MODE_SM 0
-#define OVERRIDE_LAUNCH_CMD 1
+#define OVERRIDE_LAUNCH_CMD 0
 
 EARS::StateMachineSys::StateMachine* S_PlayerMasterSM_FactoryFn(unsigned int id, EARS::StateMachineSys::StateMachineParams* pSMParams)
 {
