@@ -7,6 +7,7 @@ struct String
 {
 public:
 
+	String() = default;
 	String(const char* InSrc);
 	~String();
 

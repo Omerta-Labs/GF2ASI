@@ -11,6 +11,7 @@
 #include "SDK/EARS_Framework/Toolkits/StateMachine/SMBuilder.h"
 #include "SDK/EARS_Godfather/Modules/Player/PlayerMasterSM.h"
 #include "SDK/EARS_Godfather/Modules/Player/PlayerDebugFlySM.h"
+#include "SDK/EARS_Godfather/Modules/UI/UIPopup.h"
 
 // Pl2
 #include <polyhook2/Detour/x86Detour.hpp>
@@ -20,6 +21,7 @@
 #define IMPLEMENT_DEBUG_FLY_SM 0
 #define IMPLEMENT_ANIM_VIEWER_SM 0
 #define IMPLEMENT_PHOTO_MODE_SM 0
+#define IMPLEMENT_DEMO_PACKAGE_POPUP 1
 #define OVERRIDE_LAUNCH_CMD 0
 
 EARS::StateMachineSys::StateMachine* S_PlayerMasterSM_FactoryFn(unsigned int id, EARS::StateMachineSys::StateMachineParams* pSMParams)
@@ -103,6 +105,42 @@ void _cdecl HOOK_UIFrontend_LaunchGame(const char* pMaps, const char* pStreams, 
 }
 #endif // OVERRIDE_LAUNCH_CMD
 
+#if IMPLEMENT_DEMO_PACKAGE_POPUP
+void DemoPopupCallback(int SelectedOption, EARS::Apt::UIPopupInfo* PopupInfo, bool bAborted)
+{
+	if (bAborted)
+	{
+
+	}
+	if (PopupInfo)
+	{
+		PopupInfo->~UIPopupInfo();
+		MemUtils::CallCdeclMethod<void, void*>(0x9C8EB0, PopupInfo);
+	}
+}
+
+// PURPOSE: Ability to extend the games init streams and spawn location
+uint64_t UIFrontend_EnterState_StartNewGame_Old;
+typedef void(__thiscall* UIFrontend_EnterState_StartNewGame)(void*, int);
+void __fastcall HOOK_UIFrontend_EnterState_StartNewGame(void* _this, int ePreviousState)
+{
+	//UIFrontend_EnterState_StartNewGame funcCast = (UIFrontend_EnterState_StartNewGame)UIFrontend_EnterState_StartNewGame_Old;
+	//funcCast(_this, ePreviousState);
+
+	// create popup
+	void* alloc = MemUtils::CallCdeclMethod<uint8_t*>(0x09C8E50, sizeof(EARS::Apt::UIPopupInfo));
+	EARS::Apt::UIPopupInfo* obj = new (alloc) EARS::Apt::UIPopupInfo();
+
+	obj->SetStyle(EARS::Apt::UIPopupInfo::PopupStyle::STANDARD);
+	obj->SetCallback(DemoPopupCallback);
+	obj->SetDescription("Debug Options");
+	obj->AddOption("New Game", 1, -2);
+	obj->AddOption("Main Menu", 0, -3);
+	obj->Show();
+
+}
+#endif // IMPLEMENT_DEMO_PACKAGE_POPUP
+
 void Mod::ApplyHooks()
 {
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
@@ -119,4 +157,9 @@ void Mod::ApplyHooks()
 	PLH::x86Detour detour105((char*)0x0930E70, (char*)&HOOK_UIFrontend_LaunchGame, &UIFrontend_LaunchGame_Old, dis);
 	detour105.hook();
 #endif // OVERRIDE_LAUNCH_CMD
+
+#if IMPLEMENT_DEMO_PACKAGE_POPUP
+	PLH::x86Detour detour106((char*)0x0931CF0, (char*)&HOOK_UIFrontend_EnterState_StartNewGame, &UIFrontend_EnterState_StartNewGame_Old, dis);
+	detour106.hook();
+#endif // IMPLEMENT_DEMO_PACKAGE_POPUP
 }
