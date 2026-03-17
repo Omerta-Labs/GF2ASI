@@ -20,6 +20,8 @@ namespace EARS
 	namespace StateMachineSys
 	{
 		struct StateTable;
+		struct StateMachineParams;
+		class StateMachine;
 
 		class StateMachineManager : public Singleton<StateMachineManager>
 		{
@@ -29,6 +31,9 @@ namespace EARS
 
 			/* Fetch State Table using Given ID */
 			StateTable* GetStateTableFromID(uint32_t InTableID) const;
+
+			/* Create a new StateMachine instance from a table ID; params may be nullptr */
+			StateMachine* CreateStateMachineFromTableID(uint32_t TableID, StateMachineParams* Params);
 
 			// getters
 			EA::Allocator::IAllocator* GetStateMachineAllocator() const { return m_StateMachineAllocator; }

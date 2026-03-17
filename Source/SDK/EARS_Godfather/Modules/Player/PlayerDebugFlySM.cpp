@@ -87,7 +87,7 @@ namespace EARS
 			return true;
 		}
 
-		bool EARS::Modules::PlayerDebugFlySM::CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, void* TransData)
+		bool EARS::Modules::PlayerDebugFlySM::CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, EARS::StateMachineSys::Transition::TransitionData* TransData)
 		{
 			if (TransID == 17) // TRANSID_STOPDEBUGFLY
 			{

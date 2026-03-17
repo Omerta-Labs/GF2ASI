@@ -45,6 +45,12 @@ namespace EARS::Apt
 		m_NumOptions++;
 	}
 
+	int32_t UIPopupInfo::GetUserValue(const uint32_t InOptionIndex)
+	{
+		assert(InOptionIndex >= m_NumOptions);
+		return m_UserValueArray[InOptionIndex];
+	}
+
 	void UIPopupInfo::Show()
 	{
 		MemUtils::CallClassMethod<void, UIPopupInfo*>(0x0982E10, this);

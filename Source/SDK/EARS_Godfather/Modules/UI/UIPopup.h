@@ -54,6 +54,9 @@ namespace EARS::Apt
 		/** include an option into the popup. Call before Show(). Max is 8. */
 		void AddOption(const char* InText, bool bSelected, int32_t InUserValue);
 
+		/** Grab the user value associated with the option index. */
+		int32_t GetUserValue(const uint32_t InOptionIndex);
+
 		/** Call when Popup is ready to be shown. */
 		void Show();
 

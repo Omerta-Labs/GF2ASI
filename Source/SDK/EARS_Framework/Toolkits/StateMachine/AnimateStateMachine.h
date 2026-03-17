@@ -31,6 +31,10 @@ namespace EARS
 			AnimateStateMachine(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams);
 			virtual ~AnimateStateMachine();
 
+			//~ Begin EARS::Framework::InterruptableStateMachine interface
+			virtual void SpawnChild(uint32_t SimTime, float FrameTime, uint32_t TableID) override;
+			//~ End EARS::Framework::InterruptableStateMachine interface
+
 			virtual int PlayAnim(const uint32_t AnimID, const bool bBlend, const bool bForceAnim, const bool bIgnoreGameMovementBlend, const float FrameRateScale, const bool bGameMovementTranslationScale) = 0;
 
 		protected:

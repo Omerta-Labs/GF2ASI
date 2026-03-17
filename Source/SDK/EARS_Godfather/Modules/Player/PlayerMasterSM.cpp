@@ -33,7 +33,7 @@ bool EARS::Modules::PlayerMasterSM::HandleStateMessage(uint32_t SimTime, float F
 	return EARS::Modules::PlayerSM::HandleStateMessage(SimTime, FrameTime, CurFlags, MessageID, MsgData);
 }
 
-bool EARS::Modules::PlayerMasterSM::CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, void* TransData)
+bool EARS::Modules::PlayerMasterSM::CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, EARS::StateMachineSys::Transition::TransitionData* TransData)
 {
 	if (TransID == 17)
 	{
@@ -48,5 +48,10 @@ bool EARS::Modules::PlayerMasterSM::CheckTransition(uint32_t SimTime, float Fram
 
 void EARS::Modules::PlayerMasterSM::InitialiseChild(StateMachine* ChildMachine)
 {
-	EARS::Modules::PlayerSM::InitialiseChild(ChildMachine);
+	if (ChildMachine->GetStateMachineID() == 0x29CC4DD4)
+	{
+		// TODO: Set Grabbee in PlayerDebugFlySM
+	}
+
+	EARS::StateMachineSys::StateMachine::InitialiseChild(ChildMachine);
 }

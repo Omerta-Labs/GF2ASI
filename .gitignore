@@ -1,3 +1,7 @@
+# agent stuff
+/.claude
+/agents
+
 # Prerequisites
 *.d
 *.sln

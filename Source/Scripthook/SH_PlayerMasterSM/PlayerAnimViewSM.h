@@ -16,7 +16,7 @@ namespace SH
 		//~ Begin EARS::Modules::PlayerSM interface
 		virtual uint32_t GetStateMachineID() const override;
 		virtual bool HandleStateMessage(uint32_t SimTime, float FrameTime, uint32_t CurFlags, uint32_t MessageID, EARS::StateMachineSys::State::StateMessageData* MsgData) override;
-		virtual bool CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, void* TransData) override;
+		virtual bool CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, EARS::StateMachineSys::Transition::TransitionData* TransData) override;
 		//~ End  EARS::Modules::PlayerSM interface
 
 		static void BuildStateMachine();

@@ -40,7 +40,7 @@ namespace SH
 		return EARS::Modules::PlayerSM::HandleStateMessage(SimTime, FrameTime, CurFlags, MessageID, MsgData);
 	}
 
-	bool PlayerAnimViewSM::CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, void* TransData)
+	bool PlayerAnimViewSM::CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, EARS::StateMachineSys::Transition::TransitionData* TransData)
 	{
 		if (TransID == 0x11)
 		{
