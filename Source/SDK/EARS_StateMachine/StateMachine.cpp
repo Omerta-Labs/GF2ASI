@@ -55,6 +55,18 @@ bool EARS::StateMachineSys::TransitionList::Remove(uint32_t StateTableID, uint32
 	return bRemoved;
 }
 
+float EARS::StateMachineSys::State::StateMessageData::GetFloatData() const
+{
+	assert(m_TypeID == StateMachineTypeID::c_SMFloatDataID);
+	return m_Data.m_FloatVal;
+}
+
+uint32_t EARS::StateMachineSys::State::StateMessageData::GetIntData() const
+{
+	assert(m_TypeID == StateMachineTypeID::c_SMIntDataID);
+	return m_Data.m_IntVal;
+}
+
 EARS::StateMachineSys::StateMachine::StateMachine(unsigned int TableID, EARS::StateMachineSys::StateMachineParams* SmParams)
 	: m_StateTableID(TableID)
 	, m_CurStateIdx(0)
@@ -88,18 +100,12 @@ EARS::StateMachineSys::StateMachine::~StateMachine()
 
 bool EARS::StateMachineSys::StateMachine::HandleStateMessage(uint32_t SimTime, float FrameTime, uint32_t CurFlags, uint32_t MessageID, State::StateMessageData* MsgData)
 {
-	// Source: PC ASM 0x624C20 — reconstructed from x86 body.
-	// Handles two built-in messages:
-	//   MessageID 1 — spawn children listed in AddChildrenMessageData (AddChildren message)
-	//   MessageID 2 — remove this state machine from its tree (self-destruct signal)
-	// All other MessageIDs return false (unhandled).
-
 	switch (MessageID)
 	{
 	case State::StateMessageID::MESSAGE_ADD_CHILDREN:
 	{
 		// Spawn children: MsgData->m_Data.m_PointerVal → AddChildrenMessageData*
-		AddChildrenMessageData* data = reinterpret_cast<AddChildrenMessageData*>(MsgData->m_Data.m_PointerVal);
+		AddChildrenMessageData* data = reinterpret_cast<AddChildrenMessageData*>(MsgData->GetPointerData());
 		if ((data->m_Flags & 1) != 0)
 		{
 			SetEvaluateTransitions(true);
@@ -135,14 +141,6 @@ bool EARS::StateMachineSys::StateMachine::HandleStateMessage(uint32_t SimTime, f
 
 bool EARS::StateMachineSys::StateMachine::CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, Transition::TransitionData* TransData)
 {
-	// Source: PC ASM 0x624B00 — reconstructed from x86 body.
-	// Switch on TransID (built-in transition conditions):
-	//   1 — HasNoChildren:          true when m_ChildHead == null
-	//   2 — TimeInStateGreaterThan: true when m_TimeInCurrentState > TransData->float_at_4
-	//   3 — TimeInStateAlways:      true when m_TimeInCurrentState > global constant (0xE2B05C)
-	//   4 — Always:                 unconditionally true
-	//   default:                    false
-
 	using StateMachineTransID = Transition::StateMachineTransID;
 
 	switch (TransID)
@@ -158,11 +156,6 @@ bool EARS::StateMachineSys::StateMachine::CheckTransition(uint32_t SimTime, floa
 	}
 	case StateMachineTransID::TRANSID_NEXTFRAME:
 	{
-		// PC ASM: comiss xmm0, ds:dword_E2B05C  (address 0xE2B05C, dd 0 in .data section)
-		// dword_E2B05C is a mutable global float initialised to 0.0f; fires when
-		// m_TimeInCurrentState > 0.0f (i.e. at least one frame has elapsed in this state).
-		// NOTE: if dword_E2B05C is written at runtime the threshold would change, but
-		// no write sites have been found — treating as the constant 0.0f is safe for now.
 		return GetTimeInCurState() > 0.0f;
 	}
 	case StateMachineTransID::TRANSID_DEFAULT:
@@ -176,7 +169,7 @@ bool EARS::StateMachineSys::StateMachine::CheckTransition(uint32_t SimTime, floa
 	}
 }
 
-void EARS::StateMachineSys::StateMachine::InitialiseChild(StateMachine* ChildMachine)
+void EARS::StateMachineSys::StateMachine::InitialiseChild(StateMachine& ChildMachine)
 {
 	// nothing in default implementation
 	int z = 0;
@@ -433,14 +426,10 @@ void EARS::StateMachineSys::StateMachine::RemoveChild(EARS::StateMachineSys::Sta
 void EARS::StateMachineSys::StateMachine::SpawnChild(uint32_t SimTime, float FrameTime, uint32_t TableID)
 {
 	//// source: ?SpawnChild@StateMachine@StateMachineSys@EARS@@UAAXIIM@Z
-	//// Reconstructed from Xbox 360 PPC disassembly (PDB [0003:00F387F0], 0xAC bytes).
-	//// Creates a new child state machine from the given table ID via the manager,
-	//// propagates our external transitions, calls the virtual InitialiseChild hook,
-	//// then links the child into the tree with AddChild.
 	StateMachineManager* mgr = StateMachineManager::GetInstance();
 	StateMachine* pChild = mgr->CreateStateMachineFromTableID(TableID, nullptr);
 	pChild->SetExternalTransitions(m_ExternalTransitions);
-	InitialiseChild(pChild);
+	InitialiseChild(*pChild);
 	AddChild(SimTime, FrameTime, pChild);
 }
 
@@ -526,11 +515,6 @@ unsigned int EARS::StateMachineSys::StateMachine::PrintStateMachine(char* buf, u
 	return bufSize;
 }
 
-void EARS::StateMachineSys::StateMachine::SetExternalTransitions(TransitionList* ExternalTransitions)
-{
-	m_ExternalTransitions = ExternalTransitions;
-}
-
 void EARS::StateMachineSys::StateMachine::InitializeState(uint32_t simTime, float frameTime)
 {
 	assert(m_States);
@@ -567,12 +551,6 @@ void EARS::StateMachineSys::StateMachine::SetEvaluateTransitions(bool bCheck)
 void EARS::StateMachineSys::StateMachine::TerminateChildren()
 {
 	// source: sub_624D20 (PC address 0x624D20) — reconstructed from x86 body.
-	// Iterates m_ChildHead; for each child:
-	//   1. Recurse into the child's subtree first (depth-first).
-	//   2. Remove the child from this SM's list via RemoveChild.
-	//   3. If the child is mid-Update (EvalFlags & 1): mark it for deferred termination (EvalFlags |= 2).
-	//      Otherwise: delete it immediately (calls virtual destructor + frees memory).
-	// After RemoveChild, m_ChildHead advances to the next child automatically.
 	while (StateMachine* child = m_ChildHead)
 	{
 		child->TerminateChildren();   // recurse depth-first

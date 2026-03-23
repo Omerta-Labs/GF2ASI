@@ -1,7 +1,5 @@
 #include "ChrCntrl_AnimView.h"
 
-#include "ChrCntrl_Character.h"
-
 namespace EA
 {
 	namespace CCT

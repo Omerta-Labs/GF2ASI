@@ -23,10 +23,17 @@ namespace EA
 			 */
 			bool IsPlayingAnim(const uint32_t AnimID) const { return m_RootStateID == AnimID; }
 
+			bool TestFlags(int InFlags) const { return (m_Flags & InFlags) != 0; }
+
 			int ChangeState(EA::CCT::AnimView& InAnimView, const int32_t InStateID);
+
+			void SetAnimSpeed(const float InSpeed) { m_AnimSpeed = InSpeed; }
+
+
 
 			// getters
 			const ChrCntl_ChrInfo_s* GetCharacter() const { return m_Character; }
+			EA::CCT::AnimView* GetSecondary() const { return m_Next; }
 
 		private:
 
@@ -38,6 +45,10 @@ namespace EA
 			EA::CCT::Transform m_GameTransform;
 			void* m_BoneMods = nullptr;
 			void* m_BonePostMods = nullptr;
+			char m_Padding1[0x7C];											// 0xA8-0x123
+			EA::CCT::AnimView* m_Next = nullptr;							// 0x124 — head of secondary anim linked list
+			char m_Padding2[0x08];											// 0x128-0x12F
+			float m_AnimSpeed = 0.0f;										// 0x130
 
 			// 0x70 - character
 			// 0x74 - model index

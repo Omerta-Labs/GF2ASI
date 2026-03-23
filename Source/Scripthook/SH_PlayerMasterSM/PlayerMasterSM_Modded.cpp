@@ -50,7 +50,7 @@ namespace SH
 		return EARS::Modules::PlayerMasterSM::CheckTransition(SimTime, FrameTime, TransID, TransData);
 	}
 
-	void PlayerMasterSM_Modded::InitialiseChild(StateMachine* ChildMachine)
+	void PlayerMasterSM_Modded::InitialiseChild(StateMachine& ChildMachine)
 	{
 		EARS::Modules::PlayerMasterSM::InitialiseChild(ChildMachine);
 	}
