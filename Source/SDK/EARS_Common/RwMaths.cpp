@@ -114,3 +114,11 @@ void RwV3dAddScale(RwV3d& Out, const RwV3d& InA, const RwV3d& InB, const float I
 	Out.m_Y = InA.m_Y + (InB.m_Y * InScale);
 	Out.m_Z = InA.m_Z + (InB.m_Z * InScale);
 }
+
+RwMatrixTag::RwMatrixTag()
+{
+	pad0 = 0.0f;
+	pad1 = 0.0f;
+	pad2 = 0.0f;
+	pad3 = 1.0f;
+}

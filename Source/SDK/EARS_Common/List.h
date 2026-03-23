@@ -1,5 +1,8 @@
 #pragma once
 
+// SDK
+#include "SDK/EARS_Common/TVPContainer.h"
+
 // CPP
 #include <stdint.h>
 
@@ -29,10 +32,7 @@ namespace EARS
 			ListNode<T>* m_Head = nullptr;
 			ListNode<T>* m_Tail = nullptr;
 			int32_t m_Items = 0;
-
-			// TVPContainer
-			void* m_TVP = nullptr;
-			void* m_Allocator = nullptr;
+			EARS::Common::TVPContainer m_AllocatorParams;
 		};
 	}
 }

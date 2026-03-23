@@ -16,6 +16,9 @@ namespace EARS
 		
 			/* used to pack the guid128_t into a guid32_t */
 			uint32_t GetGuid32() const;
+
+			/* reset the guid128_t */
+			void Clear();
 		
 			// Operator overloads for equality
 			inline bool operator==(const guid128_t& rhs) const { return (this->a == rhs.a && this->b == rhs.b && this->c == rhs.c && this->d == rhs.d); }

@@ -47,6 +47,8 @@ public:
 
 struct RwMatrixTag
 {
+	RwMatrixTag();
+
 	RwV3d m_Right;
 	float pad0;
 	RwV3d m_Up;

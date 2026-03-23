@@ -5,6 +5,14 @@ uint32_t EARS::Common::guid128_t::GetGuid32() const
 	return d + 33 * (c + 33 * (b + 33 * a));
 }
 
+void EARS::Common::guid128_t::Clear()
+{
+	a = 0;
+	b = 0;
+	c = 0;
+	d = 0;
+}
+
 bool EARS::Common::guid128_t::operator<(const guid128_t& rhs) const
 {
 	if (a < rhs.a)
