@@ -13,6 +13,14 @@ namespace EARS
 		{
 		public:
 
+			struct BoneInfo
+			{
+				// unsigned __int32 m_boneIndex : 30;
+				// unsigned __int32 m_isRoot : 1;
+				// unsigned __int32 m_isLocator : 1;
+				uint32_t m_Value = 0;
+			};
+
 			virtual ~Entity() = 0;
 
 			virtual void SetPosition(const RwV3d& InPosition) = 0;

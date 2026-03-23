@@ -1,5 +1,4 @@
 #pragma once
-
 // SDK
 #include "SDK/EARS_Common/Array.h"
 #include "SDK/EARS_Framework/Core/Entity/Entity.h"
@@ -25,8 +24,26 @@ namespace EARS
 
 			void SetSecondaryAnimSlots(uint32_t NumSlots);
 
+			void SetAnimSpeed(const float InSpeed);
+
 			/** Fetch the characters current anim state from CCT */
 			const char* GetCharacterStateName() const;
+
+			/** True if a secondary animation is currently playing on the given slot.
+			 *  Checks AnimView secondary chain — returns true if the slot's state ID != -1.
+			 *  (360 PDB: EARS::Framework::Animated::IsPlayingSecondaryAnim) */
+			bool IsPlayingSecondaryAnim(int Slot) const;
+
+			/** True if the specified action (by hash) is currently playing on this Animated entity.
+			 *  Checks AnimViewInfo state ID matches the hash, validates secondary chain.
+			 *  PC address: sub_45EEC0 — standard __thiscall (ecx=this, stack arg=ActionHash). */
+			bool IsPlayingAction(uint32_t ActionHash) const;
+
+			bool IsSecondaryAnimDone(int Slot) const;
+
+			bool IsPlayingLoopingAnim() const;
+
+			bool IsAnimDone() const;
 
 			// getters
 			EA::CCT::AnimView* GetAnimViewInfo() const { return m_AnimViewInfo; }
