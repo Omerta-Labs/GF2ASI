@@ -90,22 +90,22 @@ bool EARS::Framework::InterruptableStateMachine::HandleStateMessage(uint32_t Sim
 	{
 	case MESSAGE_SETINTERRUPTHANDLE:
 	{
-		SetInterruptsHandled(MsgData->m_Data.m_IntVal);
+		SetInterruptsHandled(MsgData->GetIntData());
 		return true;
 	}
 	case MESSAGE_CLEARINTERRUPTHANDLE:
 	{
-		ClearInterruptsHandled(MsgData->m_Data.m_IntVal);
+		ClearInterruptsHandled(MsgData->GetIntData());
 		return true;
 	}
 	case MESSAGE_INITINTERRUPTHANDLE:
 	{
-		InitInterruptsHandled(MsgData->m_Data.m_IntVal);
+		InitInterruptsHandled(MsgData->GetIntData());
 		return true;
 	}
 	case MESSAGE_SENDINTERRUPT:
 	{
-		SendInterrupt(MsgData->m_Data.m_IntVal);
+		SendInterrupt(MsgData->GetIntData());
 		return true;
 	}
 	default:
