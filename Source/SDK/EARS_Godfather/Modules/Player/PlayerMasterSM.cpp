@@ -46,9 +46,9 @@ bool EARS::Modules::PlayerMasterSM::CheckTransition(uint32_t SimTime, float Fram
 	return EARS::Modules::PlayerSM::CheckTransition(SimTime, FrameTime, TransID, TransData);
 }
 
-void EARS::Modules::PlayerMasterSM::InitialiseChild(StateMachine* ChildMachine)
+void EARS::Modules::PlayerMasterSM::InitialiseChild(StateMachine& ChildMachine)
 {
-	if (ChildMachine->GetStateMachineID() == 0x29CC4DD4)
+	if (ChildMachine.GetStateMachineID() == 0x29CC4DD4)
 	{
 		// TODO: Set Grabbee in PlayerDebugFlySM
 	}

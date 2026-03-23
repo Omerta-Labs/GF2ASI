@@ -14,7 +14,7 @@ namespace EARS
 			, m_SharedFlags(0)
 		{
 			// need to assign as sentient if possible
-			EARS::Framework::Animated* AnimEntity = m_AnimatedEntity.GetPtr();
+			EARS::Framework::Animated* AnimEntity = m_AnimatedOwner.GetPtr();
 			m_Sentient = EARS::Framework::_GetInterface<Sentient>(AnimEntity, 0x55859EFAu);
 		}
 

@@ -15,7 +15,7 @@ namespace EARS
 			, m_bPairedAnimSwitched(false)
 		{
 			// need to assign as player if possible
-			EARS::Framework::Animated* AnimEntity = m_AnimatedEntity.GetPtr();
+			EARS::Framework::Animated* AnimEntity = m_AnimatedOwner.GetPtr();
 			m_Player = EARS::Framework::_GetInterface<EARS::Modules::Player>(AnimEntity, 0x383225A1u);
 		
 			// now get all behaviours from this player

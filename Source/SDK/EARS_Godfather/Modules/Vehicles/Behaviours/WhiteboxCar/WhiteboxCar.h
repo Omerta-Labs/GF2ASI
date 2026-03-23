@@ -2,7 +2,7 @@
 
 // SDK
 #include "SDK/EARS_Common/String.h"
-#include "SDK/EARS_Framework/Core/Animated/Animated.h"
+#include "SDK/EARS_Physics/Behaviours/Vehicles/BaseVehicle.h"
 
 namespace EARS
 {
@@ -16,7 +16,7 @@ namespace EARS
 		/**
 		 * A Car in the world of Godfather II.
 		 */
-		class WhiteboxCar : public EARS::Framework::Animated
+		class WhiteboxCar : public EARS::Vehicles::BaseVehicle
 		{
 		public:
 
