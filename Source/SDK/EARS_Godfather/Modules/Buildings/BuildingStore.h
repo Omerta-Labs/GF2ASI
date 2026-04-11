@@ -15,6 +15,8 @@ namespace EARS
 		{
 		public:
 
+			void ChangeOwnership(uint32_t NewFamilyID, const bool bShowFanfare, const void* pHeader, const bool bExtortion); /* pHeader -> EARS::Modules::BuildingPersistHeader */
+
 		private:
 		};
 	}
