@@ -27,7 +27,7 @@
 #define IMPLEMENT_ANIM_VIEWER_SM (DEBUG && 0)
 #define IMPLEMENT_PHOTO_MODE_SM (DEBUG && 0)
 #define IMPLEMENT_DEMO_PACKAGE_POPUP (DEBUG && 0)
-#define IMPLEMENT_VEHICLE_ENTRY_SM (DEBUG && 1)
+#define IMPLEMENT_VEHICLE_ENTRY_SM (DEBUG && 0)
 #define OVERRIDE_LAUNCH_CMD (DEBUG && 0)
 
 EARS::StateMachineSys::StateMachine* S_PlayerMasterSM_FactoryFn(unsigned int id, EARS::StateMachineSys::StateMachineParams* pSMParams)

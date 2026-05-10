@@ -131,6 +131,21 @@ namespace EARS
 			 * @return InSimNPC - The SimNPC used to find the Made Man send to jail
 			 */
 			void IncarcerateMadeMan(EARS::Modules::SimNPC& InSimNPC) const;
+
+			/**
+			 * Revive a Made Man if eliminated.
+			 * They'll travel back to their Family compound.
+			 * NB: *NOT PART OF ORIGINAL GAME*
+			 */
+			void ReviveMadeMan(EARS::Modules::SimNPC& InSimNPC) const;
+
+			/**
+			 * Revive a Family if eliminated. 
+			 * Will revive all Made Men and give back their compound.
+			 * They'll also enter the strategy game.
+			 * NB: *NOT PART OF ORIGINAL GAME*
+			 */
+			void ReviveFamily();
 			
 			/**
 			 * Get a Made Man from a specific slot in the list

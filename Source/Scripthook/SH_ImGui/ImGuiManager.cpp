@@ -535,6 +535,11 @@ void ImGuiManager::DrawTab_FamiliesSettings()
 			{
 				ImGui::Text("Compound Venue ID: %u", TargetFamily->GetCompoundVenueID());
 
+				if (ImGui::Button("Revive Family"))
+				{
+					TargetFamily->ReviveFamily();
+				}
+
 				float MinTurnInterval = TargetFamily->GetMinTurnInterval();
 				if (ImGui::InputFloat("Min Turn Interval", &MinTurnInterval))
 				{
@@ -588,7 +593,10 @@ void ImGuiManager::DrawTab_FamiliesSettings()
 							}
 							case EARS::Modules::MadeManState::MADE_MAN_STATE_ELIMINATED:
 							{
-								// TODO: Revive?
+								if (ImGui::Button("Revive Made Man"))
+								{
+									TargetFamily->ReviveMadeMan(*CurMadeMan->GetSimNPC());
+								}
 								break;
 							}
 							case EARS::Modules::MadeManState::MADE_MAN_STATE_IN_COMBAT:

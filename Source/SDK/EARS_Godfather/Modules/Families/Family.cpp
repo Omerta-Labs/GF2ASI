@@ -4,6 +4,8 @@
 #include "Addons/Hook.h"
 
 // SDK
+#include "SDK/EARS_Godfather/Modules/Buildings/BuildingManager.h"
+#include "SDK/EARS_Godfather/Modules/Buildings/BuildingStore.h"
 #include "SDK/EARS_Godfather/Modules/Families/MadeMan.h"
 
 // C++
@@ -104,6 +106,46 @@ void EARS::Modules::Family::IncarcerateMadeMan(EARS::Modules::SimNPC& InSimNPC) 
 			const float Cooldown = TargetMadeMan->GetJailTime();
 			TargetMadeMan->SetState(MADE_MAN_STATE_IN_JAIL, Cooldown);
 		}
+	}
+}
+
+void EARS::Modules::Family::ReviveMadeMan(EARS::Modules::SimNPC& InSimNPC) const
+{
+	const uint32_t MadeManIdx = FindMadeManIndex(InSimNPC);
+	if (MadeManIdx != -1)
+	{
+		EARS::Modules::MadeMan* TargetMadeMan = m_MadeMen[MadeManIdx];
+		if (TargetMadeMan->GetState() == MADE_MAN_STATE_ELIMINATED)
+		{
+			TargetMadeMan->SetState(MADE_MAN_STATE_IDLE, 0.0f);
+			TargetMadeMan->SendToCompound();
+		}
+	}
+}
+
+void EARS::Modules::Family::ReviveFamily()
+{
+	if (!m_Flags.Test((uint32_t)FamilyFlags::FAMILY_HAS_BEEN_ELIMINATED))
+	{
+		return;	
+	}
+
+	// first of all make sure the family is back in the game
+	m_Flags.Clear((uint32_t)FamilyFlags::FAMILY_HAS_BEEN_ELIMINATED);
+	m_Flags.Clear((uint32_t)FamilyFlags::FAMILY_NO_STRATEGY_ACTIONS);
+
+	// give back the compound
+	BuildingManager* BuildingMgr = BuildingManager::GetInstance();
+	if (BuildingStore* CompoundVenue = BuildingMgr->GetStoreByVenueID(GetCompoundVenueID()))
+	{
+		CompoundVenue->ChangeOwnership(GetFamilyID(), false, nullptr, false);
+	}
+
+	// then set all made men to alive
+	for (EARS::Modules::MadeMan* CurrentMadeMan : m_MadeMen)
+	{
+		CurrentMadeMan->SetState(MADE_MAN_STATE_IDLE, 0.0f);
+		CurrentMadeMan->SendToCompound();
 	}
 }
 

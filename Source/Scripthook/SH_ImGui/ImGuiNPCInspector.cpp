@@ -202,7 +202,7 @@ void ImGuiNPCInspector::DrawTab_Appearance()
 					{
 						const PartedModel::Preset& ThisPreset = ThisAssembly.m_PresetsArr[x];
 						ImGui::PushID(&ThisPreset);
-						if (ImGui::Button("SWTICH"))
+						if (ImGui::Button("SWITCH"))
 						{
 							ActiveObject->TrySwapModel(ThisAssembly.m_AssemblyName, ThisPreset.m_PresetName);
 						}
