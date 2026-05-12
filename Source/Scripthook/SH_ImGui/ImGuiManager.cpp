@@ -1036,15 +1036,20 @@ void ImGuiManager::DrawTab_Support()
 void ImGuiManager::OnTick()
 {
 	const Settings& OwnSettingsMgr = Settings::GetCheckedRef();
-	if (GetAsyncKeyState(OwnSettingsMgr.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	if (GetAsyncKeyState(OwnSettingsMgr.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F1)
 	{
 		bShowModMenuWindow = !bShowModMenuWindow;
+	}
+
+	if (GetAsyncKeyState(OwnSettingsMgr.GetImGuiInteractiveInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
+	{
+		bImGuiInteractive = !bImGuiInteractive;
 	}
 
 	// Update cursor visibility
 	// Should only really be present when any ImGui windows are open - 
 	// The ingame cursor (for menus) is expected to be powered by Apt.
-	const bool bCursorVisibilityThisFrame = bShowModMenuWindow;
+	const bool bCursorVisibilityThisFrame = bImGuiInteractive;
 	if (bCursorVisibilityThisFrame != bTakeoverCursor)
 	{
 		bTakeoverCursor = bCursorVisibilityThisFrame;
@@ -1070,7 +1075,7 @@ void ImGuiManager::OnTick()
 	}
 
 	ImGuiIO& IO = ImGui::GetIO();
-	IO.MouseDrawCursor = bTakeoverCursor;
+	IO.MouseDrawCursor = bImGuiInteractive;
 
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();

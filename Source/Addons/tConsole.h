@@ -16,6 +16,8 @@ public:
 	static void fWrite(const char* text);
 	static void fWriteLine(const char* text);
 
+	static void RouteToLogger(const bool bEnabled);
+
 	static HANDLE GetOutputHandle();
 };
 

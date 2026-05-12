@@ -114,6 +114,9 @@ private:
 	// Should we render the Parted Model window
 	bool bShowModMenuWindow = false;
 
+	// Whether or not any ImGui windows are interactive
+	bool bImGuiInteractive = false;
+
 	// Should we enter a state where we take control of the Cursor?
 	// In this state, we disable Player inputs, and get ImGui to visualise a cursor.
 	bool bTakeoverCursor = false;

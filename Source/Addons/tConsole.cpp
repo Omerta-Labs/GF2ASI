@@ -13,7 +13,7 @@ void tConsole::fCreate(const char* name)
 		cInfo.dwSize.Y = 2500;
 		SetConsoleScreenBufferSize(handle, cInfo.dwSize);
 		SetTitle(name);
-		useLogging = true;
+		RouteToLogger(true);
 	}
 }
 
@@ -38,9 +38,7 @@ void tConsole::SetTitle(const char* title)
 
 void tConsole::fAppend()
 {
-	if (handle != INVALID_HANDLE_VALUE) {
-		fWrite("\n");
-	}
+	fWrite("\n");
 }
 
 void tConsole::fPrintf(const char* text, ...)
@@ -70,10 +68,13 @@ void tConsole::fWrite(const char* text)
 
 void tConsole::fWriteLine(const char* text)
 {
-	if (handle != INVALID_HANDLE_VALUE) {
-		fWrite(text);
-		fWrite("\n");
-	}
+	fWrite(text);
+	fWrite("\n");
+}
+
+void tConsole::RouteToLogger(const bool bEnabled)
+{
+	useLogging = bEnabled;
 }
 
 HANDLE tConsole::GetOutputHandle()

@@ -12,6 +12,7 @@ public:
 	void Init();
 
 	int GetShowModMenuWindowInput() const;
+	int GetImGuiInteractiveInput() const;
 	int GetFlyModeUpInput() const;
 	int GetFlyModeDownInput() const;
 	bool WantsPreOrderBonus() const { return bWantsPreOrderBonus; }
@@ -21,6 +22,9 @@ private:
 
 	// Virtual Key to show the ImGui Demo Window
 	int ShowModMenuWindowInput = VK_F1;
+
+	// Virtual Key to show the ImGui Demo Window
+	int ImGuiInteractiveInput = VK_F2;
 
 	// Virtual Key to get up in fly mode
 	int FlyModeUpInput = VK_PRIOR;

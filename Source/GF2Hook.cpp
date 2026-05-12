@@ -473,11 +473,12 @@ void __cdecl Hook_CloseLevelServices()
 
 void GF2Hook::Init_Logging()
 {
+	C_Logger::Create("GF2SE.txt");
 #if DEBUG
-	C_Logger::Create("GF2_Hook.txt");
-
 	tConsole::fCreate("GF2SE");
 #endif // DEBUG
+
+	tConsole::RouteToLogger(true);
 }
 
 void GF2Hook::Init_ModSystems()
