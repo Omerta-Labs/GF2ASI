@@ -37,6 +37,7 @@
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
 #define ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK 0
 #define ENABLE_GF2_SPAWN_ENTITY_HOOKS 0
+#define ENABLE_GF2_SIM_MANAGER_RE 1
 
 #if ENABLE_GF2_MULTIPLAYER
 struct ConnectionParams
@@ -194,11 +195,25 @@ uint64_t StreamManager_Load_Old;
 typedef void* (__thiscall* StreamManager_Load)(void* pThis, const char*, float, uint32_t, void*, void*);
 void* __fastcall HOOK_StreamManager_Load(void* pThis, void* ecx, const char* a1, float a2, uint32_t a3, void* a4, void* a5)
 {
-	C_Logger::Printf("StreamManager::Load");
+	tConsole::fPrintf("StreamManager::Load [%s]", a1);
 
 	StreamManager_Load funcCast = (StreamManager_Load)StreamManager_Load_Old;
 	auto value = funcCast(pThis, a1, a2, a3, a4, a5);
 	return value;
+}
+
+uint64_t SimManager_LoadResource_Old;
+typedef void (__thiscall* SimManager_LoadResource)(EARS::Framework::SimManager* pThis, RWS::CResourceHandler::CResourceLoadInfo*);
+void __fastcall HOOK_SimManager_LoadResource(EARS::Framework::SimManager* pThis, void* ecx, RWS::CResourceHandler::CResourceLoadInfo* pLoadInfo)
+{
+#if ENABLE_GF2_SIM_MANAGER_RE
+	// pThis is not correct pointer, appears to be vtable version for ResourceHandler
+	EARS::Framework::SimManager* ResolvedSimMgr = EARS::Framework::SimManager::GetInstance();
+	ResolvedSimMgr->LoadResource(pLoadInfo);
+#else // ENABLE_GF2_SIM_MANAGER_RE
+	SimManager_LoadResource funcCast = (SimManager_LoadResource)SimManager_LoadResource_Old;
+	funcCast(pThis, pLoadInfo);
+#endif // ENABLE_GF2_SIM_MANAGER_RE
 }
 
 uint64_t MobfaceManager_SetTargetModel_Old;
@@ -536,6 +551,9 @@ void GF2Hook::Init_AttachHooks()
 
 	PLH::x86Detour detour170((char*)0x0403A50, (char*)&HOOK_StreamManager_Load, &StreamManager_Load_Old, dis);
 	detour170.hook();
+
+	PLH::x86Detour detour171((char*)0x0448140, (char*)&HOOK_SimManager_LoadResource, &SimManager_LoadResource_Old, dis);
+	detour171.hook();
 
 	PLH::x86Detour detour155((char*)0x608930, (char*)&HOOK_Displ_EndScene, &Displ_EndScene_Old, dis);
 	detour155.hook();

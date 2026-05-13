@@ -1049,7 +1049,7 @@ void ImGuiManager::OnTick()
 	// Update cursor visibility
 	// Should only really be present when any ImGui windows are open - 
 	// The ingame cursor (for menus) is expected to be powered by Apt.
-	const bool bCursorVisibilityThisFrame = bImGuiInteractive;
+	const bool bCursorVisibilityThisFrame = bShowModMenuWindow;
 	if (bCursorVisibilityThisFrame != bTakeoverCursor)
 	{
 		bTakeoverCursor = bCursorVisibilityThisFrame;
@@ -1075,7 +1075,7 @@ void ImGuiManager::OnTick()
 	}
 
 	ImGuiIO& IO = ImGui::GetIO();
-	IO.MouseDrawCursor = bImGuiInteractive;
+	IO.MouseDrawCursor = bShowModMenuWindow;
 
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();

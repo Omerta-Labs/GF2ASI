@@ -1,7 +1,11 @@
 #include "StreamManager.h"
 
 // addons
-#include "addons/Hook.h"
+#include <Addons/tConsole.h>
+#include <Addons/Hook.h>
+
+// C++
+#include <assert.h>
 
 uint32_t EARS::Framework::StreamManager::Load(uint32_t StreamGuid, float Priority, uint32_t LoadFlags)
 {
@@ -11,6 +15,16 @@ uint32_t EARS::Framework::StreamManager::Load(uint32_t StreamGuid, float Priorit
 uint32_t EARS::Framework::StreamManager::GetStreamHandle(uint32_t StreamGuid) const
 {
 	return MemUtils::CallClassMethod<uint32_t, const EARS::Framework::StreamManager*, uint32_t>(0x04059B0, this, StreamGuid);
+}
+
+const char* EARS::Framework::StreamManager::GetFilename(uint32_t InStreamHandle) const
+{
+	if (const EARS::Framework::Stream* Stream = GetStreamFromHandle(InStreamHandle))
+	{
+		return Stream->GetFileName();
+	}
+
+	return nullptr;
 }
 
 EARS::Framework::StreamStatus EARS::Framework::StreamManager::GetStatus(const uint32_t StreamHandle) const
@@ -32,6 +46,29 @@ EARS::Framework::Stream* EARS::Framework::StreamManager::GetStreamFromHandle(con
 	}
 
 	return nullptr;
+}
+
+uint32_t EARS::Framework::StreamManager::GetDispatchStream() const
+{
+	if (m_DispatchStream)
+	{
+		return m_DispatchStream->GetStreamHandle();
+	}
+
+	return 0;
+}
+
+void EARS::Framework::StreamManager::AddDispatchLockComplete()
+{
+	m_DispatchLockCount++;
+
+#if DEBUG
+	const uint32_t StreamHandle = GetDispatchStream();
+	assert(StreamHandle);
+
+	const char* StreamFileName = GetFilename(StreamHandle);
+	tConsole::fPrintf("StreamManager : AddLockDispatchComplete : %u : %s", m_DispatchLockCount, StreamFileName);
+#endif // DEBUG
 }
 
 void EARS::Framework::StreamManager::LinkStreamMsg(const uint32_t StreamEventMask, RWS::CEventHandler& InHandler, const uint32_t Priority) const

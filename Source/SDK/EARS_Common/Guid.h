@@ -10,6 +10,40 @@ namespace EARS
 {
 	namespace Common
 	{
+		// forward declares
+		struct guid128_t;
+
+		struct guid32_t
+		{
+		public:
+
+			guid32_t();
+			explicit guid32_t(uint32_t Value);
+			explicit guid32_t(const guid32_t& Guid);
+			explicit guid32_t(const guid128_t& Guid);
+
+			void Clear();
+
+			void Invalidate();
+
+			void Set(const uint32_t Value);
+			void Set(const guid128_t& Guid);
+
+			inline bool IsClear() const { return m_Value == 0; }
+			inline bool IzZero() const { return m_Value == 0; }
+			inline bool IsValid() const { return m_Value != 0xFE16702F; }
+			inline uint32_t ToUint32() const { return m_Value; }
+
+			// Operator overloads for equality
+			inline bool operator==(const guid32_t& rhs) const { return (this->m_Value == rhs.m_Value); }
+			inline bool operator!=(const guid32_t& rhs) const { return !(*this == rhs); }
+			bool operator<(const guid32_t& rhs)  const { return (this->m_Value < rhs.m_Value); }
+
+		private:
+
+			uint32_t m_Value = 0;
+		};
+
 		struct guid128_t
 		{
 		public:
@@ -23,7 +57,10 @@ namespace EARS
 			// Operator overloads for equality
 			inline bool operator==(const guid128_t& rhs) const { return (this->a == rhs.a && this->b == rhs.b && this->c == rhs.c && this->d == rhs.d); }
 			inline bool operator!=(const guid128_t& rhs) const { return !(*this == rhs); }
-			bool operator<(const guid128_t& rhs) const;
+			inline bool operator<(const guid128_t& rhs) const;
+
+			// Operator overloads for accessing
+			uint32_t operator[](const uint32_t index) const;
 
 			// TODO: Private these!
 			uint32_t a, b, c, d = 0;

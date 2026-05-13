@@ -10,6 +10,10 @@ namespace EARS
 		public:
 
 			TType* GetNext() const { return m_Next; }
+			void SetNext(TType* Next) { m_Next = Next; }
+
+			TType* GetPrev() const { return m_Prev; }
+			void SetPrev(TType* Prev) { m_Prev = Prev; }
 
 		private:
 
@@ -21,6 +25,23 @@ namespace EARS
 		struct DoubleInternalLinkedList
 		{
 		public:
+
+			void InsertAtBack(TType* NodeToInsert)
+			{
+				NodeToInsert->SetNext(nullptr);
+				NodeToInsert->SetPrev(m_Tail);
+
+				if (m_Tail)
+				{
+					m_Tail->SetNext(NodeToInsert);
+				}
+				else
+				{
+					m_Head = NodeToInsert;
+				}
+
+				m_Tail = NodeToInsert;
+			}
 
 			TType* GetFront() const { return m_Head; }
 

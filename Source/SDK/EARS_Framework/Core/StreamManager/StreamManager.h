@@ -2,6 +2,7 @@
 
 // SDK (Common)
 #include "SDK/EARS_Common/DoubleInternalLinkedList.h"
+#include "SDK/EARS_Common/Guid.h"
 #include "SDK/EARS_Common/HashTable.h"
 #include "SDK/EARS_Common/Singleton.h"
 #include "SDK/EARS_Common/String.h"
@@ -45,7 +46,7 @@ namespace EARS
 			uint32_t m_LoadOrder = 0;
 			EARS::Framework::StreamStatus m_Status = EARS::Framework::StreamStatus::STREAM_STATUS_INVALID;
 			uint32_t m_UStreamHandle = 0;
-			uint32_t m_StreamGUID = 0;
+			EARS::Common::guid32_t m_StreamGUID;
 
 
 		};
@@ -63,11 +64,20 @@ namespace EARS
 			/* fetch the stream handle from a Stream GUID (which can be found in StreamTOC) */
 			uint32_t GetStreamHandle(uint32_t StreamGuid) const;
 
+			/** Resolve the Filename of the given Stream using its handle */
+			const char* GetFilename(uint32_t InStreamHandle) const;
+
 			/* Get the status of a stream, using their handle */
 			EARS::Framework::StreamStatus GetStatus(const uint32_t StreamHandle) const;
 
 			/* get the stream using their handle. */
 			EARS::Framework::Stream* GetStreamFromHandle(const uint32_t InHandle) const;
+
+			/** Get the stream which is currently being loaded (otherwise known as dispatched) */
+			uint32_t GetDispatchStream() const;
+
+			/** Incrememt dispatch lock counter for the current Dispatch in progress. */
+			void AddDispatchLockComplete();
 
 			/**
 			 * Link the specific stream events to the handler.
@@ -84,6 +94,9 @@ namespace EARS
 			EARS::Common::HashTableByValue<uint32_t, EARS::Framework::Stream*, 64> m_HandleToStreamHash;	// 0x50
 			char m_StreamManager_Padding1[0x18];
 			EARS::Framework::Stream* m_ActiveStream = nullptr;
+			EARS::Framework::Stream* m_DispatchStream = nullptr;
+			char m_StreamManager_Padding2[0x14];
+			uint32_t m_DispatchLockCount = 0;
 		};
 	}
 }
