@@ -133,6 +133,13 @@ namespace EARS
 			void IncarcerateMadeMan(EARS::Modules::SimNPC& InSimNPC) const;
 
 			/**
+			 * Request that a specific Made Man is killed off, using their SimNPC
+			 * Internally the Family will be used to find their associated Made Man.
+			 * @return InSimNPC - The SimNPC used to find the Made Man and kill
+			 */
+			void KillMadeMan(EARS::Modules::SimNPC& InSimNPC) const;
+
+			/**
 			 * Revive a Made Man if eliminated.
 			 * They'll travel back to their Family compound.
 			 * NB: *NOT PART OF ORIGINAL GAME*
@@ -204,6 +211,9 @@ namespace EARS
 			 * @return uint32_t - If found, a valid index in the array. If not, -1.
 			 */
 			int32_t FindMadeManIndex(const EARS::Modules::SimNPC& InSimNPC) const;
+
+			void SetMadeManState(EARS::Modules::SimNPC& InSimNPC, EARS::Modules::MadeManState NewState, uint32_t VenueID, float Countdown) const;
+			void SetMadeManState(EARS::Modules::MadeMan& InMadeMan, EARS::Modules::MadeManState NewState, uint32_t VenueID, float Countdown) const;
 
 			EARS::Modules::FamilyCategory m_Category = FamilyCategory::FamilyCategory_REF;				// 0x50
 			uint32_t m_FamilyID = 0;

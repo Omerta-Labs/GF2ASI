@@ -43,8 +43,7 @@ bool EARS::Modules::Family::QuickRecovery(EARS::Modules::MadeMan& InMadeMan) con
 {
 	if (InMadeMan.GetState() == MADE_MAN_STATE_IN_HOSPITAL)
 	{
-		InMadeMan.SetVenueID(0);
-		InMadeMan.SetState(MADE_MAN_STATE_IDLE, 0.0f);
+		SetMadeManState(InMadeMan, MADE_MAN_STATE_IDLE, 0, 0.0f);
 		return true;
 	}
 
@@ -66,8 +65,7 @@ bool EARS::Modules::Family::Jailbreak(EARS::Modules::MadeMan& InMadeMan) const
 {
 	if (InMadeMan.GetState() == MADE_MAN_STATE_IN_JAIL)
 	{
-		InMadeMan.SetVenueID(0);
-		InMadeMan.SetState(MADE_MAN_STATE_IDLE, 0.0f);
+		SetMadeManState(InMadeMan, MADE_MAN_STATE_IDLE, 0, 0.0f);
 		return true;
 	}
 
@@ -86,7 +84,7 @@ void EARS::Modules::Family::HospitalizeMadeMan(EARS::Modules::SimNPC& InSimNPC) 
 			TargetMadeMan->ReleaseFromVenue(MADE_MAN_STATE_IDLE);
 
 			const float Cooldown = TargetMadeMan->GetHospitalTime();
-			TargetMadeMan->SetState(MADE_MAN_STATE_IN_HOSPITAL, Cooldown);
+			SetMadeManState(*TargetMadeMan, MADE_MAN_STATE_IN_HOSPITAL, 0, Cooldown);
 		}
 	}
 }
@@ -104,9 +102,14 @@ void EARS::Modules::Family::IncarcerateMadeMan(EARS::Modules::SimNPC& InSimNPC) 
 			TargetMadeMan->ReleaseFromVenue(MADE_MAN_STATE_IDLE);
 
 			const float Cooldown = TargetMadeMan->GetJailTime();
-			TargetMadeMan->SetState(MADE_MAN_STATE_IN_JAIL, Cooldown);
+			SetMadeManState(*TargetMadeMan, MADE_MAN_STATE_IN_JAIL, 0, Cooldown);
 		}
 	}
+}
+
+void EARS::Modules::Family::KillMadeMan(EARS::Modules::SimNPC& InSimNPC) const
+{
+	SetMadeManState(InSimNPC, MADE_MAN_STATE_ELIMINATED, 0, 0.0f);
 }
 
 void EARS::Modules::Family::ReviveMadeMan(EARS::Modules::SimNPC& InSimNPC) const
@@ -167,6 +170,24 @@ int32_t EARS::Modules::Family::FindMadeManIndex(const EARS::Modules::SimNPC& InS
 	}
 
 	return -1;
+}
+
+void EARS::Modules::Family::SetMadeManState(EARS::Modules::SimNPC& InSimNPC, EARS::Modules::MadeManState NewState, uint32_t VenueID, float Countdown) const
+{
+	const uint32_t MadeManIdx = FindMadeManIndex(InSimNPC);
+	if (MadeManIdx != -1)
+	{
+		SetMadeManState(*m_MadeMen[MadeManIdx], NewState, VenueID, Countdown);
+	}
+}
+
+void EARS::Modules::Family::SetMadeManState(EARS::Modules::MadeMan& InMadeMan, EARS::Modules::MadeManState NewState, uint32_t VenueID, float Countdown) const
+{
+	if (InMadeMan.GetState() != MADE_MAN_STATE_ELIMINATED)
+	{
+		InMadeMan.SetVenueID(VenueID);
+		InMadeMan.SetState(NewState, Countdown);
+	}
 }
 
 void EARS::Modules::Family::ForEachOmertaTable(const TVisitOmertaEntryFunctor& InFunction)
