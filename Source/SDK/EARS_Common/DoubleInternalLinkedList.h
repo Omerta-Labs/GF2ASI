@@ -43,6 +43,8 @@ namespace EARS
 				m_Tail = NodeToInsert;
 			}
 
+			bool IsEmpty() const { return (m_Head == nullptr); }
+
 			TType* GetFront() const { return m_Head; }
 
 		private:

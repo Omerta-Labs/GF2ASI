@@ -1,5 +1,8 @@
 #pragma once
 
+// C++
+#include <stdint.h>
+
 template <typename TType>
 struct Array
 {
@@ -17,7 +20,7 @@ public:
 		TType* Slot = &m_Items[m_Size++];
 		if (Slot)
 		{
-			Slot = new TType(Object);
+			*Slot = Object;
 		}
 	}
 
@@ -38,6 +41,28 @@ public:
 
 			m_Items = NewArr;
 			m_Capacity = InCapacity;
+		}
+	}
+
+	int32_t Find(const TType& Element) const
+	{
+		for (uint32_t Idx = 0; Idx < m_Size; Idx++)
+		{
+			if (m_Items[Idx] == Element)
+			{
+				return Idx;
+			}
+		}
+
+		return -1;
+	}
+
+	void DeleteFast(uint32_t ObjectIdx)
+	{
+		if (ObjectIdx != (m_Size - 1))
+		{
+			m_Items[ObjectIdx] = m_Items[m_Size - 1];
+			m_Size--;
 		}
 	}
 

@@ -7,6 +7,10 @@ namespace EARS
 		template <typename T>
 		class DoubleLinkedListNodeMixin2
 		{
+		public:
+
+			T* GetNextNode() const { return m_Next; }
+			
 		private:
 
 			T** m_PrevNext = nullptr;
