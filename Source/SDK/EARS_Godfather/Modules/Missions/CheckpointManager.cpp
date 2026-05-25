@@ -3,20 +3,40 @@
 // addons
 #include "Addons/Hook.h"
 
-void EARS::Modules::CheckpointManager::RestartNewCheckpoint(EARS::Modules::Checkpoint* NewCheckpoint, RestartType InType, uint32_t ExtraTeleportOptions)
-{
-	MemUtils::CallClassMethod<void, EARS::Modules::CheckpointManager*, EARS::Modules::Checkpoint*, RestartType, uint32_t>(0x08FD380, this, NewCheckpoint, InType, ExtraTeleportOptions);
-}
+// SDK
+#include "SDK/EARS_Godfather/Modules/Missions/Checkpoint.h"
 
-void EARS::Modules::CheckpointManager::ForEachCheckpoint(const TVisitCheckpointFunctor& InFunction)
+namespace EARS::Modules
 {
-	for (EARS::Modules::Checkpoint* CurrentCheckpoint : m_Checkpoints)
+	void CheckpointManager::AddCheckpoint(EARS::Modules::Checkpoint& NewCheckpoint)
 	{
-		InFunction(*CurrentCheckpoint);
+		if (m_Checkpoints.Find(&NewCheckpoint) == -1)
+		{
+			m_Checkpoints.Add(&NewCheckpoint);
+		}
 	}
-}
 
-EARS::Modules::CheckpointManager* EARS::Modules::CheckpointManager::GetInstance()
-{
-	return *(EARS::Modules::CheckpointManager**)0x11299C4;
+	void CheckpointManager::RemoveCheckpoint(EARS::Modules::Checkpoint& NewCheckpoint)
+	{
+		const int32_t CheckpointIdx = m_Checkpoints.Find(&NewCheckpoint);
+		if (CheckpointIdx >= 0)
+		{
+			m_Checkpoints.DeleteFast(CheckpointIdx);
+			if (m_ActiveCheckpoint == &NewCheckpoint)
+			{
+				m_ActiveCheckpoint->StopLoading();
+				m_ActiveCheckpoint = nullptr;
+			}
+		}
+	}
+
+	void CheckpointManager::RestartNewCheckpoint(EARS::Modules::Checkpoint* NewCheckpoint, RestartType InType, uint32_t ExtraTeleportOptions)
+	{
+		MemUtils::CallClassMethod<void, EARS::Modules::CheckpointManager*, EARS::Modules::Checkpoint*, RestartType, uint32_t>(0x08FD380, this, NewCheckpoint, InType, ExtraTeleportOptions);
+	}
+
+	CheckpointManager* CheckpointManager::GetInstance()
+	{
+		return *(EARS::Modules::CheckpointManager**)0x11299C4;
+	}
 }

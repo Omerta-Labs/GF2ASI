@@ -11,7 +11,6 @@
 #include "SDK/EARS_Framework/Core/Persistence/PersistenceRegistry.h"
 
 // CPP
-#include <functional>
 #include <stdint.h>
 
 namespace EARS
@@ -32,19 +31,13 @@ namespace EARS
 				RESTART_DEBUG_TELEPORT = 0x2,
 			};
 
+			void AddCheckpoint(EARS::Modules::Checkpoint& NewCheckpoint);
+			void RemoveCheckpoint(EARS::Modules::Checkpoint& NewCheckpoint);
+
 			void RestartNewCheckpoint(EARS::Modules::Checkpoint* NewCheckpoint, RestartType InType, uint32_t ExtraTeleportOptions);
 
 			// getters
 			EARS::Modules::Checkpoint* GetCurrentCheckpoint() const { return m_ActiveCheckpoint; }
-
-			/**
-			 * Utility function to iterate through all loaded Checkpoints
-			 * All const, we do not expect to modify any of the assemblies during iteration.
-			 * All headers pass-by-ref, so none of them should be nullptr.
-			 * Function does not exist in GF2 exe, merely utility header for us to use.
-			 */
-			typedef std::function<void(Checkpoint&)> TVisitCheckpointFunctor;
-			void ForEachCheckpoint(const TVisitCheckpointFunctor& InFunction);
 
 			static CheckpointManager* GetInstance();
 

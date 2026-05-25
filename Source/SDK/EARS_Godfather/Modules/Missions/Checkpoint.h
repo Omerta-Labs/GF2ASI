@@ -15,6 +15,9 @@ namespace EARS
 		{
 		public:
 
+			/** Unlinks the relevent event messages and stops the Checkpoint from loading. */
+			void StopLoading();
+
 			const String& GetDebugName() const { return m_DebugName; }
 			const String& GetChapterDebugName() const { return m_ChapterDebugName; }
 			uint32_t GetCheckpointNumber() const { return m_CheckpointNumber; }
@@ -27,6 +30,8 @@ namespace EARS
 			uint32_t m_ChapterNumber = 0;
 			uint32_t m_CheckpointNumber = 0;
 			RwMatrixTag m_SpawnPoint;
+			char m_Padding_Checkpoint_0[0x10];
+			bool m_bIsLoading = false;
 
 			// TODO: Figure out remaining data
 
