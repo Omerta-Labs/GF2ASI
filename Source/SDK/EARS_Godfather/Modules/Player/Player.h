@@ -2,6 +2,7 @@
 
 // SDK Common
 #include "SDK/EARS_Common/Guid.h"
+#include "SDK/EARS_Common/StaticArray.h"
 
 // SDK Framework
 #include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
@@ -27,6 +28,11 @@ namespace EARS
 		class InventoryManager;
 		class PlayerMasterSM;
 		class PlayerUpgradeComponent;
+
+		enum class PlayerFlag
+		{
+			TELEPORTING = 0x5,
+		};
 
 		/**
 		 * The Player class for The Godfather II
@@ -57,6 +63,13 @@ namespace EARS
 
 			// TODO: This is part of EARS::Framework::BasePlayer but cannot get virtual table to work...
 			uint32_t GetPlayerID() const { return m_PlayerID; }
+
+			// Player Flag API
+			bool TestPlayerFlag(EARS::Modules::PlayerFlag InFlag) const;
+			void SetPlayerFlag(EARS::Modules::PlayerFlag InFlag);
+			void ClearPlayerFlag(EARS::Modules::PlayerFlag InFlag);
+
+			void Teleport(const RwMatrixTag& InMatrix, uint32_t InOptions, RWS::CEventId* InEventMsg, StaticArray<void*, 4>* InPartitionList);
 
 			/**
 			 * Get the Local Player

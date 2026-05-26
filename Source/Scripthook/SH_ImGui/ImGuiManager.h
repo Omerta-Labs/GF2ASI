@@ -10,11 +10,12 @@
 
 // Common
 #include "SDK/EARS_Common/Guid.h"
+#include "SDK/EARS_Common/RwMaths.h"
 
 // CPP
 #include <windows.h>
 #include <string>
-#include <vector>
+#include <optional>
 
 // Forward declarations
 namespace EARS
@@ -81,6 +82,11 @@ public:
 
 private:
 
+	struct BuildingTeleportPayload
+	{
+		RwV3d TeleportLocation;
+	};
+
 	void DrawTab_PlayerSettings();
 
 	void DrawTab_CheckpointSettings();
@@ -90,6 +96,8 @@ private:
 	void DrawTab_DemographicSettings();
 
 	void DrawTab_CitiesSettings();
+
+	void DrawTab_BuildingSettings();
 
 	void DrawTab_FamiliesSettings();
 
@@ -108,6 +116,8 @@ private:
 	// Initialise an NPC Inspector for a given object in the game world
 	void InitialiseNPCInspector(EARS::Modules::Sentient* InSentient, const bool bIsPlayer);
 
+	void ProcessBuildingTeleport();
+
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 	
@@ -116,6 +126,8 @@ private:
 	ImGuiNPCInspector CurrentInspector;
 
 	SH::ImGuiCheckpointDebug CheckpointDebug;
+
+	std::optional<BuildingTeleportPayload> DeferredTeleportPayload;
 
 	// Should we render the Parted Model window
 	bool bShowModMenuWindow = false;

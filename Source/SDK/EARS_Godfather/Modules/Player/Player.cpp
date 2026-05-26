@@ -1,9 +1,7 @@
 #include "Player.h"
 
-// Addons
-#include "Addons/tConsole.h"
-
 // Framework
+#include "SDK/EARS_Common/BitVector.h"
 #include "SDK/EARS_Framework/Core/Player/PlayerManager.h"
 #include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Player/PlayerMasterSM.h"
@@ -34,6 +32,26 @@ namespace EARS
 			}
 
 			return nullptr;
+		}
+
+		bool Player::TestPlayerFlag(PlayerFlag InFlag) const
+		{
+			return BitVector_Test(m_PlayerFlags, (uint32_t)InFlag);
+		}
+
+		void Player::SetPlayerFlag(PlayerFlag InFlag)
+		{
+			BitVector_Set(m_PlayerFlags, (uint32_t)InFlag);
+		}
+
+		void Player::ClearPlayerFlag(EARS::Modules::PlayerFlag InFlag)
+		{
+			BitVector_Clear(m_PlayerFlags, (uint32_t)InFlag);
+		}
+
+		void Player::Teleport(const RwMatrixTag& InMatrix, uint32_t InOptions, RWS::CEventId* InEventMsg, StaticArray<void*, 4>* InPartitionList)
+		{
+			MemUtils::CallClassMethod<void, Player*, const RwMatrixTag&, uint32_t, RWS::CEventId*, StaticArray<void*, 4>*>(0x0079E3C0, this, InMatrix, InOptions, InEventMsg, InPartitionList);
 		}
 
 		Player* Player::GetLocalPlayer()

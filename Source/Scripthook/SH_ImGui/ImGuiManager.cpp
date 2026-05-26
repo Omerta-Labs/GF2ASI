@@ -13,6 +13,9 @@
 #include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
 #include "SDK/EARS_Framework/Core/StreamManager/StreamManager.h"
 #include "SDK/EARS_Framework/Toolkits/GroupManager/GroupManager.h"
+#include "SDK/EARS_Godfather/Modules/Buildings/Building.h"
+#include "SDK/EARS_Godfather/Modules/Buildings/BuildingStore.h"
+#include "SDK/EARS_Godfather/Modules/Buildings/BuildingManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/Family.h"
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
@@ -91,6 +94,8 @@ namespace DefinedEvents
 	static hook::Type<RWS::CEventId> iMsgStreamBeginLoad = hook::Type<RWS::CEventId>(0x1206794);
 	static hook::Type<RWS::CEventId> iMsgStreamIdle = hook::Type<RWS::CEventId>(0x12067A4);
 	static hook::Type<RWS::CEventId> iMsgStreamUnloading = hook::Type<RWS::CEventId>(0x12067B4);
+
+	static hook::Type<RWS::CEventId> iMsgPlayerTeleportDoneExceptFade = hook::Type<RWS::CEventId>(0x112B344);
 }
 
 ImGuiManager::ImGuiManager()
@@ -113,18 +118,13 @@ void ImGuiManager::HandleEvents(const RWS::CMsg& MsgEvent)
 	{
 		OnTick();
 	}
-
-	if (MsgEvent.IsEvent(DefinedEvents::PlayerAsDriverEnterVehicleEvent))
+	else if (MsgEvent.IsEvent(DefinedEvents::iMsgPlayerTeleportDoneExceptFade))
 	{
-		// On Vehicle entered
-	}
+		ProcessBuildingTeleport();
 
-	if (MsgEvent.IsEvent(DefinedEvents::PlayerAsPassengerEnterVehicleEvent))
-	{
-		// On Vehicle entered
+		UnlinkMsg(&DefinedEvents::iMsgPlayerTeleportDoneExceptFade);
 	}
-
-	if (MsgEvent.IsEvent(DefinedEvents::PlayerExitVehicleEvent))
+	else if (MsgEvent.IsEvent(DefinedEvents::PlayerExitVehicleEvent))
 	{
 		if (bPlayerVehicleGodModeActive)
 		{
@@ -197,6 +197,9 @@ void ImGuiManager::CloseLevelServices()
 	UnlinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent);
 	UnlinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent);
 	UnlinkMsg(&DefinedEvents::PlayerExitVehicleEvent);
+
+	// Just in case player exits mid-teleport
+	UnlinkMsg(&DefinedEvents::iMsgPlayerTeleportDoneExceptFade);
 }
 
 LRESULT ImGuiManager::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -460,6 +463,154 @@ void ImGuiManager::DrawTab_CitiesSettings()
 	}
 }
 
+void ImGuiManager::DrawTab_BuildingSettings()
+{
+	EARS::Modules::FamilyManager* FamilyMgr = EARS::Modules::FamilyManager::GetInstance();
+	EARS::Modules::BuildingManager* BuildingMgr = EARS::Modules::BuildingManager::GetInstance();
+	EARS::Modules::CityManager* CityMgr = EARS::Modules::CityManager::GetInstance();
+	if (!BuildingMgr || !FamilyMgr || !CityMgr)
+	{
+		return;
+	}
+
+	// Utility which implements Family takeover for a single building
+	auto DrawFamilyComboBox = [&](EARS::Modules::BuildingStore& Store)
+		{
+			const EARS::Modules::Family* OwningFamily = FamilyMgr->GetFamily(Store.GetFamilyID());
+			const String* FamilyString = OwningFamily->GetInternalName();
+
+			ImGui::PushItemWidth(-1.0f);
+			if (ImGui::BeginCombo("###family_selector", FamilyString->c_str()))
+			{
+				FamilyMgr->ForEachStrategyFamily([&](const EARS::Modules::Family& StrategyFamily)
+					{
+						const String* SelectableName = StrategyFamily.GetInternalName();
+						if (ImGui::Selectable(SelectableName->c_str(), StrategyFamily.GetFamilyID() == Store.GetFamilyID()))
+						{
+							Store.ChangeOwnership(StrategyFamily.GetFamilyID(), false, nullptr, false);
+						}
+					});
+
+				ImGui::EndCombo();
+			}
+			ImGui::PopItemWidth();
+		};
+
+	auto DrawPlayerTeleportButton = [&](EARS::Modules::BuildingStore& Store)
+		{
+			ImGui::PushItemWidth(-1.0f);
+			if (ImGui::Button("Teleport"))
+			{
+				DeferredTeleportPayload = { .TeleportLocation = Store.GetEntrancePos() };
+
+				if (CityMgr->GetCurrentCity() != Store.GetCityID())
+				{
+					// we need to first teleport to new city to get world partitions sync'd up
+					CityMgr->TeleportToCity(Store.GetCityID());
+
+					LinkMsg(&DefinedEvents::iMsgPlayerTeleportDoneExceptFade, 0x8000);
+				}
+				else
+				{
+					ProcessBuildingTeleport();
+				}
+			}
+			ImGui::PopItemWidth();
+		};
+
+	if (ImGui::BeginTabItem("Buildings", nullptr, ImGuiTabItemFlags_None))
+	{
+		/*if (ImGui::TreeNodeEx("Active Buildings", ImGuiTreeNodeFlags_Framed))
+		{
+			if (ImGui::BeginTable("active_building_table", 4, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
+			{
+				ImGui::TableSetupColumn("VenueID", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+				ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+				ImGui::TableSetupColumn("Family", ImGuiTableColumnFlags_WidthFixed, 300.0f);
+				ImGui::TableHeadersRow();
+
+				BuildingMgr->ForEachActiveBuilding([&](const EARS::Modules::Building& ActiveBuilding) 
+					{
+						ImGui::PushID(&ActiveBuilding);
+
+						ImGui::TableNextRow();
+						ImGui::TableNextColumn();
+
+						EARS::Modules::BuildingStore& ActiveStore = *ActiveBuilding.GetStorageUnit();
+						const String* BuildingString = ActiveStore.GetDisplayName();
+
+						ImGui::Text("%u", ActiveStore.GetVenueID());
+						ImGui::TableNextColumn();
+						ImGui::Text("%s", BuildingString->c_str());
+						ImGui::TableNextColumn();
+						ImGui::Text("%s", BuildingMgr->GetBuildingTypeInternalName(ActiveStore.GetBuildingType()));
+						ImGui::TableNextColumn();
+						DrawFamilyComboBox(ActiveStore);
+						ImGui::TableNextColumn();
+
+						ImGui::PopID();
+					});
+
+				ImGui::EndTable();
+			}
+
+			ImGui::TreePop();
+		}*/
+
+		if (ImGui::TreeNodeEx("Buildings", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::BeginChild("building_store_table");
+			if (ImGui::BeginTable("active_building_table", 5, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
+			{
+				const float AvailWidth = ImGui::GetContentRegionAvail().x;
+				ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.08f);
+				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.42f);
+				ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.1f);
+				ImGui::TableSetupColumn("Family", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.2f);
+				ImGui::TableSetupColumn("Teleport", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.2f);
+				ImGui::TableHeadersRow();
+
+				BuildingMgr->ForEachBuildingStore([&](EARS::Modules::BuildingStore& ActiveStore) 
+					{
+						ImGui::PushID(&ActiveStore);
+
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+
+						const String* BuildingString = ActiveStore.GetDisplayName();
+						
+						const EARS::Modules::Family* OwningFamily = FamilyMgr->GetFamily(ActiveStore.GetFamilyID());
+						const String* FamilyString = OwningFamily->GetInternalName();
+
+						const String* CityString = CityMgr->GetDisplayName(ActiveStore.GetCityID());
+
+						ImGui::Text("%u", ActiveStore.GetVenueID());
+						ImGui::TableNextColumn();
+						ImGui::Text("%s", BuildingString->c_str());
+						ImGui::TableNextColumn();
+						ImGui::Text("%s", BuildingMgr->GetBuildingTypeInternalName(ActiveStore.GetBuildingType()));
+						ImGui::TableNextColumn();
+						DrawFamilyComboBox(ActiveStore);
+						ImGui::TableNextColumn();
+						DrawPlayerTeleportButton(ActiveStore);
+						ImGui::TableNextColumn();
+
+						ImGui::PopID();
+					});
+
+
+				ImGui::EndTable();
+			}
+			ImGui::EndChild();
+
+			ImGui::TreePop();
+		}
+
+		ImGui::EndTabItem();
+	}
+}
+
 void ImGuiManager::DrawTab_FamiliesSettings()
 {
 #if SHOW_FAMILY_TAB
@@ -502,10 +653,12 @@ void ImGuiManager::DrawTab_FamiliesSettings()
 			{
 				ImGui::Text("Compound Venue ID: %u", TargetFamily->GetCompoundVenueID());
 
+				ImGui::BeginDisabled(!TargetFamily->HasBeenEliminated());
 				if (ImGui::Button("Revive Family"))
 				{
 					TargetFamily->ReviveFamily();
 				}
+				ImGui::EndDisabled();
 
 				float MinTurnInterval = TargetFamily->GetMinTurnInterval();
 				if (ImGui::InputFloat("Min Turn Interval", &MinTurnInterval))
@@ -1083,6 +1236,7 @@ void ImGuiManager::OnTick()
 
 				DrawTab_CitiesSettings();
 
+				DrawTab_BuildingSettings();
 
 #if SHOW_FAMILY_TAB
 				DrawTab_FamiliesSettings();
@@ -1130,4 +1284,20 @@ bool ImGuiManager::SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, boo
 void ImGuiManager::InitialiseNPCInspector(EARS::Modules::Sentient* InSentient, const bool bIsPlayer)
 {
 	CurrentInspector.Initialise(InSentient, bIsPlayer);
+}
+
+void ImGuiManager::ProcessBuildingTeleport()
+{
+	if (DeferredTeleportPayload.has_value())
+	{
+		const BuildingTeleportPayload& Payload = DeferredTeleportPayload.value();
+
+		RwMatrixTag Transform;
+		Transform.m_Pos = Payload.TeleportLocation;
+
+		EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
+		LocalPlayer->Teleport(Transform, 1152, nullptr, nullptr);
+
+		DeferredTeleportPayload = {};
+	}
 }
