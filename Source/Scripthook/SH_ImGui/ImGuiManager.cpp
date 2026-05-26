@@ -31,8 +31,6 @@
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
-#include "SDK/EARS_Godfather/Modules/Missions/CheckpointManager.h"
-#include "SDK/EARS_Godfather/Modules/Missions/Checkpoint.h"
 #include "SDK/EARS_Godfather/Modules/UI/UIHud.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/Behaviours/WhiteboxCar/WhiteboxCar.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/VehicleDamageComponent.h"
@@ -43,11 +41,7 @@
 #include "SDK/EARS_RT_LLRender/include/ShaderManager.h"
 
 // CPP
-#include <iostream>
-#include <fstream>
-#include <format>
 #include <string>
-#include <sstream>
 
 #define ENABLE_ENTITY_SPAWN_DEBUG 0
 
@@ -180,6 +174,8 @@ void ImGuiManager::OpenLevelServices()
 	LinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent, 0x8000);
 	LinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent, 0x8000);
 	LinkMsg(&DefinedEvents::PlayerExitVehicleEvent, 0x8000);
+
+	CheckpointDebug.OpenLevelServices();
 }
 
 void ImGuiManager::CloseLevelServices()
@@ -193,6 +189,8 @@ void ImGuiManager::CloseLevelServices()
 	TargetFamily = nullptr;
 	InventoryAddItem_SelectedName.clear();
 	InventoryAddItem_SelectedGuid = {};
+
+	CheckpointDebug.CloseLevelServices();
 
 	// remove other events
 	UnlinkMsg(&DefinedEvents::RunningTickEvent);
@@ -352,38 +350,7 @@ void ImGuiManager::DrawTab_CheckpointSettings()
 {
 	if (ImGui::BeginTabItem("Checkpoints", nullptr, ImGuiTabItemFlags_None))
 	{
-		EARS::Modules::CheckpointManager* CheckpointMgr = EARS::Modules::CheckpointManager::GetInstance();
-
-		if (ImGui::CollapsingHeader("Current Checkpoint", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			// get active and tell user
-			if (EARS::Modules::Checkpoint* CurrentCheckpoint = CheckpointMgr->GetCurrentCheckpoint())
-			{
-				const String& DebugName = CurrentCheckpoint->GetDebugName();
-				ImGui::Text("Current Checkpoint: %s", DebugName.c_str());
-			}
-		}
-
-		// TODO: Consider extending this so we have more info in ImGui such as checkpoint and chapters
-		if(ImGui::CollapsingHeader("Select Checkpoint", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			CheckpointMgr->ForEachCheckpoint([&](EARS::Modules::Checkpoint& CurCheckpoint) {
-				ImGui::PushID(&CurCheckpoint);
-
-				// compile name
-				const String& DebugName = CurCheckpoint.GetDebugName();
-
-				// present selectable element which user can press
-				ImGui::Bullet();
-				if (ImGui::Selectable(DebugName.c_str(), (CheckpointMgr->GetCurrentCheckpoint() == &CurCheckpoint)))
-				{
-					CheckpointMgr->RestartNewCheckpoint(&CurCheckpoint, EARS::Modules::CheckpointManager::RestartType::RESTART_DEBUG_TELEPORT, 0);
-				}
-
-				ImGui::PopID();
-				});
-		}
-
+		GetCheckpointDebug().DisplayTab();
 		ImGui::EndTabItem();
 	}
 }
@@ -585,9 +552,14 @@ void ImGuiManager::DrawTab_FamiliesSettings()
 							case EARS::Modules::MadeManState::MADE_MAN_STATE_IN_JAIL:
 							case EARS::Modules::MadeManState::MADE_MAN_STATE_IN_COOLDOWN:
 							{
-								if (ImGui::Button("Reset State"))
+								if (ImGui::Button("Send To Component"))
 								{
 									CurMadeMan->SendToCompound();
+								}
+								ImGui::SameLine();
+								if (ImGui::Button("Eliminate"))
+								{
+									TargetFamily->KillMadeMan(*CurMadeMan->GetSimNPC());
 								}
 								break;
 							}
@@ -616,6 +588,11 @@ void ImGuiManager::DrawTab_FamiliesSettings()
 								if (ImGui::Button("Incarcerate"))
 								{
 									TargetFamily->IncarcerateMadeMan(*CurMadeMan->GetSimNPC());
+								}
+								ImGui::SameLine();
+								if (ImGui::Button("Eliminate"))
+								{
+									TargetFamily->KillMadeMan(*CurMadeMan->GetSimNPC());
 								}
 								break;
 							}

@@ -2,6 +2,7 @@
 
 // addons
 #include "Scripthook/SH_ImGui/ImGuiNPCInspector.h"
+#include "Scripthook/SH_ImGui/ImGuiCheckpointDebug.h"
 #include "Utils/Singleton.h"
 
 // RenderWare Framework
@@ -69,6 +70,9 @@ public:
 	 */
 	void CloseLevelServices();
 
+	/** Fetch Checkpoint tab debug*/
+	SH::ImGuiCheckpointDebug& GetCheckpointDebug() { return CheckpointDebug; }
+
 	/**
 	 * API for ImGui to listen for Windows messages
 	 * Do not call outside of a WndProc function handler!
@@ -110,6 +114,8 @@ private:
 	// Inspector for the current object
 	// (Either Player or NPC)
 	ImGuiNPCInspector CurrentInspector;
+
+	SH::ImGuiCheckpointDebug CheckpointDebug;
 
 	// Should we render the Parted Model window
 	bool bShowModMenuWindow = false;
