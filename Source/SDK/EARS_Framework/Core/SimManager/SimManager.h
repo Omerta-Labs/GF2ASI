@@ -98,7 +98,7 @@ namespace EARS
 
 			enum class SimGroupListID : int32_t
 			{
-				UNKNOWN = 0xFFFFFFFF,
+				UNKNOWN = -1,
 				LOAD_QUEUE = 0x0,
 				UNLOAD_QUEUE = 0x1,
 				DISPATCHED = 0x2,

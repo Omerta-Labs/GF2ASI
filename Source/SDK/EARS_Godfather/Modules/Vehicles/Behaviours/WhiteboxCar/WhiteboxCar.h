@@ -11,7 +11,7 @@ namespace EARS
 	namespace Vehicles
 	{
 		// forward declares
-		struct HavokWheeledVehicle;
+		class HavokWheeledVehicle;
 
 		/**
 		 * A Car in the world of Godfather II.

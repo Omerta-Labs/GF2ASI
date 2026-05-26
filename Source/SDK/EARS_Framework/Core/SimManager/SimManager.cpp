@@ -211,6 +211,11 @@ void EARS::Framework::InitialiseScripthookModLoader()
 	// TODO: Could probably move this to utility header
 	const std::filesystem::path ExecutablePath = RawExeBuffer;
 	const std::filesystem::path CompletePath = (ExecutablePath.parent_path() / MODS_FOLDER_NAME);
+	if (!std::filesystem::exists(CompletePath))
+	{
+		tConsole::fPrintf("ERROR: SimGroupOverride path [%s] does not exist!", CompletePath.string().data());
+		return;
+	}
 
 	for (const auto& dirEntry : std::filesystem::directory_iterator(CompletePath))
 	{

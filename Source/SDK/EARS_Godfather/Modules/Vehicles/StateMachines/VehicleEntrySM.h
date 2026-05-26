@@ -13,7 +13,7 @@ namespace EARS::Modules
 
 	enum class VehicleSeatPreference : int32_t
 	{
-		VehicleSeatPreference_REF = 0xFFFFFFFF,
+		VehicleSeatPreference_REF = -1,
 		SEAT_DRIVER = 0x0,
 		SEAT_PASSENGER = 0x1,
 		SEAT_REAR_LEFT = 0x2,
