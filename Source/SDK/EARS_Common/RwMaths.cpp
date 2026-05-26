@@ -115,10 +115,27 @@ void RwV3dAddScale(RwV3d& Out, const RwV3d& InA, const RwV3d& InB, const float I
 	Out.m_Z = InA.m_Z + (InB.m_Z * InScale);
 }
 
+void RwMatrixSetIdentity(RwMatrixTag& InMatrix)
+{
+	InMatrix.m_Right.m_X = 1.0f;
+	InMatrix.m_Right.m_Y = 0.0f;
+	InMatrix.m_Right.m_Z = 0.0f;
+
+	InMatrix.m_Up.m_X = 0.0f;
+	InMatrix.m_Up.m_Y = 1.0f;
+	InMatrix.m_Up.m_Z = 0.0f;
+
+	InMatrix.m_At.m_X = 0.0f;
+	InMatrix.m_At.m_Y = 0.0f;
+	InMatrix.m_At.m_Z = 1.0f;
+
+	InMatrix.pad0 = 0.0f;
+	InMatrix.pad1 = 0.0f;
+	InMatrix.pad2 = 0.0f;
+	InMatrix.pad3 = 1.0f;
+}
+
 RwMatrixTag::RwMatrixTag()
 {
-	pad0 = 0.0f;
-	pad1 = 0.0f;
-	pad2 = 0.0f;
-	pad3 = 1.0f;
+	RwMatrixSetIdentity(*this);
 }

@@ -76,8 +76,7 @@ public:
 	inline unsigned int Size() const { return m_Size; }
 	inline bool IsEmpty() const { return (Size() == 0); }
 
-	TType& operator[](unsigned int idx) { return m_Items[idx]; }
-	const TType& operator[](unsigned int idx) const { return m_Items[idx]; }
+	TType& operator[](unsigned int idx) const { return m_Items[idx]; }
 
 public:
 
