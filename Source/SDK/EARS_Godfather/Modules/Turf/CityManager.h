@@ -33,10 +33,14 @@ namespace EARS
 			 */
 			uint32_t GetCurrentCity() const { return m_CurrCityID; }
 
-			/**
-			 * Fetch the Display Name of the given City ID.
-			 */
+			/** Fetch the Display Name of the given City ID. */
 			String* GetDisplayName(const uint32_t CityID) const;
+
+			/** Resolve runtime pointer of a city using its internal ID */
+			City* GetCity(const uint32_t CityID) const;
+
+			/** Request that the Player is teleported to a different city. */
+			void TeleportToCity(const uint32_t CityID) const;
 
 			/**
 			 * Utility function to iterate through all loaded Cities

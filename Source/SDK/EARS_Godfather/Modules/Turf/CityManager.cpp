@@ -28,6 +28,26 @@ String* EARS::Modules::CityManager::GetDisplayName(const uint32_t CityID) const
 	return nullptr;
 }
 
+EARS::Modules::City* EARS::Modules::CityManager::GetCity(const uint32_t CityID) const
+{
+	const int32_t CityIndex = FindCityIndex(CityID);
+	if (CityIndex != -1)
+	{
+		return m_Cities[CityIndex];
+	}
+
+	assert(false);
+	return nullptr;
+}
+
+void EARS::Modules::CityManager::TeleportToCity(const uint32_t CityID) const
+{
+	if (const EARS::Modules::City* DesiredCity = GetCity(CityID))
+	{
+		DesiredCity->RequestTeleport();
+	}
+}
+
 void EARS::Modules::CityManager::ForEachCity(const TVisitCityFunctor& InFunction)
 {
 	for (EARS::Modules::City* CurrentCity : m_Cities)
