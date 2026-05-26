@@ -500,6 +500,8 @@ void GF2Hook::Init_ModSystems()
 {
 	Settings* SettingsMgr = Settings::Get();
 	SettingsMgr->Init();
+
+	EARS::Framework::InitialiseScripthookModLoader();
 }
 
 void GF2Hook::Init_AttachHooks()

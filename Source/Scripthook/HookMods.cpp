@@ -2,10 +2,12 @@
 
 // Addons
 #include "Addons/Hook.h"
+#include "Addons/tConsole.h"
 
 // Scripthook
 #include "Scripthook/SH_PlayerMasterSM/PlayerAnimViewSM.h"
 #include "Scripthook/SH_PlayerMasterSM/PlayerMasterSM_Modded.h"
+#include "Scripthook/SH_ImGui/ImGuiManager.h"
 
 // SDK
 #include "SDK/EARS_Framework/Toolkits/StateMachine/SMBuilder.h"
@@ -14,6 +16,9 @@
 #include "SDK/EARS_Godfather/Modules/UI/UIPopup.h"
 #include "SDK/EARS_Godfather/Modules/UI/UIFrontend.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/StateMachines/VehicleEntrySM.h"
+
+#include "SDK/EARS_Godfather/Modules/Missions/Checkpoint.h"
+#include "SDK/EARS_Godfather/Modules/Missions/CheckpointManager.h"
 
 #include "SDK/EARS_Godfather/Modules/Debug/DemoPackageManager.h"
 #include "SDK/EARS_Godfather/Modules/Debug/DemoPackage.h"
@@ -29,6 +34,15 @@
 #define IMPLEMENT_DEMO_PACKAGE_POPUP (DEBUG && 0)
 #define IMPLEMENT_VEHICLE_ENTRY_SM (DEBUG && 0)
 #define OVERRIDE_LAUNCH_CMD (DEBUG && 0)
+#define IMPLEMENT_SEND_MSG (DEBUG && 0)
+
+// PURPOSE: Route all SendMsg(s) directly into ours
+uint64_t HOOK__SendMsg_Old;
+bool _cdecl HOOK_SendMsg(RWS::CMsg& InEventId, bool bSendToInactive)
+{
+	//tConsole::fPrintf("EventID: %u", InEventId.GetEventID());
+	return PLH::FnCast(HOOK__SendMsg_Old, &HOOK_SendMsg)(InEventId, bSendToInactive);
+}
 
 EARS::StateMachineSys::StateMachine* S_PlayerMasterSM_FactoryFn(unsigned int id, EARS::StateMachineSys::StateMachineParams* pSMParams)
 {
@@ -117,6 +131,32 @@ void _cdecl HOOK_UIFrontend_LaunchGame(const char* pMaps, const char* pStreams, 
 	PLH::FnCast(UIFrontend_LaunchGame_Old, &HOOK_UIFrontend_LaunchGame)(pMaps, ModifiedStreams, bOnline, pSpawn);
 }
 #endif // OVERRIDE_LAUNCH_CMD
+
+// PURPOSE: Allow ImGui to generate sorted checkpoint list
+uint64_t CheckpointManager_AddCheckpoint_Old;
+typedef void(__thiscall* CheckpointManager_AddCheckpoint)(EARS::Modules::CheckpointManager*, EARS::Modules::Checkpoint*);
+void __fastcall HOOK_CheckpointManager_AddCheckpoint(EARS::Modules::CheckpointManager* pThis, void* ecx, EARS::Modules::Checkpoint* pCheckpoint)
+{
+	EARS::Modules::CheckpointManager& CheckpointMgr = *EARS::Modules::CheckpointManager::GetInstance();
+	CheckpointMgr.AddCheckpoint(*pCheckpoint);
+
+	// now send directly to Scripthook
+	ImGuiManager& ImGuiMgr = ImGuiManager::GetCheckedRef();
+	ImGuiMgr.GetCheckpointDebug().AddCheckpoint(*pCheckpoint);
+}
+
+// PURPOSE: Allow ImGui to generate sorted checkpoint list
+uint64_t CheckpointManager_RemoveCheckpoint_Old;
+typedef void(__thiscall* CheckpointManager_RemoveCheckpoint)(EARS::Modules::CheckpointManager*, EARS::Modules::Checkpoint*);
+void __fastcall HOOK_CheckpointManager_RemoveCheckpoint(EARS::Modules::CheckpointManager* pThis, void* ecx, EARS::Modules::Checkpoint* pCheckpoint)
+{
+	// now remove from Scripthook
+	ImGuiManager& ImGuiMgr = ImGuiManager::GetCheckedRef();
+	ImGuiMgr.GetCheckpointDebug().RemoveCheckpoint(*pCheckpoint);
+
+	EARS::Modules::CheckpointManager& CheckpointMgr = *EARS::Modules::CheckpointManager::GetInstance();
+	CheckpointMgr.RemoveCheckpoint(*pCheckpoint);
+}
 
 #if IMPLEMENT_DEMO_PACKAGE_POPUP
 void DemoPopupCallback(int SelectedOption, EARS::Apt::UIPopupInfo* PopupInfo, bool bAborted)
@@ -223,7 +263,11 @@ void __fastcall HOOK_UIFrontend_ExecuteNextState(EARS::Apt::UIFrontend* _this)
 	//hook::Type<FrontendState> NextStateVal = hook::Type<FrontendState>(0x0E5672C);
 	hook::Type<Flags32> FrontendFlagsVal = hook::Type<Flags32>(0x01130590);
 
-	EARS::Apt::UIFrontend::GetInstance()->ExecuteNextState();
+	// Broken right now
+	//EARS::Apt::UIFrontend::GetInstance()->ExecuteNextState();
+
+	UIFrontend_ExecuteNextState funcCast = (UIFrontend_ExecuteNextState)UIFrontend_ExecuteNextState_Old;
+	funcCast(_this);
 }
 #endif // IMPLEMENT_DEMO_PACKAGE_POPUP
 
@@ -234,9 +278,20 @@ void Mod::ApplyHooks()
 	PLH::x86Detour detour100((char*)0x067DEB0, (char*)&HOOK_BuildStateMachines, &HOOK_BuildStateMachines_Old, dis);
 	detour100.hook();
 
+	PLH::x86Detour detour201((char*)0x08FD320, (char*)&HOOK_CheckpointManager_AddCheckpoint, &CheckpointManager_AddCheckpoint_Old, dis);
+	detour201.hook();
+
+	PLH::x86Detour detour202((char*)0x08FC950, (char*)&HOOK_CheckpointManager_RemoveCheckpoint, &CheckpointManager_RemoveCheckpoint_Old, dis);
+	detour202.hook();
+
+#if IMPLEMENT_SEND_MSG
+	PLH::x86Detour detour204((char*)0x0408A00, (char*)&HOOK_SendMsg, &HOOK__SendMsg_Old, dis);
+	detour204.hook();
+#endif // IMPLEMENT_SEND_MSG
+
 #if RUN_MASTER_SM_IN_ASI
-	PLH::x86Detour detour101((char*)0x07AAA00, (char*)&HOOK_PlayerMasterSM_BuildStateMachine, &HOOK_PlayerMasterSM_BuildStateMachine_Old, dis);
-	detour101.hook();
+	PLH::x86Detour detour203((char*)0x07AAA00, (char*)&HOOK_PlayerMasterSM_BuildStateMachine, &HOOK_PlayerMasterSM_BuildStateMachine_Old, dis);
+	detour203.hook();
 #endif // RUN_MASTER_SM_IN_ASI
 
 #if IMPLEMENT_VEHICLE_ENTRY_SM

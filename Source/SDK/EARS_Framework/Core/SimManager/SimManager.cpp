@@ -8,6 +8,11 @@
 #include "SDK/EARS_Framework/Core/AttributeHandler/CAttributeHandler.h"
 #include "SDK/EARS_Framework/Core/StreamManager/StreamManager.h"
 
+// c++
+#include <filesystem>
+#include <fstream>
+#include <map>
+
 namespace PrivateUtils
 {
 	template<typename TClass>
@@ -19,6 +24,20 @@ namespace PrivateUtils
 			uintptr_t base = reinterpret_cast<uintptr_t>(PtrBase);
 			PtrToFixUp = reinterpret_cast<TClass*>(offset + base);
 		}
+	}
+
+	std::vector<EARS::Framework::SimGroupTOC*> LoadedOverrideFiles;
+	std::map<EARS::Common::guid128_t, RWS::CAttributePacket*> RegisteredPackets;
+
+	void DestroyTOC()
+	{
+		for (EARS::Framework::SimGroupTOC* SimGroup : LoadedOverrideFiles)
+		{
+			delete SimGroup;
+		}
+
+		LoadedOverrideFiles.clear();
+		RegisteredPackets.clear();
 	}
 }
 
@@ -97,6 +116,7 @@ void EARS::Framework::SimManager::LoadResource(RWS::CResourceHandler::CResourceL
 		return;
 	}
 
+	// TODO: I don't even know if this works
 	hook::Type<uint32_t> some_value = hook::Type<uint32_t>(0x1163EC0);
 
 	LARGE_INTEGER PerformanceCount;
@@ -105,15 +125,20 @@ void EARS::Framework::SimManager::LoadResource(RWS::CResourceHandler::CResourceL
 
 	tConsole::fPrintf("SimManager::LoadResource: [%s]", StreamName);
 
+	// Recover pointers
 	PrivateUtils::RecoverPtr<RWS::CAttributePacket*>(SimGroupTOC->m_EntPackets, (uint8_t*)SimGroupTOC);
-
 	for (uint32_t idx = 0; idx < SimGroupTOC->m_NumEnts; idx++)
 	{
 		PrivateUtils::RecoverPtr<RWS::CAttributePacket>(SimGroupTOC->m_EntPackets[idx], (uint8_t*)SimGroupTOC);
 
 		RWS::CAttributePacket* Pckt = SimGroupTOC->m_EntPackets[idx];
 
-		int z = 0;
+		// NB: If exists, directly hot patch
+		const EARS::Common::guid128_t PcktID = Pckt->GetInstanceID();
+		if (PrivateUtils::RegisteredPackets.contains(PcktID))
+		{
+			SimGroupTOC->m_EntPackets[idx] = PrivateUtils::RegisteredPackets.at(PcktID);
+		}
 	}
 
 	SimGroupTOC->m_hStream = DispatchStream;
@@ -126,10 +151,10 @@ void EARS::Framework::SimManager::LoadResource(RWS::CResourceHandler::CResourceL
 		{
 			bNeedsDispatchLock = false;
 		}
-
+		
 		if (bNeedsDispatchLock)
 		{
-			(&m_SimGroupListArr[0])->InsertAtBack(SimGroupTOC);
+			(&m_SimGroupListArr[(int)SimGroupListID::LOAD_QUEUE])->InsertAtBack(SimGroupTOC);
 
 			SimGroupTOC->m_Flags |= 0x20;
 			StrmMgr->AddDispatchLockComplete();
@@ -137,12 +162,12 @@ void EARS::Framework::SimManager::LoadResource(RWS::CResourceHandler::CResourceL
 		else
 		{
 			SimGroupTOC->m_Flags |= 0x100;
-			(&m_SimGroupListArr[0])->InsertAtBack(SimGroupTOC);
+			(&m_SimGroupListArr[(int)SimGroupListID::REJECTED])->InsertAtBack(SimGroupTOC);
 		}
 	}
 	else
 	{
-		(&m_SimGroupListArr[0])->InsertAtBack(SimGroupTOC);
+		(&m_SimGroupListArr[(int)SimGroupListID::REJECTED])->InsertAtBack(SimGroupTOC);
 	}
 }
 
@@ -171,4 +196,59 @@ void* EARS::Framework::SimManager::SpawnEntity(RWS::CAttributePacket* Packet, ui
 const EARS::Common::guid128_t& EARS::Framework::SimManager::AttrPacketGetKey::GetKey(const RWS::CAttributePacket* InPacket)
 {
 	return InPacket->GetInstanceID();
+}
+
+void EARS::Framework::InitialiseScripthookModLoader()
+{
+	static const std::filesystem::path MODS_FOLDER_NAME = "simgroup_mods";
+
+	// use primitive module file name because otherwise std::filesystem produces bad results
+	// for example double'd up scripts folder in path.
+	wchar_t RawExeBuffer[256];
+	memset(RawExeBuffer, 0, 256);
+	GetModuleFileNameW(nullptr, RawExeBuffer, 256);
+
+	// TODO: Could probably move this to utility header
+	const std::filesystem::path ExecutablePath = RawExeBuffer;
+	const std::filesystem::path CompletePath = (ExecutablePath.parent_path() / MODS_FOLDER_NAME);
+
+	for (const auto& dirEntry : std::filesystem::directory_iterator(CompletePath))
+	{
+		if (!dirEntry.is_regular_file())
+		{
+			continue;
+		}
+
+		const std::filesystem::path& AsPath = dirEntry.path();
+		if (AsPath.has_extension() && AsPath.extension() == ".sgp")
+		{
+			tConsole::fPrintf("Detected SimGroupOverride file [%s]", AsPath.c_str());
+
+			std::ifstream input(AsPath.c_str(), std::ios::binary);
+			const std::vector<char> Bytes((std::istreambuf_iterator<char>(input)), (std::istreambuf_iterator<char>()));
+			input.close();
+
+			uint8_t* SimGroupBytes = new uint8_t[Bytes.size()];
+			memcpy(SimGroupBytes, Bytes.data(), Bytes.size());
+
+			EARS::Framework::SimGroupTOC* SimGroupTOC = reinterpret_cast<EARS::Framework::SimGroupTOC*>(SimGroupBytes);
+			PrivateUtils::LoadedOverrideFiles.push_back(SimGroupTOC);
+
+			PrivateUtils::RecoverPtr<RWS::CAttributePacket*>(SimGroupTOC->m_EntPackets, (uint8_t*)SimGroupTOC);
+			for (uint32_t idx = 0; idx < SimGroupTOC->m_NumEnts; idx++)
+			{
+				PrivateUtils::RecoverPtr<RWS::CAttributePacket>(SimGroupTOC->m_EntPackets[idx], (uint8_t*)SimGroupTOC);
+				RWS::CAttributePacket* Pckt = SimGroupTOC->m_EntPackets[idx];
+
+				const EARS::Common::guid128_t PcktID = Pckt->GetInstanceID();
+				tConsole::fPrintf("Loaded behaviour [0x%X-0x%X-0x%X-0x%X] from SimGroupOverride file [%s]", PcktID[0], PcktID[1], PcktID[2], PcktID[3], AsPath.c_str());
+
+				PrivateUtils::RegisteredPackets.insert({ PcktID, Pckt });
+			}
+
+			tConsole::fPrintf("Finished SimGroupOverride file [%s], with a total of %u behaviours mounted.", AsPath.c_str(), SimGroupTOC->m_NumEnts);
+		}
+	}
+
+	atexit(PrivateUtils::DestroyTOC);
 }

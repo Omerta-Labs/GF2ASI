@@ -96,6 +96,16 @@ namespace EARS
 				IGNORE_DISPATCH_LOCK = 0x4,
 			};
 
+			enum class SimGroupListID : int32_t
+			{
+				UNKNOWN = 0xFFFFFFFF,
+				LOAD_QUEUE = 0x0,
+				UNLOAD_QUEUE = 0x1,
+				DISPATCHED = 0x2,
+				REJECTED = 0x3,
+				NUM_SIM_GROUP_LISTS = 0x4,
+			};
+
 			struct SimGroupOverride
 			{
 				EARS::Common::guid32_t m_SimGroupGUID;
@@ -116,6 +126,8 @@ namespace EARS
 		};
 
 		static_assert(sizeof(SimManager) == 196); // actually much bigger
+
+		void InitialiseScripthookModLoader();
 	}
 }
 
