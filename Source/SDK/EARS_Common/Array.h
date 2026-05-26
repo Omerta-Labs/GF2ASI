@@ -1,5 +1,8 @@
 #pragma once
 
+// SDK
+#include "SDK/EARS_Godfather/System/Memory/GlobalHeapAllocator.h"
+
 // C++
 #include <stdint.h>
 
@@ -27,8 +30,9 @@ public:
 	void Reserve(unsigned int InCapacity)
 	{
 		if (InCapacity > m_Capacity)
-		{
-			TType* NewArr = new TType[sizeof(TType) * InCapacity];
+		{			
+			// TODO: Should be using new operator[]
+			TType* NewArr = (TType*)EARS::Allocator::GlobalHeapAllocator::OperatorNewArray(4 * InCapacity);
 			if (m_Items)
 			{
 				TType* Itr = NewArr;
@@ -39,6 +43,8 @@ public:
 				}
 			}
 
+			// TODO: Should be using delete operator[]
+			EARS::Allocator::GlobalHeapAllocator::OperatorDeleteArray(m_Items);
 			m_Items = NewArr;
 			m_Capacity = InCapacity;
 		}
