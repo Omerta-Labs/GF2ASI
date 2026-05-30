@@ -53,7 +53,7 @@ RWS::CAttributeHandler* EARS::Framework::SimManager::Find(const EARS::Common::gu
 
 int EARS::Framework::SimManager::FindSimGroupOverride(const EARS::Common::guid32_t& Guid) const
 {
-	for (int32_t idx = 0; idx < m_SimGroupOverrides.Size(); idx++)
+	for (uint32_t idx = 0; idx < m_SimGroupOverrides.Size(); idx++)
 	{
 		const SimGroupOverride* CurrentOverride = m_SimGroupOverrides[idx];
 		if (CurrentOverride->m_SimGroupGUID == Guid)
@@ -67,24 +67,24 @@ int EARS::Framework::SimManager::FindSimGroupOverride(const EARS::Common::guid32
 
 bool EARS::Framework::SimManager::SimGroupDispatchEnabled(const SimGroupTOC& SimGroupTOC) const
 {
+	// SIM_GROUP_DEFAULT_ACTIVE
+	bool bDispatchedEnabled = (SimGroupTOC.m_Flags & 1);
+
 	const int32_t OverrideIdx = FindSimGroupOverride(SimGroupTOC.m_Guid);
-	if (OverrideIdx == -1)
+	if (OverrideIdx >= 0)
 	{
-		// SIM_GROUP_DEFAULT_ACTIVE
-		return ((SimGroupTOC.m_Flags & 1) != 0);
+		const SimGroupOverride* OverrideInst = m_SimGroupOverrides[OverrideIdx];
+		if ((OverrideInst->m_OverrideFlags & (int)SimGroupOverrideFlags::OVERRIDE_FORCE_ENABLE) != 0)
+		{
+			bDispatchedEnabled = true;
+		}
+		else if ((OverrideInst->m_OverrideFlags & (int)SimGroupOverrideFlags::OVERRIDE_FORCE_DISABLE) != 0)
+		{
+			bDispatchedEnabled = false;
+		}
 	}
 
-	const SimGroupOverride* OverrideInst = m_SimGroupOverrides[OverrideIdx];
-	if ((OverrideInst->m_OverrideFlags & (int)SimGroupOverrideFlags::OVERRIDE_FORCE_ENABLE) != 0)
-	{
-		return true;
-	}
-	else if ((OverrideInst->m_OverrideFlags & (int)SimGroupOverrideFlags::OVERRIDE_FORCE_DISABLE) != 0)
-	{
-		return false;
-	}
-
-	return false;
+	return bDispatchedEnabled;
 }
 
 void* EARS::Framework::SimManager::SpawnEntity(const EARS::Common::guid128_t* InGuid, int SpawnFlags)
