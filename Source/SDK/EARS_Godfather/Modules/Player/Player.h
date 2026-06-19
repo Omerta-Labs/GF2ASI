@@ -103,7 +103,22 @@ namespace EARS
 			int32_t m_PlayerDisableCount = 0;
 			uint32_t m_EventHashNames[EARS::Modules::PlayerActionEvents::kEvent_NumEvents];
 			uint32_t m_VibrationHashNames[EARS::Modules::PlayerVibrationEvents::kVib_NumEvents];
-			char m_Player_Padding_5[0x6BC];
+			char m_Player_Padding_5[0x70];
+			EARS::Common::guid128_t m_ChaseCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_ChaseCameraSprintingInfoReferenceGUID;
+			EARS::Common::guid128_t m_DrivingCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_TargetingCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_ActionableCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_WallcoverCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_WallcoverZoomCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_WallcoverSniperCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_FreeAimCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_WalkingFreeAimCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_SecondaryFreeAimCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_FreeAimZoomCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_FreeAimSniperCameraInfoReferenceGUID;
+			EARS::Common::guid128_t m_SteadyCameraModifierInfoReferenceGUID;
+			char m_Player_Padding_6[0x56C];
 		};
 
 		static_assert(sizeof(Player) == 0x31D0, "EARS::Modules::Player must equal 0x31D0");
