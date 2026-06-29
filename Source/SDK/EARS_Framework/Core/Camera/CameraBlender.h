@@ -1,5 +1,9 @@
 #pragma once
 
+// SDK
+#include "SDK/EARS_Common/SafePtr.h"
+#include "SDK/EARS_Framework/Core/Camera/Camera.h"
+
 // C++
 #include <stdint.h>
 
@@ -7,36 +11,17 @@ namespace EARS
 {
 	namespace Framework
 	{
-		enum CameraAuthoredAspectRatio : uint32_t
-		{
-			CAMERA_AUTHORED_16x9 = 0x1,
-			CAMERA_AUTHORED_4x3 = 0x2,
-		};
-
-		enum CameraAspectConversionType : uint32_t
-		{
-			CAMERA_DISPLAY_CONST_X = 0x1,
-			CAMERA_DISPLAY_CONST_Y = 0x2,
-		};
-
-		struct CameraData
-		{
-		public:
-
-			float m_Position[4];
-			float m_Anchor[4];
-			float m_Rotation[4];
-			float m_FieldOfView = 0.0f;
-			EARS::Framework::CameraAuthoredAspectRatio m_AuthoredAspectRatio;
-			EARS::Framework::CameraAspectConversionType m_AspectConversionType;
-		};
+		// forward declares
+		class CameraInfo;
 
 		/**
 		 * Blends Cameras together using stacks, primarily from CameraInfo(s).
 		 */
-		class CameraBlender
+		class __declspec(align(16)) CameraBlender
 		{
 		public:
+
+			void PushCamera(uint32_t PlayerID, CameraInfo& CameraInfo, float BlendTime, CameraInterpType InterpType, bool bResetCamera);
 
 			float GetActiveCamFov() const { return m_Data.m_FieldOfView; }
 
@@ -44,7 +29,53 @@ namespace EARS
 
 		private:
 
+			struct CameraBlend
+			{
+				EARS::Framework::Camera* m_Camera = nullptr;
+				float m_Weight = 0.0f;
+				float m_WeightToBlend = 0.0f;
+			};
+
+			struct __declspec(align(4)) PostBlendModifier
+			{
+				void* m_Modifier = nullptr; // CameraPostBlendModifier
+				bool m_bDeleteOnPop = false;
+			};
+
+			struct __declspec(align(4)) DelayedCameraActionInfo
+			{
+				enum DelayedCameraAction
+				{
+					INVALID = 0,
+					PUSH_CAMERAINFO = 1,
+					POP_CAMERAINFO = 2,
+					POP_CAMERAPOSTBLENDMODIFIERINFO = 3
+				};
+
+				DelayedCameraAction m_Action = DelayedCameraAction::INVALID;
+				SafePtr<EARS::Framework::CameraInfo> m_CameraInfo;
+				float m_BlendTime = 0.0f;
+				uint32_t m_PlayerID = 0;
+				CameraInterpType m_InterpType = CameraInterpType::CAMERA_INTERP_NONE;
+				bool m_bResetNextCamera = false;
+			};
+
 			CameraData m_Data;
+			float m_YawVelocity = 0.0f;
+			SafePtr<EARS::Framework::CameraInfo> m_CameraInfoStack[8];
+			int32_t m_CameraInfoStackIdx = 0;
+			CameraBlender::CameraBlend m_ActiveCameraList[12];
+			uint32_t m_ActiveCameraIdx = 0;
+			float m_BlendTime = 0.0f;
+			float m_BlendValue = 0.0f;
+			float m_BlendTimeTotal = 0.0f;
+			CameraInterpType m_BlendInterpType = CameraInterpType::CAMERA_INTERP_NONE;
+			CameraBlender::PostBlendModifier m_PostBlendModifiers[4];
+			CameraBlender::DelayedCameraActionInfo m_DelayedCameraActions[4];
+			int32_t m_DelayedCameraIdx = 0;
+			bool m_bUpdating = false;
 		};
+
+		static_assert(sizeof(CameraBlender) == 0x1D0, "Size Mismatch");
 	} // Framework
 } // EARS

@@ -31,7 +31,7 @@ namespace EARS
 			assert(ViewportID < 4 && "viewport < MAX_VIEWPORTS");
 
 			// NB: This is what the game does, RwV3d does not exist in CameraBlender
-			const CameraBlender& ViewportBlender = m_CameraBlenders[ViewportID];
+			const CameraBlender& ViewportBlender = m_CameraBlender[ViewportID];
 			OutFov = ViewportBlender.GetActiveCamFov();
 
 			return true;
@@ -44,7 +44,7 @@ namespace EARS
 			assert(ViewportID < 4 && "viewport < MAX_VIEWPORTS");
 
 			// NB: This is what the game does, RwV3d does not exist in CameraBlender
-			const CameraBlender& ViewportBlender = m_CameraBlenders[ViewportID];
+			const CameraBlender& ViewportBlender = m_CameraBlender[ViewportID];
 			const float* Rotation = ViewportBlender.GetActiveCamRot();
 			OutRotation = RwV3d(Rotation[0], Rotation[1], Rotation[2]);
 

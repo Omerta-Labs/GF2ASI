@@ -50,7 +50,7 @@ namespace EARS
 			// convert PlayerID to ViewportID. Useful when requesting blender
 			uint32_t ViewportIDFromPlayerID(uint32_t InPlayerID) const;
 
-			CameraBlender* m_CameraBlenders = nullptr;				// 0x10
+			CameraBlender* m_CameraBlender = nullptr;				// 0x10
 			char m_Padding_CameraMgr[0x13C];
 			uint32_t m_MaxViewports = 0;							// 0x150
 			uint32_t m_NumViewports = 0;							// 0x154
