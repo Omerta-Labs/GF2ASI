@@ -12,6 +12,9 @@
 // SDK (Godfather)
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
+#include "SDK/EARS_Godfather/Modules/Item/Inventory.h"
+#include "SDK/EARS_Godfather/Modules/Item/InventoryManager.h"
+#include "SDK/EARS_Godfather/Modules/Item/Item.h"
 
 namespace DefinedEvents
 {
@@ -91,6 +94,7 @@ bool Mod::ObjectManager::RequestSpawnCar(const ObjectSpawnRequestParams& Request
 	{
 		// probably not loaded
 		const uint32_t StreamHandle = StreamMgr->Load(AsGuid32, 0.0f, 0);
+		const char* Filename = StreamMgr->GetFilename(StreamHandle);
 
 		// link to recieve event
 		StreamMgr->LinkStreamMsg(2, *this, 0x8000);
@@ -248,6 +252,26 @@ void Mod::ObjectManager::ImGuiDrawContents()
 			const RwV3d SpawnPosition = PlayerMatrix.m_Pos + (PlayerMatrix.m_At * 5.0f);
 			SpawnItem(ItemSpawnList.GetSelectedGUID(), SpawnPosition);
 		}
+		
+		// only show if we have the Player
+		if (EARS::Modules::InventoryManager* PlayerInventoryMgr = LocalPlayer->GetInventoryManager())
+		{
+			ImGui::SameLine();
+
+			if (ImGui::Button("Add To Player"))
+			{
+				if (EARS::Modules::Item* NewItem = PlayerInventoryMgr->TrySpawnItem(ItemSpawnList.GetSelectedGUID(), LocalPlayer->GetStream()))
+				{
+					const bool bExistingValue = NewItem->GetFanFareWhenAcquiredFlag();
+					NewItem->SetFanFareWhenAcquiredFlag(false);
+					NewItem->SetForceIntoInventoryFlag(true);
+					PlayerInventoryMgr->AddItemToInventory(NewItem, false);
+					NewItem->SetFanFareWhenAcquiredFlag(true);
+					NewItem->SetForceIntoInventoryFlag(bExistingValue);
+				}
+			}
+		}
+
 		ImGui::PopItemWidth();
 
 		ImGui::PopID();
@@ -267,7 +291,11 @@ Mod::ObjectEntryList::~ObjectEntryList()
 
 void Mod::ObjectEntryList::RegisterEntry(const EntityEntry& InEntry)
 {
-	Entries.push_back(InEntry);
+	auto FoundIt = std::find_if(Entries.begin(), Entries.end(), [&](const EntityEntry& OtherEntry) { return InEntry.GUID == OtherEntry.GUID; });
+	if (FoundIt == Entries.end())
+	{
+		Entries.push_back(InEntry);
+	}
 }
 
 void Mod::ObjectEntryList::DrawList()

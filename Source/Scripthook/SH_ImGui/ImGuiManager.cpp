@@ -20,9 +20,7 @@
 #include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
 #include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
 #include "SDK/EARS_Godfather/Modules/Families/MadeMan.h"
-#include "SDK/EARS_Godfather/Modules/Item/Inventory.h"
 #include "SDK/EARS_Godfather/Modules/Item/InventoryManager.h"
-#include "SDK/EARS_Godfather/Modules/Item/Item.h"
 #include "SDK/EARS_Godfather/Modules/Player/Player.h"
 #include "SDK/EARS_Godfather/Modules/Player/PlayerDebug.h"
 #include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
@@ -253,7 +251,7 @@ void ImGuiManager::DrawTab_PlayerSettings()
 
 			if (ImGui::CollapsingHeader("Players Inventory", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ImGui::TextWrapped("Modify Players Inventory (Unlimited Ammo, swapping weapons)");
+				ImGui::TextWrapped("Modify Players Inventory (Unlimited Ammo, giving weapons has been moved to ObjectManager)");
 
 				Mod::ObjectManager& ObjMgrRef = Mod::ObjectManager::GetCheckedRef();
 
@@ -263,35 +261,6 @@ void ImGuiManager::DrawTab_PlayerSettings()
 					if (ImGui::Button(Label))
 					{
 						PlayerInventoryMgr->ToggleUnlimitedAmmo();
-					}
-
-					ImGui::PushItemWidth(-1.0f);
-					if(ImGui::BeginCombo("##add_to_inventory", InventoryAddItem_SelectedName.data()))
-					{
-						ObjMgrRef.ForEachItem([&](const std::string& Name, const EARS::Common::guid128_t& EntityID)
-						{
-								if (ImGui::Selectable(Name.data(), (InventoryAddItem_SelectedGuid == EntityID)))
-								{
-									InventoryAddItem_SelectedName = Name;
-									InventoryAddItem_SelectedGuid = EntityID;
-								}
-						});
-
-						ImGui::EndCombo();
-					}
-					ImGui::PopItemWidth();
-
-					if (ImGui::Button("Add To Inventory"))
-					{
-						if (EARS::Modules::Item* NewItem = PlayerInventoryMgr->TrySpawnItem(InventoryAddItem_SelectedGuid, LocalPlayer->GetStream()))
-						{
-							const bool bExistingValue = NewItem->GetFanFareWhenAcquiredFlag();
-							NewItem->SetFanFareWhenAcquiredFlag(false);
-							NewItem->SetForceIntoInventoryFlag(true);
-							PlayerInventoryMgr->AddItemToInventory(NewItem, false);
-							NewItem->SetFanFareWhenAcquiredFlag(true);
-							NewItem->SetForceIntoInventoryFlag(bExistingValue);
-						}
 					}
 				}
 			}
@@ -582,8 +551,6 @@ void ImGuiManager::DrawTab_BuildingSettings()
 						
 						const EARS::Modules::Family* OwningFamily = FamilyMgr->GetFamily(ActiveStore.GetFamilyID());
 						const String* FamilyString = OwningFamily->GetInternalName();
-
-						const String* CityString = CityMgr->GetDisplayName(ActiveStore.GetCityID());
 
 						ImGui::Text("%u", ActiveStore.GetVenueID());
 						ImGui::TableNextColumn();
