@@ -21,6 +21,7 @@ namespace EARS
 		class Item;
 		class SimNPC;
 		class NPC;
+		class CustomCameraInfo;
 	}
 
 	namespace Vehicles
@@ -103,6 +104,17 @@ inline EARS::Modules::Item* SafePtr<EARS::Modules::Item>::GetPtr() const
 	if (m_Obj)
 	{
 		return (EARS::Modules::Item*)(m_Obj - 0x9);
+	}
+
+	return nullptr;
+}
+
+template<>
+inline EARS::Modules::CustomCameraInfo* SafePtr<EARS::Modules::CustomCameraInfo>::GetPtr() const
+{
+	if (m_Obj)
+	{
+		return (EARS::Modules::CustomCameraInfo*)(m_Obj - 0x9);
 	}
 
 	return nullptr;
