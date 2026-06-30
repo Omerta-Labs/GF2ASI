@@ -10,6 +10,8 @@ namespace EARS
 	namespace Framework
 	{
 		class CameraBlender;
+		class CameraInfo;
+		enum CameraInterpType : uint32_t;
 
 		/**
 		 * Core Camera class to maintain viewports and POV for the engine.
@@ -39,6 +41,16 @@ namespace EARS
 			 * Fetch the active rotation for the specific Player.
 			 */
 			bool GetActiveCamRot(RwV3d& OutRotation, uint32_t InPlayerID) const;
+
+			/**
+			 * Fetch the PlayerID currently bound to the given viewport/player index.
+			 */
+			uint32_t GetBoundPlayer(uint32_t InPlayerIndex) const;
+
+			/**
+			 * Push a CameraInfo onto the stack for the specified Player.
+			 */
+			void PushCameraInfo(uint32_t InPlayerID, CameraInfo* InCameraInfo, float InBlendTime, CameraInterpType InInterpType, bool bInResetCamera);
 
 			/**
 			 * Fetch the instance of this class

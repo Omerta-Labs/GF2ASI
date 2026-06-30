@@ -68,6 +68,16 @@ namespace EARS
 			return 4;
 		}
 
+		uint32_t CameraManager::GetBoundPlayer(uint32_t InPlayerIndex) const
+		{
+			return MemUtils::CallClassMethod<uint32_t>(0x424CF0, this, InPlayerIndex);
+		}
+
+		void CameraManager::PushCameraInfo(uint32_t InPlayerID, CameraInfo* InCameraInfo, float InBlendTime, CameraInterpType InInterpType, bool bInResetCamera)
+		{
+			MemUtils::CallClassMethod<void>(0x424DC0, this, InPlayerID, InCameraInfo, InBlendTime, InInterpType, bInResetCamera);
+		}
+
 		/* static */
 		CameraManager* CameraManager::GetInstance()
 		{
