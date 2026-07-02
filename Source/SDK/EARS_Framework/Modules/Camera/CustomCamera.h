@@ -3,13 +3,21 @@
 // SDK
 #include "SDK/EARS_Framework/Core/Camera/Camera.h"
 
+// C++
+#include <type_traits>
+
 namespace EARS::Modules
 {
 	class CustomCameraInfo : public EARS::Framework::CameraInfo
 	{
 	public:
 
-		//CustomCameraInfo();
+		CustomCameraInfo();
+		virtual ~CustomCameraInfo();
+
+		//~ Begin EARS::Framework::CameraInfo overrides
+		virtual EARS::Framework::Camera* Create() override;
+		//~ End EARS::Framework::CameraInfo overrides
 
 		void SetPointers(float (*Pos)[4], float (*Rot)[4], float* FOV);
 		void SetAuthoredAspectRatio(EARS::Framework::CameraAuthoredAspectRatio InType) { m_AuthoredAspectRatio = InType; }
@@ -25,4 +33,5 @@ namespace EARS::Modules
 	};
 
 	static_assert(sizeof(CustomCameraInfo) == 0x6C, "EARS::Modules::CustomCameraInfo must equal 0x6C");
+	static_assert(!std::is_abstract<CustomCameraInfo>::value, "CustomCameraInfo must be concrete (instantiable)");
 }

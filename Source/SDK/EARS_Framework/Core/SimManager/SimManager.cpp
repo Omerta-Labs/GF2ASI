@@ -87,6 +87,11 @@ bool EARS::Framework::SimManager::SimGroupDispatchEnabled(const SimGroupTOC& Sim
 	return bDispatchedEnabled;
 }
 
+void EARS::Framework::SimManager::Remove(RWS::CAttributeHandler* InHandler)
+{
+	MemUtils::CallClassMethod<void, SimManager*, RWS::CAttributeHandler*>(0x0446560, this, InHandler);
+}
+
 void* EARS::Framework::SimManager::SpawnEntity(const EARS::Common::guid128_t* InGuid, int SpawnFlags)
 {
 	return MemUtils::CallClassMethod<void*, SimManager*, const EARS::Common::guid128_t*, int>(0x0446130, this, InGuid, SpawnFlags);

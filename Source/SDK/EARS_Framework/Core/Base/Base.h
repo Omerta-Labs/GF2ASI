@@ -15,13 +15,22 @@ namespace EARS
 		{
 		public:
 
+			virtual ~Base();
 
+			//~ Begin RWS::CEventHandler Interface
+			virtual void HandleEvents(const RWS::CMsg& MsgEvent) override;
+			virtual void DisableMessages() override;
+			virtual void EnableMessages() override;
+			//~ End RWS::CEventHandler Interface
 
-			virtual ~Base() = 0;
+			// Convert this object to a given class
+			virtual bool QueryInterface(const uint32_t ClassID, void** OutObjectPtr) const;
 
-			virtual bool QueryInterface(const uint32_t ClassID, void** OutObjectPtr) const = 0;
-			virtual void LinkTick() = 0;
-			virtual void UnLinkTick() = 0;
+			// assuming this registers a tick event to this object
+			virtual void LinkTick() { /* nothing by default */ }
+
+			// assuming this unregisters a tick event to this object
+			virtual void UnLinkTick() { /* nothing by default */ }
 
 			static bool IsEventHandlerBase(const RWS::CEventHandler& InHandler);
 

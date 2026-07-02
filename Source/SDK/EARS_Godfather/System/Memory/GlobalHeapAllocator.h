@@ -1,11 +1,14 @@
 #pragma once
 
 // SDK
-#include "SDK/EARS_Common/IAllocator.h"
+#include "SDK/EARS_Framework/Core/Memory/Allocator.h"
+
+// C++
+#include <stdint.h>
 
 namespace EARS::Allocator
 {
-	class GlobalHeapAllocator
+	class GlobalHeapAllocator : public Allocator
 	{
 	public:
 
@@ -14,6 +17,10 @@ namespace EARS::Allocator
 		static void* OperatorNewArray(const uint32_t Size);
 		static void OperatorDeleteArray(void* Data);
 
+		static GlobalHeapAllocator* GetSingletonPtr();
+
 	private:
 	};
 }
+
+extern EARS::Allocator::Allocator* get_thread_new_allocator();

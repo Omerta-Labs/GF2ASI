@@ -10,15 +10,22 @@ namespace EARS
 {
 	namespace Framework
 	{
+		// forward declares
+		class Component;
+
 		class ComponentListRecord
 		{
 		public:
+
+			void EnableMessagesToComponents(EARS::Framework::Component** Components);
+			void DisableMessagesToComponents(EARS::Framework::Component** Components);
 
 			uint16_t GetIndex(const uint32_t RegisteredIndex) const { return m_Map[RegisteredIndex]; }
 
 		private:
 
-			char m_Padding_0[0xE];
+			uint16_t m_NumComponents = 0;
+			char m_Padding_0[0xC];
 			uint16_t m_Map[255];
 		};
 
@@ -29,6 +36,8 @@ namespace EARS
 		class Component  : public RWS::CEventHandler
 		{
 		public:
+
+
 
 		private:
 

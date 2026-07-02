@@ -1,5 +1,8 @@
 #pragma once
 
+// C++
+#include <cstdint>
+
 /**
  * Customised version of Renderware's RwV3d
  * This is built more to make use of new C++ tech
@@ -68,3 +71,28 @@ void RwV3dScale(RwV3d& Out, const RwV3d& InA, const RwV3d& InB);
 void RwV3dAddScale(RwV3d& Out, const RwV3d& InA, const RwV3d& InB, const float InScale);
 
 void RwMatrixSetIdentity(RwMatrixTag& InMatrix);
+
+// Combine modes for RwMatrixRotate (matches Renderware's RwOpCombineType)
+enum RwOpCombineType : uint32_t
+{
+	rwCOMBINEREPLACE = 0,		// InMatrix becomes the rotation
+	rwCOMBINEPRECONCAT = 1,		// InMatrix = rotation * InMatrix
+	rwCOMBINEPOSTCONCAT = 2,	// InMatrix = InMatrix * rotation
+};
+
+// Builds a rotation of 'InAngleDegrees' about 'InAxis' (Rodrigues) and combines it into 'InMatrix'.
+void RwMatrixRotate(RwMatrixTag& InMatrix, const RwV3d& InAxis, float InAngleDegrees, RwOpCombineType InCombineOp);
+
+// Out = InA * InB using Renderware's row-vector convention (Out.row[i] = sum_k InA[i][k] * InB.row[k]).
+// 'Out' may safely alias 'InA' or 'InB'.
+void RwMatrixMultiply(RwMatrixTag& Out, const RwMatrixTag& InA, const RwMatrixTag& InB);
+
+namespace EARS
+{
+	// Extracts Euler angles (radians) from the rotation part of 'InMatrix'.
+	// Result is stored as { X = pitch, Y = yaw, Z = roll }.
+	void RwMatrixExtractEulerAngles(RwV3d& Result, const RwMatrixTag& InMatrix);
+
+	// Copies an RwV3d into a 4-float vector, setting the W component to 1.0f.
+	void ConvertRwV3dToVec4flt(float Out[4], const RwV3d& In);
+}

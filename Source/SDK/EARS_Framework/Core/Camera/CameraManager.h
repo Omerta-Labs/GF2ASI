@@ -43,6 +43,11 @@ namespace EARS
 			bool GetActiveCamRot(RwV3d& OutRotation, uint32_t InPlayerID) const;
 
 			/**
+			 * Fetch the active position for the specific Player.
+			 */
+			bool GetActiveCamPos(RwV3d& OutPosition, uint32_t InPlayerID) const;
+
+			/**
 			 * Fetch the PlayerID currently bound to the given viewport/player index.
 			 */
 			uint32_t GetBoundPlayer(uint32_t InPlayerIndex) const;
@@ -51,6 +56,8 @@ namespace EARS
 			 * Push a CameraInfo onto the stack for the specified Player.
 			 */
 			void PushCameraInfo(uint32_t InPlayerID, CameraInfo* InCameraInfo, float InBlendTime, CameraInterpType InInterpType, bool bInResetCamera);
+
+			void PopCameraInfo(uint32_t InPlayerID, CameraInfo* InCameraInfo, float InBlendTime, CameraInterpType InInterpType, bool bInResetCamera, bool bUpdateCameraRightAway);
 
 			/**
 			 * Fetch the instance of this class

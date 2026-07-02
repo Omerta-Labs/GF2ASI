@@ -27,6 +27,8 @@ namespace EARS
 
 			const float* GetActiveCamRot() const { return m_Data.m_Rotation; }
 
+			const float* GetActiveCamPos() const { return m_Data.m_Position; }
+
 		private:
 
 			struct CameraBlend

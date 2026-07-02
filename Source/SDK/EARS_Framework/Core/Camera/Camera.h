@@ -10,16 +10,12 @@ namespace RWS
 	{
 	public:
 
-		virtual ~CSystemCommands() = 0;
+		virtual ~CSystemCommands() {}
 
 	private:
-
-		// TODO: Unknown member. Present in the engine layout (CSystemCommands is vtable + 4 bytes = 0x8),
-		// which pushes CameraInfo's derived members (e.g. CustomCameraInfo::m_Pos) to their correct offsets.
-		uint32_t m_Unknown_CSystemCommands = 0;
 	};
 
-	static_assert(sizeof(CSystemCommands) == 0x8, "RWS::CSystemCommands must equal 0x8");
+	static_assert(sizeof(CSystemCommands) == 0x4, "RWS::CSystemCommands must equal 0x4");
 }
 
 namespace EARS::Framework
@@ -28,7 +24,8 @@ namespace EARS::Framework
 	{
 	public:
 
-		virtual ~iAcceptStateChanges() = 0;
+		virtual void ClearState(const uint32_t* State) = 0;
+		virtual void SetState(const uint32_t* State) = 0;
 	};
 
 	enum CameraAuthoredAspectRatio : uint32_t
@@ -68,9 +65,32 @@ namespace EARS::Framework
 		EARS::Framework::CameraAspectConversionType m_AspectConversionType;
 	};
 
+	class Camera;
+
 	class CameraInfo : public EARS::Framework::Base, public RWS::CSystemCommands
 	{
+	public:
 
+		CameraInfo();
+		virtual ~CameraInfo();
+
+		//~ Begin RWS::CAttributeHandler / EARS::Framework::Base overrides
+		virtual void HandleAttributes(const RWS::CAttributePacket& InPacket) override;
+		virtual bool QueryInterface(const uint32_t ClassID, void** OutObjectPtr) const override;
+		//~ End overrides
+
+		virtual bool IsCameraModifier() const;
+		virtual EARS::Framework::Camera* Create();
+
+	protected:
+
+		// Only used by marketing camera, we can leave as protected for now
+		void SetIsNonInterruptable(bool bIsNonInterruptable) { m_bIsNonInterruptable = bIsNonInterruptable; }
+
+	private:
+
+		bool m_bFreeOnPop = false;
+		bool m_bIsNonInterruptable = false;
 	};
 
 	static_assert(sizeof(CameraInfo) == 0x58, "EARS::Framework::CameraInfo must equal 0x58");
@@ -78,6 +98,27 @@ namespace EARS::Framework
 	class Camera : public SafeObj, public iAcceptStateChanges
 	{
 	public:
+
+		Camera(const EARS::Framework::CameraInfo& InCameraInfo);
+
+		//~ Begin iAcceptStateChanges Interface
+		virtual void ClearState(const uint32_t* State) override { /* no default implementation */ }
+		virtual void SetState(const uint32_t* State) override { /* no default implementation */ }
+		//~ End iAcceptStateChanges Interface
+
+		virtual void Init(uint32_t PlayerID, bool bResetCamera) { /* nothing by default */ }
+
+		virtual void Update(float DeltaTime) { /* nothing by default */ }
+
+		virtual void HandleCollision(EARS::Framework::CameraData* Data, EARS::Framework::CameraInterpType InterpType, float Weight) { /* nothing by default */ }
+
+		virtual uint32_t GetCameraID() const { return 0x514EB665; }
+
+		// operator overloads
+		void* operator new(size_t size);
+		void operator delete(void* pointer, size_t size);
+
+	protected:
 
 		SafePtr<EARS::Framework::CameraInfo> m_CameraInfo;
 		__declspec(align(16)) EARS::Framework::CameraData m_CameraData; // TODO: Validate

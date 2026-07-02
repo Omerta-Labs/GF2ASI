@@ -1,5 +1,19 @@
 #include "SafePtr.h"
 
+SafeObj::~SafeObj()
+{
+	// On destruction, invalidate every SafePtr still referencing this object so
+	// they safely read back as null rather than dangling.
+	while (m_SafePtrList)
+	{
+		SafePtrBase* const Current = m_SafePtrList;
+		m_SafePtrList = Current->m_Next;
+
+		Current->m_Obj = nullptr;
+		Current->m_Next = nullptr;
+	}
+}
+
 SafePtrBase::~SafePtrBase()
 {
 	if (m_Obj)

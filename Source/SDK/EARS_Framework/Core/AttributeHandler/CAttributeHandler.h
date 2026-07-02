@@ -1,6 +1,7 @@
 #pragma once
 
 // SDK Common
+#include "SDK/EARS_Common/BitArray.h"
 #include "SDK/EARS_Common/CommonTypes.h"
 #include "SDK/EARS_Common/DoubleInternalLinkedList2.h"
 #include "SDK/EARS_Common/Guid.h"
@@ -19,6 +20,11 @@ namespace RWS
 {
 	class CAttributePacket;
 	class CAttributeHandler;
+
+	struct IDArray : BitArray<4096, uint32_t>
+	{
+		// nothing implemented
+	};
 
 	/**
 	 * A list of entities associated one an other, using a linked list
@@ -188,10 +194,15 @@ namespace RWS
 	{
 	public:
 
+		// NB: Virtual order must match the engine vtable exactly:
+		// ~dtor, HandleAttributes, HandleAttributesFromProxy, DisableMessages
 		virtual ~CAttributeHandler() = 0;
-		virtual void HandleAttributes() = 0;
-		virtual void HandleAttributesFromProxy() = 0;
+		virtual void HandleAttributes(const RWS::CAttributePacket& InPacket) = 0;
+		virtual void HandleAttributesFromProxy(const RWS::CAttributePacket& InPacket);
 		virtual void DisableMessages() = 0;
+
+		void EnableMessagesToComponents();
+		void DisableMessagesToComponents();
 
 		/**
 		 * Fetch the Instance ID of this Attribute Handler.
@@ -200,10 +211,17 @@ namespace RWS
 
 		bool HasAttributeHandlerFlag(const uint32_t InFlag) const;
 
+		bool IsRuntimeIDValid() { return HasAttributeHandlerFlag(0x10000000); }
+		bool IsManagedBySimManager() { return HasAttributeHandlerFlag(0x20000000); }
+
 		uint32_t GetStream() const { return m_hStream; }
 
 		bool HasComponents() const;
 		EARS::Framework::Component* GetComponent(const uint32_t Index) const;
+
+		// operator overloads
+		void* operator new(size_t Size, size_t AdditionalSize);
+		void operator delete(void* Pointer, size_t Size);
 
 	private:
 
@@ -211,6 +229,8 @@ namespace RWS
 		 * Unpack the flags from the handler and return - useful to query specific flags
 		 */
 		uint32_t GetAttributeHandlerFlags() const { return m_FlagsAndID & 0xFFFFF000; }
+
+		void FreeRuntimeUID();
 
 		RWS::CAttributeHandler** m_PrevNextHandlerFromPacket = nullptr;
 		RWS::CAttributeHandler* m_NextHandlerFromPacket = nullptr;

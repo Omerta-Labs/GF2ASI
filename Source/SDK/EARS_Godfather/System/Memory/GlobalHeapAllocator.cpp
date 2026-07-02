@@ -13,4 +13,15 @@ namespace EARS::Allocator
 	{
 		MemUtils::CallCdeclMethod<void*>(0x9C8F10, Data);
 	}
+
+	GlobalHeapAllocator* GlobalHeapAllocator::GetSingletonPtr()
+	{
+		return *(GlobalHeapAllocator**)0x113160C;
+	}
+}
+
+/* extern */
+EARS::Allocator::Allocator* get_thread_new_allocator()
+{
+	return EARS::Allocator::GlobalHeapAllocator::GetSingletonPtr();
 }

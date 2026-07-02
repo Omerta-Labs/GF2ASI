@@ -60,6 +60,9 @@ namespace EARS
 			// Check whether a SimGroup has permission to dispatch.
 			bool SimGroupDispatchEnabled(const SimGroupTOC& SimGroupTOC) const;
 
+			// Remove a Handler from the SimManager lists
+			void Remove(RWS::CAttributeHandler* InHandler);
+
 			// NB: EXPERIMENTAL CODE
 			// Spawn an object in the game world
 			void* SpawnEntity(const EARS::Common::guid128_t* InGuid, int SpawnFlags);
@@ -77,6 +80,9 @@ namespace EARS
 
 			typedef std::function<void(RWS::CAttributePacket&)> TPacketVisitor;
 			void ForEachPacket(const TPacketVisitor& VisitorFunc);
+
+			// Used to allocate Attribute Handlers
+			EA::Allocator::IAllocator* GetBaseAllocator() const { return m_BaseAllocator; }
 
 			// Fetch the SimManager instance
 			static SimManager* GetInstance();
@@ -123,9 +129,11 @@ namespace EARS
 			EARS::Common::IntrusiveHashTable<EARS::Common::guid128_t, RWS::CAttributeHandler> m_AttributeHandlerHash;
 			EARS::Common::DoubleInternalLinkedList<EARS::Framework::SimGroupTOC> m_SimGroupListArr[4];
 			ManagedArray<SimGroupOverride> m_SimGroupOverrides;
+			char m_SimManagerPadding_2[0x210];
+			EA::Allocator::IAllocator* m_BaseAllocator = nullptr;
 		};
 
-		static_assert(sizeof(SimManager) == 196); // actually much bigger
+		static_assert(sizeof(SimManager) == 0x2D8); // actually much bigger
 
 		void InitialiseScripthookModLoader();
 	}

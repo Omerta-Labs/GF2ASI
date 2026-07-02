@@ -5,9 +5,45 @@
 
 // Framework
 #include "SDK/EARS_Framework/Core/Component/Component.h"
+#include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
 
 // CPP
 #include <assert.h>
+
+static hook::Type<RWS::IDArray> s_RuntimeIdArray(0x120E710);
+static hook::Type<uint32_t> s_CurrentRuntimeID(0x110ABD4);
+
+// Pure-virtual destructor still requires an out-of-line definition for the chain to link.
+RWS::CAttributeHandler::~CAttributeHandler()
+{
+	if (HasComponents())
+	{
+		MemUtils::CallClassMethod<void, RWS::CAttributeHandler*, EARS::Framework::Component**>(0x0482990, this, m_Components);
+	}
+
+	if (IsManagedBySimManager())
+	{
+		EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
+		SimMgr->Remove(this);
+	}
+
+	FreeRuntimeUID();
+}
+
+void RWS::CAttributeHandler::HandleAttributesFromProxy(const RWS::CAttributePacket& InPacket)
+{
+	// Engine default is a no-op; concrete handlers override HandleAttributes instead.
+}
+
+void RWS::CAttributeHandler::EnableMessagesToComponents()
+{
+	m_ComponentList->EnableMessagesToComponents(m_Components);
+}
+
+void RWS::CAttributeHandler::DisableMessagesToComponents()
+{
+	m_ComponentList->DisableMessagesToComponents(m_Components);
+}
 
 RWS::CAttributeHandler* RWS::CAttributePacketEntityList::GetNext() const
 {
@@ -110,4 +146,28 @@ EARS::Framework::Component* RWS::CAttributeHandler::GetComponent(const uint32_t 
 	}
 
 	return nullptr;
+}
+
+void* RWS::CAttributeHandler::operator new(size_t Size, size_t AdditionalSize)
+{
+	EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
+	EA::TagValuePair Pair = EA::TagValuePair(2u, 16);
+
+	return SimMgr->GetBaseAllocator()->Alloc(Size + AdditionalSize, Pair);
+}
+
+void RWS::CAttributeHandler::operator delete(void* pointer, size_t size)
+{
+	EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
+	SimMgr->GetBaseAllocator()->Free(pointer, 0);
+}
+
+void RWS::CAttributeHandler::FreeRuntimeUID()
+{
+	if (IsRuntimeIDValid())
+	{
+		s_CurrentRuntimeID = (m_FlagsAndID & 0xFFF);
+		s_RuntimeIdArray->Clear(s_CurrentRuntimeID);
+		m_FlagsAndID &= 0xEFFFF000;
+	}
 }
