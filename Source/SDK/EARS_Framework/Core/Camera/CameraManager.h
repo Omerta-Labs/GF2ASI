@@ -32,6 +32,8 @@ namespace EARS
 			 */
 			void DisableUpdate();
 
+			void EnableUpdateWhenPaused(bool bEnable) { m_UpdateWhenPaused = bEnable; }
+
 			/**
 			 * Fetch the active Field of View for the specific Player
 			 */
@@ -74,7 +76,7 @@ namespace EARS
 			uint32_t m_MaxViewports = 0;							// 0x150
 			uint32_t m_NumViewports = 0;							// 0x154
 			uint32_t m_PlayerIDs[4];								// 0x158
-			char m_Padding2_CameraMgr[0x4];
+			uint32_t m_UpdateWhenPaused = 0;						// 0x168
 			uint32_t m_DisableUpdate = 0;							// 0x16C
 
 		};

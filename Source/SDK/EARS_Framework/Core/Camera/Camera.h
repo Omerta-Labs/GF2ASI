@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SDK/EARS_Common/RwMaths.h"
 #include "SDK/EARS_Common/SafePtr.h"
 #include "SDK/EARS_Framework/Core/Base/Base.h"
 
@@ -113,6 +114,18 @@ namespace EARS::Framework
 		virtual void HandleCollision(EARS::Framework::CameraData* Data, EARS::Framework::CameraInterpType InterpType, float Weight) { /* nothing by default */ }
 
 		virtual uint32_t GetCameraID() const { return 0x514EB665; }
+
+		// FOV handling
+		void SetFOV(const float NewFOV) { m_CameraData.m_FieldOfView = NewFOV; }
+		float GetFOV() const { return m_CameraData.m_FieldOfView; }
+
+		// Position handling
+		void GetPosition(RwV3d& OutPosition) const;
+		void SetPosition(const RwV3d& InPosition);
+
+		// Rotation handling
+		void GetRotation(RwV3d& OutRotation) const;
+		void SetRotation(const RwV3d& InRotation);
 
 		// operator overloads
 		void* operator new(size_t size);

@@ -52,6 +52,34 @@ namespace EARS::Framework
 		return nullptr;
 	}
 
+	void Camera::GetPosition(RwV3d& OutPosition) const
+	{
+		OutPosition.m_X = m_CameraData.m_Position[0];
+		OutPosition.m_Y = m_CameraData.m_Position[1];
+		OutPosition.m_Z = m_CameraData.m_Position[2];
+	}
+
+	void Camera::SetPosition(const RwV3d& InPosition)
+	{
+		m_CameraData.m_Position[0] = InPosition.m_X;
+		m_CameraData.m_Position[1] = InPosition.m_Y;
+		m_CameraData.m_Position[2] = InPosition.m_Z;
+	}
+
+	void Camera::GetRotation(RwV3d& OutRotation) const
+	{
+		OutRotation.m_X = m_CameraData.m_Rotation[0];
+		OutRotation.m_Y = m_CameraData.m_Rotation[1];
+		OutRotation.m_Z = m_CameraData.m_Rotation[2];
+	}
+
+	void Camera::SetRotation(const RwV3d& InRotation)
+	{
+		m_CameraData.m_Rotation[0] = InRotation.m_X;
+		m_CameraData.m_Rotation[1] = InRotation.m_Y;
+		m_CameraData.m_Rotation[2] = InRotation.m_Z;
+	}
+
 	void* Camera::operator new(size_t size)
 	{
 		EA::Allocator::IAllocator* Allocator = get_thread_new_allocator();
