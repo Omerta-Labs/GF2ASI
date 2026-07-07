@@ -7,6 +7,16 @@
 // Hook
 #include <Addons/Hook.h>
 
+void EARS::Modules::NPC::ActivateHUDIndicator(uint32_t NewIndicatorType, const char* InIndicatorVfxName)
+{
+	MemUtils::CallClassMethod<void>(0x737940, this, NewIndicatorType, InIndicatorVfxName);
+}
+
+void EARS::Modules::NPC::DisableHUDIndicator()
+{
+	MemUtils::CallClassMethod<void>(0x72D290, this);
+}
+
 EARS::Modules::NPCCrewComponent* EARS::Modules::NPC::GetCrewComponent() const
 {
 	hook::Type<uint32_t> CrewComponentIndex = hook::Type<uint32_t>(0x1131040);

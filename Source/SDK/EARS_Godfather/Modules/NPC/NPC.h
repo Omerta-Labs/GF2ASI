@@ -23,6 +23,12 @@ namespace EARS
 		{
 		public:
 
+			void ActivateHUDIndicator(uint32_t NewIndicatorType, const char* InIndicatorVfxName);
+
+			void DisableHUDIndicator();
+
+			uint32_t GetHudIndicatorType() const { return m_HudIndicatorType; }
+
 			// Getters
 			EARS::Modules::NPCCrewComponent* GetCrewComponent() const;
 			EARS::Modules::NPCUpgradeComponent* GetUpgradeComponent() const;
@@ -30,9 +36,12 @@ namespace EARS
 
 		private:
 
-			char m_Padding_NPC_1[0x1F0];
+			char m_Padding_NPC_1[0x1D4];
+			uint32_t m_HudIndicatorType = 0;									// 0x2104							
+			int m_IndicatorType_1 = 0;									// 0x2108		
+			char m_Padding_NPC_2[0x14];
 			void* m_CrewSpecialtyIndicator = nullptr;					// 0x2120
-			char m_Padding_NPC_2[0x54];
+			char m_Padding_NPC_3[0x54];
 			SafePtr<EARS::Modules::SimNPC> m_OwnerSimNPC;				// 0x2178
 
 		};

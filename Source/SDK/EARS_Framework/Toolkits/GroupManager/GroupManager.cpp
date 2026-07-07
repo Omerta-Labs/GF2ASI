@@ -1,6 +1,19 @@
 #include "GroupManager.h"
 
-EARS::Framework::GroupManager* EARS::Framework::GroupManager::GetInstance()
+namespace EARS::Framework
 {
-	return *(GroupManager**)0x1223414;
+	const GroupManager::TEntityList& GroupManager::FindGroupMembers(uint32_t GroupHandle) const
+	{
+		return m_GroupContainer[GroupHandle].m_MemberList;
+	}
+
+	GroupManager* GroupManager::GetInstance()
+	{
+		return *(GroupManager**)0x1223414;
+	}
+
+	bool GroupManager::IsGroupHandleInRange(uint32_t GroupHandle) const
+	{
+		return (GroupHandle < 0x40);
+	}
 }

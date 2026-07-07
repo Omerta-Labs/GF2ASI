@@ -85,6 +85,27 @@ namespace EARS
 			/* Get the state of a current controller */
 			const Controller_Info* GetControllerInfo(uint8_t JoypadIdx) const;
 
+			/* Mouse movement accumulated over the last frame, in pixels, already scaled by the
+			 * user's Mouse.Sensitivity option. This is a per-frame displacement, not a rate:
+			 * do NOT multiply it by delta time. (PC only - the mouse device also feeds this
+			 * into the merged virtual controller's stick, where it is NOT time-normalised.) */
+			void GetMouseDelta(float& OutX, float& OutY) const
+			{
+				OutX = m_MouseDeltaX;
+				OutY = m_MouseDeltaY;
+			}
+
+			/* Mouse wheel movement over the last frame (PC only) */
+			float GetMouseWheelDelta() const { return m_MouseWheelDelta; }
+
+			/* Device slot indices (PC only). INVALID_DEVICE_SLOT when not present. */
+			uint8_t GetMouseDeviceSlot() const { return m_MouseDeviceSlot; }
+			uint8_t GetKeyboardDeviceSlot() const { return m_KeyboardDeviceSlot; }
+			uint8_t GetActiveDeviceSlot() const { return m_ActiveDeviceSlot; }
+
+			/* Sentinel stored in the device slot bytes when no device is assigned */
+			static constexpr uint8_t INVALID_DEVICE_SLOT = 0x12;
+
 			/** Fetch the singleton of the InputDeviceManager */
 			static InputDeviceManager* GetInstance();
 
@@ -92,7 +113,25 @@ namespace EARS
 
 			char m_Padding_InputDevice[0x1C];
 			Controller_Info m_Controllers[16];		// 0x2C
-			char m_Padding_InputDevice1[0x120];
+			char m_Padding_InputDevice1[0x80];		// 0x46C
+			void* m_InputDevices[16];				// 0x4EC - per-slot device objects (XInput/keyboard/mouse)
+			bool m_bMergeDevices;					// 0x52C - when set, source slots are merged into the target slot each frame
+			bool m_MergeSourceSlots[16];			// 0x52D
+			uint8_t m_MergeTargetSlot;				// 0x53D
+			char m_Padding_InputDevice2[0x6];		// 0x53E
+			float m_MouseDeltaX;					// 0x544 - per-frame pixel delta * Mouse.Sensitivity, +X = right
+			float m_MouseDeltaY;					// 0x548 - per-frame pixel delta * Mouse.Sensitivity, +Y = down
+			float m_MouseWheelDelta;				// 0x54C
+			uint32_t m_MouseButtons;				// 0x550
+			char m_Padding_InputDevice3[0x10];		// 0x554
+			uint8_t m_MouseDeviceSlot;				// 0x564
+			uint8_t m_KeyboardDeviceSlot;			// 0x565
+			uint8_t m_LastLeftStickDeviceSlot;		// 0x566
+			uint8_t m_LastRightStickDeviceSlot;		// 0x567
+			uint8_t m_ActiveDeviceSlot;				// 0x568 - most recently used device slot
+			char m_Padding_InputDevice4[0x3];		// 0x569
+			uint32_t m_ActiveDeviceTime;			// 0x56C
+			char m_Padding_InputDevice5[0x1C];		// 0x570
 		};
 
 		static_assert(sizeof(EARS::Framework::InputDeviceManager) == 0x58C, "EARS::Framework::InputDeviceManager must equal 0x58C");

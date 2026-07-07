@@ -17,7 +17,10 @@ namespace EARS
 		{
 		public:
 
-			virtual ~GroupManager();
+			virtual ~GroupManager() = 0;
+
+			typedef List<EARS::Framework::Entity*> TEntityList;
+			const TEntityList& FindGroupMembers(uint32_t GroupHandle) const;
 
 			static GroupManager* GetInstance();
 
@@ -27,8 +30,10 @@ namespace EARS
 			{
 				uint32_t m_GroupID = 0;
 				uint32_t m_NumTimesReserved = 0;
-				EARS::Common::List<EARS::Framework::Entity*> m_Items;
+				List<EARS::Framework::Entity*> m_MemberList;
 			};
+
+			bool IsGroupHandleInRange(uint32_t GroupHandle) const;
 
 			// NB: Max number of groups is 64
 			GroupContainerElement* m_GroupContainer = nullptr;
