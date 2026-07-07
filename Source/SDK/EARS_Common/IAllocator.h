@@ -3,6 +3,15 @@
 // C++
 #include <stdint.h>
 
+// forward dec
+namespace EARS
+{
+	namespace Common
+	{
+		struct TVPContainer;
+	}
+}
+
 namespace EA
 {
 	struct TagValuePair
@@ -39,6 +48,9 @@ namespace EA
 		}
 
 	private:
+
+		// TVPContainer deep-copies tag chains
+		friend struct EARS::Common::TVPContainer;
 
 		union InternalValue
 		{

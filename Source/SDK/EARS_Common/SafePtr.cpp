@@ -37,14 +37,14 @@ void SafePtrBase::InitSafePtr(SafeObj* NewObj)
 	{
 		if (m_Obj)
 		{
-			NewObj->RemoveSafePtr(this);
+			m_Obj->RemoveSafePtr(this);
 		}
 
 		m_Obj = NewObj;
 
 		if (m_Obj)
 		{
-			NewObj->AddSafePtr(this);
+			m_Obj->AddSafePtr(this);
 		}
 	}
 }

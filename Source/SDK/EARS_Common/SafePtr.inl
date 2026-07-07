@@ -17,11 +17,12 @@ namespace EARS
 
 	namespace Modules
 	{
+		class CustomCameraInfo;
 		class Family;
 		class Item;
 		class SimNPC;
+		class MarketingCamera;
 		class NPC;
-		class CustomCameraInfo;
 	}
 
 	namespace Vehicles
@@ -115,6 +116,17 @@ inline EARS::Modules::CustomCameraInfo* SafePtr<EARS::Modules::CustomCameraInfo>
 	if (m_Obj)
 	{
 		return (EARS::Modules::CustomCameraInfo*)(m_Obj - 0x9);
+	}
+
+	return nullptr;
+}
+
+template<>
+inline EARS::Modules::MarketingCamera* SafePtr<EARS::Modules::MarketingCamera>::GetPtr() const
+{
+	if (m_Obj)
+	{
+		return (EARS::Modules::MarketingCamera*)(m_Obj);
 	}
 
 	return nullptr;
