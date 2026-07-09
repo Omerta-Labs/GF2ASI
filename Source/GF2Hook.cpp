@@ -15,6 +15,8 @@
 #include "Scripthook/SH_Discord/DiscordManager.h"
 #include "Scripthook/SH_ObjectManager/ObjectManager.h"
 #include "Scripthook/SH_PlayerMasterSM/PlayerDebugOptions_Modded.h"
+#include "Scripthook/SH_GammaFix/GammaFix.h"
+#include "Scripthook/SH_EdgeAA/EdgeAA.h"
 #include "Scripthook/HookMods.h"
 
 #include "SDK/EARS_Common/Guid.h"
@@ -26,11 +28,13 @@
 #include "SDK/EARS_Godfather/Modules/Scoring/ScoreKeeper.h"
 #include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
 #include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
+#include "SDK/EARS_Godfather/Modules/Trinity/TrinityGameCamera.h"
 #include "SDK/EARS_Godfather/Modules/Turf/City.h"
 #include <SDK/EARS_RT_LLRender/include/ShaderManager.h>
 
 #include <sol.hpp>
 #include <thread>
+#include <Addons/Hook.h>
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
 #define ENABLE_GF2_MULTIPLAYER 0
@@ -38,6 +42,119 @@
 #define ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK 0
 #define ENABLE_GF2_SPAWN_ENTITY_HOOKS 0
 #define ENABLE_GF2_SIM_MANAGER_RE 1
+
+/*
+template<typename TType, uint32_t N>
+struct AptValueSet
+{
+public:
+
+	int32_t m_NumElements = 0;
+	TType m_Elements[512];
+};
+
+struct AptCXForm
+{
+	float scale[4];
+	float translate[4];
+};
+
+struct AptMatrix
+{
+	float a;
+	float b;
+	float c;
+	float d;
+	float tx;
+	float ty;
+};
+
+struct AptValue
+{
+public:
+
+	uint32_t m_ValueData = 0;
+};
+
+struct AptString : public AptValue
+{
+	uint32_t m_Size = 0;
+	uint32_t m_Capacity = 0;
+	char* m_String = nullptr;
+	char m_InlineString[16];
+};
+
+struct AptCIH : public AptValue
+{
+	__declspec(align(16)) AptCXForm cxform;
+	int m_Depth = 0;
+	AptString* m_MyName = nullptr;
+	AptMatrix matrix;
+	void* m_ProceduralSettings = nullptr;
+	AptCIH* m_Parent = nullptr;
+	void* m_Data = nullptr;
+	AptCIH* m_Prev = nullptr;
+	AptCIH* m_Next = nullptr;
+	bool m_bASChange = false;
+};
+
+struct AptDisplayListState
+{
+	AptCIH* m_Head;
+};
+
+struct AptDisplayList
+{
+	AptDisplayListState* m_State = nullptr;
+};
+
+struct AptAnimationPoolData
+{
+public:
+
+	struct AptActionPool
+	{
+		uint32_t m_ActionType = 0;
+		uint32_t m_Input = 0;
+		char m_Padding[0xC];
+	};
+
+	AptAnimationPoolData::AptActionPool m_ActionPool[256];
+	AptAnimationPoolData::AptActionPool* m_StartDeque = nullptr;
+	AptAnimationPoolData::AptActionPool* m_EndDeque = nullptr;
+	AptCIH* m_NewInsts[512];
+	int32_t m_NumNewInsts = 0;
+	AptValueSet<AptValue*, 64> m_ListenerSet;
+	AptValueSet<AptCIH*, 512> m_InputSet;
+	AptDisplayList m_DisplayList;
+
+};
+
+struct AptHashItem
+{
+public:
+
+	AptString* m_Key = nullptr;
+	AptValue* m_Value = nullptr;
+	AptHashItem* m_Next = nullptr;
+	uint32_t m_HashValue = 0;
+};
+
+struct AptNativeHash
+{
+public:
+
+	uint16_t m_Size = 0;
+	uint16_t m_NumItems = 0;
+	AptHashItem** m_Data = nullptr;
+	AptHashItem* m_InlineData[16];
+};
+
+struct AptGlobal : public AptValue, public AptNativeHash
+{
+
+};
+*/
 
 #if ENABLE_GF2_MULTIPLAYER
 struct ConnectionParams
@@ -296,6 +413,13 @@ void __cdecl HOOK_Displ_EndScene()
 		ImGuiMgr->OnEndScene();
 	}
 
+	// Keep the EdgeAA pass armed for the next frame's post-FX chain
+	Mod::EdgeAA::OnEndScene();
+
+	// Windowed-mode brightness: applied last so the whole frame is affected,
+	// matching how the hardware gamma ramp behaves in fullscreen
+	Mod::GammaFix::OnEndScene();
+
 	PLH::FnCast(Displ_EndScene_Old, &HOOK_Displ_EndScene)();
 }
 
@@ -306,13 +430,21 @@ void __cdecl HOOK_Displ_EndScene()
 uint64_t Displ_ResetDevice_Old;
 bool __cdecl HOOK_Displ_ResetDevice(int a1)
 {
-	ImGui_ImplDX9_InvalidateDeviceObjects();
+	if (ImGuiManager* ImGuiMgr = ImGuiManager::Get())
+	{
+		ImGuiMgr->OnDeviceLost();
+	}
+
+	Mod::GammaFix::OnDeviceReset();
 
 	const bool bResult = PLH::FnCast(Displ_ResetDevice_Old, &HOOK_Displ_ResetDevice)(a1);
 
 	if (bResult)
 	{
-		ImGui_ImplDX9_CreateDeviceObjects();
+		if (ImGuiManager* ImGuiMgr = ImGuiManager::Get())
+		{
+			ImGuiMgr->OnDeviceRestored();
+		}
 	}
 
 	return bResult;
@@ -486,6 +618,17 @@ void __cdecl Hook_CloseLevelServices()
 	PLH::FnCast(CloseLevelServices_Old, &Hook_CloseLevelServices)();
 }
 
+uint64_t TrinityGameCamera_BeginUpdate_Old;
+typedef void (__thiscall* TrinityGameCamera_BeginUpdate)(EARS::Modules::TrinityGameCamera*);
+void __fastcall HOOK_TrinityGameCamera_BeginUpdate(EARS::Modules::TrinityGameCamera* pThis, void* ecx)
+{
+	// pThis points at the EA::Trinity::TrinityCamera subobject; step back to the full object
+	EARS::Modules::TrinityGameCamera* ActualPtr = (EARS::Modules::TrinityGameCamera*)((uint8_t*)pThis - 12);
+
+	// Call our reimplementation directly (qualified to avoid dispatching back into the game's vtable)
+	ActualPtr->EARS::Modules::TrinityGameCamera::BeginUpdate();
+}
+
 void GF2Hook::Init_Logging()
 {
 	C_Logger::Create("GF2SE.txt");
@@ -597,8 +740,13 @@ void GF2Hook::Init_AttachHooks()
 	PLH::x86Detour detour1557((char*)0x0495010, (char*)&HOOK_EARSJobScheduler_GetDefaultThreadCount, &EARSJobScheduler_GetDefaultThreadCount_old, dis);
 	detour1557.hook();
 
+	PLH::x86Detour detour1558((char*)0x0841460, (char*)&HOOK_TrinityGameCamera_BeginUpdate, &TrinityGameCamera_BeginUpdate_Old, dis);
+	detour1558.hook();
+
 	EARS::Modules::DemographicRegion::StaticApplyHooks();
 	EARS::Modules::ScoreKeeper::StaticApplyHooks();
+	Mod::GammaFix::StaticApplyHooks();
+	Mod::EdgeAA::StaticApplyHooks();
 }
 
 void GF2Hook::Init_GameSystems()
@@ -614,5 +762,16 @@ void GF2Hook::Init_GameSystems()
 
 void GF2Hook::Tick()
 {
-	//Nothing
+	//static hook::Type<AptGlobal*> AptGlobalGlobal = hook::Type<AptGlobal*>(0x119CBB8);
+	//static hook::Type<AptAnimationPoolData*> AptPool = hook::Type<AptAnimationPoolData*>(0x119A9CC);
+
+	//if (AptGlobalGlobal)
+	//{
+	//	int z = 0;
+	//}
+
+	//if (AptPool)
+	//{
+	//	int z = 0;
+	//}
 }

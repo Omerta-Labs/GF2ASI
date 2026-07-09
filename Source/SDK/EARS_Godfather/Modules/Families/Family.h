@@ -165,9 +165,9 @@ namespace EARS
 			void ForEachOmertaTable(const TVisitOmertaEntryFunctor& InFunction);
 
 			// getters
-			inline uint32_t GetFamilyID() const { return m_FamilyID; }
-			inline uint32_t GetNumAllies() const { return m_NumAllyFamilies; }
-			inline uint32_t GetNumMadeMen() const { return m_MadeMen.Size(); }
+			uint32_t GetFamilyID() const { return m_FamilyID; }
+			uint32_t GetNumAllies() const { return m_NumAllyFamilies; }
+			uint32_t GetNumMadeMen() const { return m_MadeMen.Size(); }
 			const String* GetInternalName() const;
 			const String* GetSingularName() const;
 			const String* GetPluralName() const;
@@ -175,6 +175,7 @@ namespace EARS
 			float GetMaxTurnInterval() const { return m_MaxTurnInterval; }
 			float GetResponseDelay() const { return m_ResponseDelay; }
 			uint32_t GetCompoundVenueID() const { return m_CompoundVenueID; }
+			bool HasBeenEliminated() const { return m_Flags.Test((int)FamilyFlags::FAMILY_HAS_BEEN_ELIMINATED); }
 
 			// made men API
 			float GetMadeManHospitalTime() const { return m_HospitalTime; }

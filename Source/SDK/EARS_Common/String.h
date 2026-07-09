@@ -13,8 +13,9 @@ public:
 
 	void assign(const char* InSrc);
 
+	const char* c_str() const;
+
 	// inline
-	const char* c_str() const { return m_pCStr; }
 	bool IsValid() const { return m_Length != 0; }
 
 	operator bool() const { return IsValid(); }

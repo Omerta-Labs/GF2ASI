@@ -28,6 +28,7 @@ namespace EARS
 			void DisableHUDIndicator();
 
 			uint32_t GetHudIndicatorType() const { return m_HudIndicatorType; }
+			const String& GetHudIndicatorVFXName() const { return m_HudIndicatorVFXName; }
 
 			// Getters
 			EARS::Modules::NPCCrewComponent* GetCrewComponent() const;
@@ -37,13 +38,15 @@ namespace EARS
 		private:
 
 			char m_Padding_NPC_1[0x1D4];
-			uint32_t m_HudIndicatorType = 0;									// 0x2104							
-			int m_IndicatorType_1 = 0;									// 0x2108		
-			char m_Padding_NPC_2[0x14];
-			void* m_CrewSpecialtyIndicator = nullptr;					// 0x2120
+			uint32_t m_HudIndicatorType = 0;									// 0x2104	
+			String m_HudIndicatorVFXName;										// 0x2108	
+			char m_Padding_NPC_2[8];
+			void* m_CrewSpecialtyIndicator = nullptr;							// 0x2120
 			char m_Padding_NPC_3[0x54];
-			SafePtr<EARS::Modules::SimNPC> m_OwnerSimNPC;				// 0x2178
+			SafePtr<EARS::Modules::SimNPC> m_OwnerSimNPC;						// 0x2178
 
 		};
+
+		static_assert(sizeof(NPC) == 8576);
 	} // Modules
 } // EARS

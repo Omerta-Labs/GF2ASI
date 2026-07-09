@@ -46,3 +46,14 @@ void String::assign(const char* InSrc)
 	// TODO: Move code from gf2 into asi
 	MemUtils::CallClassMethod<void, String*, const char*>(0x4D3D90, this, InSrc);
 }
+
+const char* String::c_str() const
+{
+	if (m_pCStr)
+	{
+		return m_pCStr;
+	}
+
+	static const char* s_NullStr = "0";
+	return s_NullStr;
+}

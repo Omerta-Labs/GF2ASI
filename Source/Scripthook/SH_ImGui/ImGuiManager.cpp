@@ -12,6 +12,7 @@
 #include "SDK/EARS_Framework/Core/Camera/CameraManager.h"
 #include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
 #include "SDK/EARS_Framework/Core/StreamManager/StreamManager.h"
+#include "SDK/EARS_Framework/MainLoop/Logic.h"
 #include "SDK/EARS_Framework/Toolkits/GroupManager/GroupManager.h"
 #include "SDK/EARS_Godfather/Modules/Buildings/Building.h"
 #include "SDK/EARS_Godfather/Modules/Buildings/BuildingStore.h"
@@ -32,16 +33,15 @@
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
-#include "SDK/EARS_Godfather/Modules/UI/UIHud.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/Behaviours/WhiteboxCar/WhiteboxCar.h"
 #include "SDK/EARS_Godfather/Modules/Vehicles/VehicleDamageComponent.h"
 #include "SDK/EARS_Physics/Characters/CharacterProxy.h"
 #include "SDK/EARS_Physics/Vehicles/ground/wheeled/HavokWheeledVehicle.h"
-#include "SDK/EARS_Locale/LocaleManager.h"
 
 #include "SDK/EARS_RT_LLRender/include/ShaderManager.h"
 
 // CPP
+#include <filesystem>
 #include <string>
 
 #define ENABLE_ENTITY_SPAWN_DEBUG 0
@@ -78,6 +78,7 @@ public:
 namespace DefinedEvents
 {
 	static hook::Type<RWS::CEventId> RunningTickEvent = hook::Type<RWS::CEventId>(0x012069C4);
+	static hook::Type<RWS::CEventId> PausedTickEvent = hook::Type<RWS::CEventId>(0x12069B4);
 	static hook::Type<RWS::CEventId> DoRenderEvent = hook::Type<RWS::CEventId>(0x01206970);
 	static hook::Type<RWS::CEventId> PreRenderEvent = hook::Type<RWS::CEventId>(0x01206980);
 	static hook::Type<RWS::CEventId> PlayerAsDriverEnterVehicleEvent = hook::Type<RWS::CEventId>(0x112E030);
@@ -96,6 +97,120 @@ namespace DefinedEvents
 	static hook::Type<RWS::CEventId> iMsgPlayerTeleportDoneExceptFade = hook::Type<RWS::CEventId>(0x112B344);
 }
 
+namespace PrivateImGui
+{
+	void SetupImGuiStyle()
+	{
+		// Fork of Clean Dark/Red style from ImThemes
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		style.WindowPadding = ImVec2(5.0f, 2.0f);
+		style.WindowRounding = 4.0f;
+		style.WindowBorderSize = 1.0f;
+		style.WindowMinSize = ImVec2(32.0f, 32.0f);
+		style.WindowTitleAlign = ImVec2(0.0f, 0.5f);
+		style.WindowMenuButtonPosition = ImGuiDir_Left;
+		style.ChildRounding = 4.0f;
+		style.ChildBorderSize = 1.0f;
+		style.PopupRounding = 4.0f;
+		style.PopupBorderSize = 1.0f;
+		style.FramePadding = ImVec2(9.0f, 7.0f);
+		style.FrameRounding = 4.0f;
+		style.FrameBorderSize = 1.0f;
+		style.ItemSpacing = ImVec2(9.0f, 8.0f);
+		style.ItemInnerSpacing = ImVec2(4.0f, 4.0f);
+		style.CellPadding = ImVec2(4.0f, 2.0f);
+		style.IndentSpacing = 0.0f;
+		style.ColumnsMinSpacing = 6.0f;
+		style.ScrollbarSize = 16.0f;
+		style.ScrollbarRounding = 4.0f;
+		style.ScrollbarPadding = 4.0f;
+		style.GrabMinSize = 10.0f;
+		style.GrabRounding = 4.0f;
+		style.TabRounding = 4.0f;
+		style.TabBorderSize = 2.0f;
+		style.TabBarBorderSize = 2.0f;
+		style.TabBarOverlineSize = 1.0f;
+		style.TabMinWidthBase = 1.0f;
+		style.TabMinWidthShrink = 80;
+		style.TouchExtraPadding = ImVec2(0.0f, 0.0f);
+		//style.TabMinWidthForCloseButton = 3.0f;
+		style.ColorButtonPosition = ImGuiDir_Right;
+		style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
+		style.SelectableTextAlign = ImVec2(0.5f, 0.0f);
+		style.ColorMarkerSize = 3.0f;
+		style.SelectableTextAlign = ImVec2(0.5f, 0.0f);
+		style.SeparatorSize = 1.0f;
+		style.SeparatorTextBorderSize = 3.0f;
+		style.SeparatorTextAlign = ImVec2(0.0f, 0.5f);
+
+		ImVec4* colors = style.Colors;
+		colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+		colors[ImGuiCol_TextDisabled] = ImVec4(0.73f, 0.75f, 0.74f, 1.00f);
+		colors[ImGuiCol_WindowBg] = ImVec4(0.07f, 0.07f, 0.07f, 0.94f);
+		colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+		colors[ImGuiCol_Border] = ImVec4(0.52f, 0.52f, 0.52f, 1.00f);
+		colors[ImGuiCol_BorderShadow] = ImVec4(0.21f, 0.21f, 0.21f, 1.00f);
+		colors[ImGuiCol_FrameBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.54f);
+		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.21f, 0.21f, 0.21f, 0.40f);
+		colors[ImGuiCol_FrameBgActive] = ImVec4(0.29f, 0.29f, 0.29f, 0.67f);
+		colors[ImGuiCol_TitleBg] = ImVec4(0.14f, 0.14f, 0.14f, 0.65f);
+		colors[ImGuiCol_TitleBgActive] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+		colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.14f, 0.14f, 0.14f, 0.67f);
+		colors[ImGuiCol_MenuBarBg] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+		colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+		colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.48f, 0.48f, 0.48f, 1.00f);
+		colors[ImGuiCol_CheckMark] = ImVec4(0.00f, 1.00f, 0.03f, 1.00f);
+		colors[ImGuiCol_CheckboxSelectedBg] = ImVec4(0.22f, 0.48f, 0.80f, 0.45f);
+		colors[ImGuiCol_SliderGrab] = ImVec4(0.75f, 0.00f, 0.00f, 1.00f);
+		colors[ImGuiCol_SliderGrabActive] = ImVec4(1.00f, 0.38f, 0.38f, 1.00f);
+		colors[ImGuiCol_Button] = ImVec4(0.00f, 0.00f, 0.00f, 0.54f);
+		colors[ImGuiCol_ButtonHovered] = ImVec4(0.18f, 0.18f, 0.18f, 0.40f);
+		colors[ImGuiCol_ButtonActive] = ImVec4(0.20f, 0.20f, 0.20f, 0.67f);
+		colors[ImGuiCol_Header] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
+		colors[ImGuiCol_HeaderHovered] = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
+		colors[ImGuiCol_HeaderActive] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+		colors[ImGuiCol_Separator] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+		colors[ImGuiCol_SeparatorHovered] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+		colors[ImGuiCol_SeparatorActive] = ImVec4(1.00f, 0.33f, 0.33f, 1.00f);
+		colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+		colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.00f, 0.49f, 0.49f, 1.00f);
+		colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 0.49f, 0.49f, 1.00f);
+		colors[ImGuiCol_InputTextCursor] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+		colors[ImGuiCol_TabHovered] = ImVec4(0.46f, 0.46f, 0.46f, 1.00f);
+		colors[ImGuiCol_Tab] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+		colors[ImGuiCol_TabSelected] = ImVec4(0.47f, 0.00f, 0.00f, 1.00f);
+		colors[ImGuiCol_TabSelectedOverline] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+		colors[ImGuiCol_TabDimmed] = ImVec4(0.15f, 0.07f, 0.07f, 0.97f);
+		colors[ImGuiCol_TabDimmedSelected] = ImVec4(0.40f, 0.15f, 0.15f, 1.00f);
+		colors[ImGuiCol_TabDimmedSelectedOverline] = ImVec4(0.55f, 0.55f, 0.55f, 0.00f);
+		colors[ImGuiCol_DockingPreview] = ImVec4(0.26f, 0.59f, 0.98f, 0.70f);
+		colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+		colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+		colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+		colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.00f, 0.00f, 1.00f);
+		colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.36f, 0.00f, 0.00f, 1.00f);
+		colors[ImGuiCol_TableHeaderBg] = ImVec4(0.34f, 0.34f, 0.34f, 1.00f);
+		colors[ImGuiCol_TableBorderStrong] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+		colors[ImGuiCol_TableBorderLight] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+		colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+		colors[ImGuiCol_TextLink] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.64f, 0.88f, 0.44f);
+		colors[ImGuiCol_TreeLines] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+		colors[ImGuiCol_DragDropTarget] = ImVec4(0.47f, 0.18f, 0.18f, 0.97f);
+		colors[ImGuiCol_DragDropTargetBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_UnsavedMarker] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+		colors[ImGuiCol_NavCursor] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+		colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+	}
+}
+
 ImGuiManager::ImGuiManager()
 	: CEventHandler()
 {
@@ -104,6 +219,10 @@ ImGuiManager::ImGuiManager()
 
 ImGuiManager::~ImGuiManager()
 {
+	std::lock_guard<std::recursive_mutex> ContextLock(ImGuiContextLock);
+
+	ClearDrawDataSnapshot();
+
 	ImGui_ImplWin32_Shutdown();
 	ImGui_ImplDX9_Shutdown();
 }
@@ -112,7 +231,8 @@ void ImGuiManager::HandleEvents(const RWS::CMsg& MsgEvent)
 {
 	RWS::CEventHandler::HandleEvents(MsgEvent);
 
-	if (MsgEvent.IsEvent(DefinedEvents::RunningTickEvent))
+	if (MsgEvent.IsEvent(DefinedEvents::RunningTickEvent) 
+	|| MsgEvent.IsEvent(DefinedEvents::PausedTickEvent))
 	{
 		OnTick();
 	}
@@ -138,6 +258,9 @@ void ImGuiManager::HandleEvents(const RWS::CMsg& MsgEvent)
 
 void ImGuiManager::Open()
 {
+	// The EndScene/WndProc hooks may already be live on other threads
+	std::lock_guard<std::recursive_mutex> ContextLock(ImGuiContextLock);
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -150,14 +273,108 @@ void ImGuiManager::Open()
 
 	hook::Type<IDirect3DDevice9*> Dx9Device = hook::Type<IDirect3DDevice9*>(0x1205750);
 	ImGui_ImplDX9_Init(Dx9Device);
+
+	AddFont("scripts/Roboto-Medium.ttf");
+
+	PrivateImGui::SetupImGuiStyle();
 }
 
 void ImGuiManager::OnEndScene()
 {
-	if (ImDrawData* DrawData = ImGui::GetDrawData())
+	std::lock_guard<std::recursive_mutex> ContextLock(ImGuiContextLock);
+
+	if (SnapshotDrawData.Valid)
 	{
-		ImGui_ImplDX9_RenderDrawData(DrawData);
+		ImGui_ImplDX9_RenderDrawData(&SnapshotDrawData);
 	}
+}
+
+void ImGuiManager::OnDeviceLost()
+{
+	std::lock_guard<std::recursive_mutex> ContextLock(ImGuiContextLock);
+
+	ClearDrawDataSnapshot();
+
+	ImGui_ImplDX9_InvalidateDeviceObjects();
+}
+
+void ImGuiManager::OnDeviceRestored()
+{
+	std::lock_guard<std::recursive_mutex> ContextLock(ImGuiContextLock);
+
+	ImGui_ImplDX9_CreateDeviceObjects();
+}
+
+void ImGuiManager::CaptureDrawDataSnapshot()
+{
+	ClearDrawDataSnapshot();
+
+	const ImDrawData* SourceData = ImGui::GetDrawData();
+	if (!SourceData || !SourceData->Valid)
+	{
+		return;
+	}
+
+	// Copy the scalar fields (counts, display rect, texture list pointer),
+	// then swap the context-owned draw lists for clones we own. The clones
+	// stay valid while the context recycles its lists on the next NewFrame.
+	SnapshotDrawData = *SourceData;
+	SnapshotDrawData.CmdLists.resize(0);
+	for (const ImDrawList* SourceList : SourceData->CmdLists)
+	{
+		SnapshotDrawData.CmdLists.push_back(SourceList->CloneOutput());
+	}
+}
+
+void ImGuiManager::ClearDrawDataSnapshot()
+{
+	// ImDrawData::Clear() does not free the lists - it assumes the context
+	// owns them, but ours are clones
+	for (ImDrawList* ClonedList : SnapshotDrawData.CmdLists)
+	{
+		IM_DELETE(ClonedList);
+	}
+
+	SnapshotDrawData.Clear();
+}
+
+void ImGuiManager::AddFont(const char* name)
+{
+	// ensure we have all fonts existing on disk
+	if (!std::filesystem::exists(name))
+	{
+		//CF_FATAL("Missing font file (%s), cannot run program! Please ensure this file is in the same folder as the tool executable!", FontPath.data());
+		return;
+	}
+
+	// Add fonts (clear first though)
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->Clear();
+
+	//PE: Add all lang.
+	static const ImWchar Generic_ranges_everything[] =
+	{
+	   0x0020, 0xFFFF, // Everything test.
+	   0,
+	};
+	static const ImWchar Generic_ranges_most_needed[] =
+	{
+		0x0020, 0x00FF, // Basic Latin + Latin Supplement
+		0x0100, 0x017F,	//0100 — 017F  	Latin Extended-A
+		0x0180, 0x024F,	//0180 — 024F  	Latin Extended-B
+		0,
+	};
+
+	float FONTUPSCALE = 1.0; //Font upscaling.
+	float FontSize = 15.0f;
+
+	CustomFont = io.Fonts->AddFontFromFileTTF(name, FontSize * FONTUPSCALE, NULL, &Generic_ranges_everything[0]); //Set as default font.
+	if (!CustomFont)
+	{
+		CustomFont = io.Fonts->AddFontDefault();
+	}
+
+	DefaultFont = io.Fonts->AddFontDefault();
 }
 
 bool ImGuiManager::HasCursorControl() const
@@ -169,6 +386,7 @@ void ImGuiManager::OpenLevelServices()
 {
 	// apply more events
 	LinkMsg(&DefinedEvents::RunningTickEvent, 0x8000);
+	LinkMsg(&DefinedEvents::PausedTickEvent, 0x8000);
 	LinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent, 0x8000);
 	LinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent, 0x8000);
 	LinkMsg(&DefinedEvents::PlayerExitVehicleEvent, 0x8000);
@@ -181,7 +399,6 @@ void ImGuiManager::CloseLevelServices()
 	// reset any existing state applied to player / ui
 	bPlayerGodModeActive = false;
 	bPlayerVehicleGodModeActive = false;
-	bWantsUISuppressed = false;
 
 	// reset things used by mod menu
 	TargetFamily = nullptr;
@@ -190,19 +407,42 @@ void ImGuiManager::CloseLevelServices()
 
 	CheckpointDebug.CloseLevelServices();
 
+	PhotoModeSystem.CloseLevelServices();
+
+	UISystem.CloseLevelServices();
+
+	if (bFreezeLogic)
+	{
+		RWS::MainLoop::Logic::PopPause(16);
+		bFreezeLogic = false;
+	}
+
 	// remove other events
 	UnlinkMsg(&DefinedEvents::RunningTickEvent);
+	UnlinkMsg(&DefinedEvents::PausedTickEvent);
 	UnlinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent);
 	UnlinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent);
 	UnlinkMsg(&DefinedEvents::PlayerExitVehicleEvent);
 
 	// Just in case player exits mid-teleport
 	UnlinkMsg(&DefinedEvents::iMsgPlayerTeleportDoneExceptFade);
+
+	// Ticks have stopped but EndScene keeps firing; drop the last frame so it
+	// doesn't linger over the loading screen
+	{
+		std::lock_guard<std::recursive_mutex> ContextLock(ImGuiContextLock);
+		ClearDrawDataSnapshot();
+	}
 }
 
 LRESULT ImGuiManager::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+	// The handler appends to the context's shared input queue, which must not
+	// overlap the SIM thread's frame build
+	std::lock_guard<std::recursive_mutex> ContextLock(ImGuiContextLock);
+
 	return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 }
 
@@ -233,6 +473,21 @@ void ImGuiManager::DrawTab_PlayerSettings()
 					DamageComp->SetInvincible(bNewGodModeActive);
 
 					bPlayerGodModeActive = bNewGodModeActive;
+				}
+
+				bool bNewFreezeGameLogic = bFreezeLogic;
+				if (ImGui::Checkbox("Freeze Game Logic", &bNewFreezeGameLogic))
+				{
+					if (bNewFreezeGameLogic)
+					{
+						RWS::MainLoop::Logic::PushPause(16);
+					}
+					else
+					{
+						RWS::MainLoop::Logic::PopPause(16);
+					}
+
+					bFreezeLogic = bNewFreezeGameLogic;
 				}
 
 				if (ImGui::Button("Inspect Player"))
@@ -954,79 +1209,6 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 	}
 }
 
-void ImGuiManager::DrawTab_UIHUDSettings()
-{
-	if (ImGui::BeginTabItem("UI Hud", nullptr, ImGuiTabItemFlags_None))
-	{
-		if (EARS::Apt::UIHUD* UIHudManager = EARS::Apt::UIHUD::GetInstance())
-		{
-			if (ImGui::Checkbox("Hide HUD", &bWantsUISuppressed))
-			{
-				if (bWantsUISuppressed)
-				{
-					UIHudManager->Suppress();
-				}
-				else
-				{
-					UIHudManager->Unsuppress();
-				}
-			}
-		}
-		else
-		{
-			ImGui::Text("City Manager is missing!");
-		}
-
-		if (EARS::Locale::LocaleManager* LocaleMgr = EARS::Locale::LocaleManager::GetInstance())
-		{
-			if (ImGui::BeginCombo("###select_language_text", "Select Language"))
-			{
-				for (uint32_t i = 0; i < LocaleMgr->GetNumLanguages(); i++)
-				{
-					if (LocaleMgr->GetTextLanguageIsUserSelectable(i))
-					{
-						const char* LanguageCode = LocaleMgr->GetTextLanguageCode(i);
-						const std::string Label = LocaleMgr->GetLanguageName(LanguageCode);
-
-						if (ImGui::Selectable(Label.c_str()))
-						{
-							LocaleMgr->SetCurrentLanguage(i);
-						}
-					}
-				}
-
-				ImGui::EndCombo();
-			}
-
-			if (ImGui::BeginCombo("###select_language_audio", "Select Audio Language"))
-			{
-				for (uint32_t i = 0; i < LocaleMgr->GetNumLanguages(); i++)
-				{
-					if (LocaleMgr->GetTextLanguageIsUserSelectable(i))
-					{
-						const char* LanguageCode = LocaleMgr->GetTextLanguageCode(i);
-						const int AudioIndex = LocaleMgr->FindAudioLanguageIndex(LanguageCode);
-
-						if (AudioIndex != -1)
-						{
-							const std::string Label = LocaleMgr->GetLanguageName(LanguageCode);
-
-							if (ImGui::Selectable(Label.c_str()))
-							{
-								LocaleMgr->SetCurrentAudioLanguage(AudioIndex);
-							}
-						}
-					}
-				}
-
-				ImGui::EndCombo();
-			}
-		}
-
-		ImGui::EndTabItem();
-	}
-}
-
 void ImGuiManager::DrawTab_ObjectMgrSettings()
 {
 	if (EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer())
@@ -1126,6 +1308,11 @@ void ImGuiManager::DrawTab_Support()
 		TextURL("Ko-fi", "https://ko-fi.com/greavesy");
 		TextURL("Boosty", "https://boosty.to/greavesy/donate");
 
+		if(ImGui::Button("Show ImGui Style Editor"))
+		{
+			bShowImGuiStyleEditor = true;
+		}
+
 		ImGui::EndTabItem();
 	}
 }
@@ -1171,6 +1358,10 @@ void ImGuiManager::OnTick()
 		}
 	}
 
+	// Everything below touches the live ImGui context; keep the presentation
+	// and window threads out until this frame's draw data is snapshotted
+	std::lock_guard<std::recursive_mutex> ContextLock(ImGuiContextLock);
+
 	ImGuiIO& IO = ImGui::GetIO();
 	IO.MouseDrawCursor = bShowModMenuWindow;
 
@@ -1178,6 +1369,11 @@ void ImGuiManager::OnTick()
 	ImGui_ImplWin32_NewFrame();
 
 	ImGui::NewFrame();
+	
+	if(bShowImGuiStyleEditor)
+	{
+		ImGui::ShowStyleEditor(&ImGui::GetStyle());
+	}
 
 	if (bShowModMenuWindow)
 	{
@@ -1188,6 +1384,8 @@ void ImGuiManager::OnTick()
 				DrawTab_PlayerSettings();
 
 				DrawTab_CheckpointSettings();
+
+				PhotoModeSystem.DrawTab();
 
 				DrawTab_TimeOfDaySettings();
 
@@ -1211,7 +1409,7 @@ void ImGuiManager::OnTick()
 
 				DrawTab_PlayerFamilyTreeSettings();
 
-				DrawTab_UIHUDSettings();
+				UISystem.DrawTab();
 
 				DrawTab_Support();
 
@@ -1226,6 +1424,9 @@ void ImGuiManager::OnTick()
 
 	ImGui::EndFrame();
 	ImGui::Render();
+
+	// Publish a complete frame for the presentation thread to consume
+	CaptureDrawDataSnapshot();
 }
 
 bool ImGuiManager::SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, bool bGodModeActive) const
