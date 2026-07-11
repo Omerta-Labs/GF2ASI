@@ -130,10 +130,12 @@ void Mod::ObjectManager::Spawn(const EARS::Common::guid128_t& PacketID, const Rw
 
 void Mod::ObjectManager::ImGuiDrawContents()
 {
+	ImGui::BeginChild("objectmanager_selection_child");
+
 	EARS::Framework::SimManager* SimMgr = EARS::Framework::SimManager::GetInstance();
 	EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
 
-	if (ImGui::Button("Populate lists"))
+	if (ImGui::Button("Populate lists", ImVec2(-1.0f, 0.0f)))
 	{
 		VehicleSpawnList.ClearList();
 		NPCSpawnList.ClearList();
@@ -200,7 +202,8 @@ void Mod::ObjectManager::ImGuiDrawContents()
 
 		VehicleSpawnList.DrawList();
 
-		if (ImGui::Button("Spawn Car"))
+		ImGui::PushItemWidth(-1.0f);
+		if (ImGui::Button("Spawn Car", ImVec2(-1.0f, 0.0f)))
 		{
 			Mod::ObjectManager::ObjectSpawnRequestParams RequestParams = {};
 			RequestParams.ObjectGuid = VehicleSpawnList.GetSelectedGUID();
@@ -211,6 +214,7 @@ void Mod::ObjectManager::ImGuiDrawContents()
 
 			RequestSpawnCar(RequestParams);
 		}
+		ImGui::PopItemWidth();
 
 		ImGui::PopID();
 	}
@@ -220,7 +224,8 @@ void Mod::ObjectManager::ImGuiDrawContents()
 		ImGui::PushID("npc_spawn_list");
 		NPCSpawnList.DrawList();
 
-		if (ImGui::Button("Spawn NPC"))
+		ImGui::PushItemWidth(-1.0f);
+		if (ImGui::Button("Spawn NPC", ImVec2(-1.0f, 0.0f)))
 		{
 			const RWS::CAttributeHandler* ActiveSimNPC = SimMgr->Find(NPCSpawnList.GetSelectedGUID(), nullptr);
 			if (ActiveSimNPC)
@@ -236,6 +241,7 @@ void Mod::ObjectManager::ImGuiDrawContents()
 				Spawn(NPCGuid, SpawnPosition);
 			}
 		}
+		ImGui::PopItemWidth();
 
 		ImGui::PopID();
 	}
@@ -245,20 +251,21 @@ void Mod::ObjectManager::ImGuiDrawContents()
 		ImGui::PushID("item_spawn_list");
 		ItemSpawnList.DrawList();
 
-		ImGui::PushItemWidth(-1.0f);
-		if (ImGui::Button("Spawn Item"))
+		EARS::Modules::InventoryManager* PlayerInventoryMgr = LocalPlayer->GetInventoryManager();
+		const float ButtonWidth = PlayerInventoryMgr ? (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x) * 0.5f : -FLT_MIN;
+
+		if (ImGui::Button("Spawn Item", ImVec2(ButtonWidth, 0.0f)))
 		{
 			const RwMatrixTag PlayerMatrix = LocalPlayer->GetMatrix();
 			const RwV3d SpawnPosition = PlayerMatrix.m_Pos + (PlayerMatrix.m_At * 5.0f);
 			SpawnItem(ItemSpawnList.GetSelectedGUID(), SpawnPosition);
 		}
-		
+
 		// only show if we have the Player
-		if (EARS::Modules::InventoryManager* PlayerInventoryMgr = LocalPlayer->GetInventoryManager())
+		if (PlayerInventoryMgr)
 		{
 			ImGui::SameLine();
-
-			if (ImGui::Button("Add To Player"))
+			if (ImGui::Button("Add Item To Player", ImVec2(ButtonWidth, 0.0f)))
 			{
 				if (EARS::Modules::Item* NewItem = PlayerInventoryMgr->TrySpawnItem(ItemSpawnList.GetSelectedGUID(), LocalPlayer->GetStream()))
 				{
@@ -272,10 +279,10 @@ void Mod::ObjectManager::ImGuiDrawContents()
 			}
 		}
 
-		ImGui::PopItemWidth();
-
 		ImGui::PopID();
 	}
+
+	ImGui::EndChild();
 }
 
 Mod::ObjectEntryList::ObjectEntryList()
@@ -300,12 +307,12 @@ void Mod::ObjectEntryList::RegisterEntry(const EntityEntry& InEntry)
 
 void Mod::ObjectEntryList::DrawList()
 {
-	ObjectFilter.Draw("##filter");
-	ImGui::SameLine();
 	if (ImGui::Button("Search"))
 	{
 		RequestSearch();
 	}
+	ImGui::SameLine();
+	ObjectFilter.Draw("##filter", -FLT_MIN);
 
 	ImGui::PushItemWidth(-1.0f);
 	if (ImGui::BeginListBox("##list", ImVec2(0.0f, 0.0f)))

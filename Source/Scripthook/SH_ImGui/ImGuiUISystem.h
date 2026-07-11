@@ -14,13 +14,17 @@ namespace SH
 		 */
 		void CloseLevelServices();
 
-	private:
+		void SupressHUD();
+
+		void UnsupressHUD();
 
 		// Re-activate the HUD indicator on every currently spawned NPC
 		void ShowAllNPCIndicators();
 
 		// Disable the HUD indicator on every currently spawned NPC
 		void HideAllNPCIndicators();
+
+	private:
 
 		bool bWantsUISuppressed = false;
 

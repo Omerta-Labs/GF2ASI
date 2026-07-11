@@ -31,7 +31,16 @@ namespace EARS
 
 		enum class PlayerFlag
 		{
+			INITIALIZED = 0x0,
+			GAMEPLAY_CONTROL_ENABLED = 0x1,		// Cleared/set by Player::DisablePlayerControl/EnablePlayerControl. Gates all Player input accessors (GetStickDir, IsButtonPressed, etc.)
+			ENABLE_CAMERA_CONTROL = 0x2,		// Sampled by PlayerCameraSM::InitializeChaseCamera into ChaseCameraSettings::m_allowPlayerControl
 			TELEPORTING = 0x5,
+
+			// WARNING: The PC enum diverges from X360 in the upper range - on X360 this flag is 0x31,
+			// but on PC it is 0x34 (verified against UIHud::ShowWeaponWheel in the PC executable).
+			// While set, CollisionCamera::GetStickValues (on-foot chase cam) and FollowCameraInternal
+			// (vehicle cam) zero out camera look input, but the camera itself keeps updating.
+			WEAPON_WHEEL_SHOWING = 0x34,
 		};
 
 		/**

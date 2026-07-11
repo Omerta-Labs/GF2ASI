@@ -68,8 +68,6 @@ void Settings::Init()
 		tConsole::fWriteLine("Loading Settings");
 
 		const std::wstring& WidePath = ConfigFilePath;
-		ShowModMenuWindowInput = GetPrivateProfileIntW(L"Keybinds", L"model", VK_F1, WidePath.data());
-		ImGuiInteractiveInput = GetPrivateProfileIntW(L"Keybinds", L"ImGuiInteractiveToggle", VK_F2, WidePath.data());
 		FlyModeUpInput = GetPrivateProfileIntW(L"Keybinds", L"flyup", VK_PRIOR, WidePath.data());
 		FlyModeDownInput = GetPrivateProfileIntW(L"Keybinds", L"flydown", VK_NEXT, WidePath.data());
 		bWantsPreOrderBonus = GetPrivateProfileIntW(L"Mods", L"UnlockPreOrderCrew", true, WidePath.data());
@@ -98,8 +96,6 @@ void Settings::Init()
 		EdgeAA.DepthWeight = GetPrivateProfileFloatW(L"EdgeAA", L"DepthWeight", EdgeAA.DepthWeight, WidePath.data());
 		EdgeAA.bDeferredMode = GetPrivateProfileIntW(L"EdgeAA", L"DeferredMode", EdgeAA.bDeferredMode, WidePath.data()) != 0;
 
-		tConsole::fPrintf("Show Menu Input: 0x%X", ShowModMenuWindowInput);
-		tConsole::fPrintf("ImGui Interactive: 0x%X", ImGuiInteractiveInput);
 		tConsole::fPrintf("Fly Mode Up Input: 0x%X", FlyModeUpInput);
 		tConsole::fPrintf("Fly Mode Down Input: 0x%X", FlyModeDownInput);
 		tConsole::fPrintf("Wants Pre-Order: %u", bWantsPreOrderBonus);
@@ -136,16 +132,6 @@ void Settings::SaveCameraSettings() const
 	WritePrivateProfileStringW(L"PhotoMode", L"GamepadRotationSmoothing", CurrentSettings.m_bGamepadRotationSmoothing ? L"1" : L"0", ConfigFilePath.data());
 	WritePrivateProfileStringW(L"PhotoMode", L"MouseSmoothing", CurrentSettings.m_bMouseSmoothing ? L"1" : L"0", ConfigFilePath.data());
 	WritePrivateProfileFloatW(L"PhotoMode", L"MouseSmoothTime", CurrentSettings.m_MouseSmoothTime, ConfigFilePath.data());
-}
-
-int Settings::GetShowModMenuWindowInput() const
-{
-	return ShowModMenuWindowInput;
-}
-
-int Settings::GetImGuiInteractiveInput() const
-{
-	return ImGuiInteractiveInput;
 }
 
 int Settings::GetFlyModeUpInput() const

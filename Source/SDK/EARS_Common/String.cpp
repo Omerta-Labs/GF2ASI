@@ -57,3 +57,8 @@ const char* String::c_str() const
 	static const char* s_NullStr = "0";
 	return s_NullStr;
 }
+
+const char* String::raw_c_str() const
+{
+	return m_pCStr;
+}

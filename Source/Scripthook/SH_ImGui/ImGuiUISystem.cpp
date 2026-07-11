@@ -35,14 +35,12 @@ namespace SH
 			{
 				if (bNewSuppressed)
 				{
-					UIHudManager->Suppress();
+					SupressHUD();
 				}
 				else
 				{
-					UIHudManager->Unsuppress();
+					UnsupressHUD();
 				}
-
-				bWantsUISuppressed = bNewSuppressed;
 			}
 
 			ImGui::EndDisabled();
@@ -60,8 +58,6 @@ namespace SH
 				{
 					HideAllNPCIndicators();
 				}
-
-				bNPCIndicatorsHidden = !bNewIndicatorsVisible;
 			}
 
 			ImGui::EndTable();
@@ -144,6 +140,8 @@ namespace SH
 				AsNPC->ActivateHUDIndicator(AsNPC->GetHudIndicatorType(), VFXName.c_str());
 			}
 		}
+
+		bNPCIndicatorsHidden = false;
 	}
 
 	void ImGuiUISystem::HideAllNPCIndicators()
@@ -160,6 +158,8 @@ namespace SH
 				AsNPC->DisableHUDIndicator();
 			}
 		}
+
+		bNPCIndicatorsHidden = true;
 	}
 
 	void ImGuiUISystem::CloseLevelServices()
@@ -168,5 +168,17 @@ namespace SH
 		// just drop our state so the next level starts from defaults
 		bWantsUISuppressed = false;
 		bNPCIndicatorsHidden = false;
+	}
+
+	void ImGuiUISystem::SupressHUD()
+	{
+		EARS::Apt::UIHUD::GetInstance()->Suppress();
+		bWantsUISuppressed = true;
+	}
+
+	void ImGuiUISystem::UnsupressHUD()
+	{
+		EARS::Apt::UIHUD::GetInstance()->Unsuppress();
+		bWantsUISuppressed = false;
 	}
 }

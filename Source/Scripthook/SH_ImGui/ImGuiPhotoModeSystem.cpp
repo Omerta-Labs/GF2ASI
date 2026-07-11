@@ -6,6 +6,7 @@
 #include "Addons/imgui/imgui.h"
 
 // Scripthook
+#include "Scripthook/SH_ImGui/ImGuiManager.h"
 #include "Scripthook/SH_ImGui/ImGuiPropertyGrid.h"
 
 // SDK
@@ -13,10 +14,7 @@
 #include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 #include "SDK/EARS_Framework/MainLoop/Logic.h"
 #include "SDK/EARS_Framework/Modules/ScreenFX/ScreenFX.h"
-#include "SDK/EARS_Framework/Toolkits/GroupManager/GroupManager.h"
 #include "SDK/EARS_Godfather/Modules/Debug/MarketingDebug.h"
-
-#include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
 
 // C++
 #include <cfloat>
@@ -61,18 +59,14 @@ namespace SH
 {
 	void ImGuiPhotoModeSystem::DrawTab()
 	{
-		if (!ImGui::BeginTabItem("Photo Mode", nullptr, ImGuiTabItemFlags_None))
-		{
-			return;
-		}
-
+		ImGui::BeginChild("photomode_window");
 		bool bInPhotoMode = (PhotoModeCameraInfo != nullptr);
+
+		ImGui::TextWrapped("Detach the camera from the player to compose a shot. "
+			"Move with the left stick, look with the right stick or mouse, hold LB or left mouse click to move faster.");
 
 		if (!bInPhotoMode)
 		{
-			ImGui::TextWrapped("Detach the camera from the player to compose a shot. "
-				"Move with the left stick, look with the right stick or mouse, hold LB or left mouse click to move faster.");
-
 			if (ImGui::Button("Enter Photo Mode", ImVec2(-FLT_MIN, 0.0f)))
 			{
 				StartPhotoMode();
@@ -280,7 +274,7 @@ namespace SH
 
 		DrawEffectsSection(bInPhotoMode);
 
-		ImGui::EndTabItem();
+		ImGui::EndChild();
 	}
 
 	void ImGuiPhotoModeSystem::DrawEffectsSection(const bool bInPhotoMode)
@@ -389,16 +383,6 @@ namespace SH
 				bBloomEnabled = bNewBloom;
 			}
 
-			ImGui::BeginDisabled(!bBloomEnabled);
-
-			BeginPropertyRow("Bloom Intensity", "Glow radius and how strongly it overrides the scene's own bloom.");
-			if (ImGui::SliderFloat("##BloomIntensity", &BloomIntensity, 0.0f, 1.0f, "%.2f"))
-			{
-				ScreenFXInst->GetBloomEffect().SetIntensity(BloomIntensity);
-			}
-
-			ImGui::EndDisabled();
-
 			ImGui::EndTable();
 		}
 
@@ -437,37 +421,22 @@ namespace SH
 		bBloomEnabled = false;
 	}
 
-	void ImGuiPhotoModeSystem::ShowAllNPCIndicators()
+	void ImGuiPhotoModeSystem::Toggle()
 	{
-		using namespace EARS::Framework;
-
-		GroupManager* GroupMgr = GroupManager::GetInstance();
-		const GroupManager::TEntityList& MemberList = GroupMgr->FindGroupMembers(2);
-
-		for (Entity* Member : MemberList)
+		if (PhotoModeCameraInfo != nullptr)
 		{
-			if (EARS::Modules::NPC* AsNPC = EARS::Framework::_GetInterface<EARS::Modules::NPC>(Member, 0x369AC561))
-			{
-				const String& VFXName = AsNPC->GetHudIndicatorVFXName();
-				AsNPC->ActivateHUDIndicator(AsNPC->GetHudIndicatorType(), VFXName.c_str());
-			}
+			StopPhotoMode();
+			return;
 		}
-	}
 
-	void ImGuiPhotoModeSystem::HideAllNPCIndicators()
-	{
-		using namespace EARS::Framework;
-
-		GroupManager* GroupMgr = GroupManager::GetInstance();
-		const GroupManager::TEntityList& MemberList = GroupMgr->FindGroupMembers(2);
-
-		for (Entity* Member : MemberList)
+		// StartPhotoMode dereferences the camera manager, which only exists in-game;
+		// ignore the shortcut at the front end rather than crashing.
+		if (EARS::Framework::CameraManager::GetInstance() == nullptr)
 		{
-			if (EARS::Modules::NPC* AsNPC = EARS::Framework::_GetInterface<EARS::Modules::NPC>(Member, 0x369AC561))
-			{
-				AsNPC->DisableHUDIndicator();
-			}
+			return;
 		}
+
+		StartPhotoMode();
 	}
 
 	void ImGuiPhotoModeSystem::StartPhotoMode()
@@ -483,7 +452,8 @@ namespace SH
 
 		CameraMgr->PushCameraInfo(0, PhotoModeCameraInfo, 0.0f, EARS::Framework::CAMERA_INTERP_NONE, true);
 
-		HideAllNPCIndicators();
+		ImGuiManager::StaticGetUISystemDebug().SupressHUD();
+		ImGuiManager::StaticGetUISystemDebug().HideAllNPCIndicators();
 		SetPlayerFrozen(true);
 		SetTimeFrozen(true);
 	}
@@ -497,7 +467,8 @@ namespace SH
 		PhotoModeCameraInfo = nullptr;
 
 		// Hand back anything we still hold frozen, and ramp out any active effects
-		ShowAllNPCIndicators();
+		ImGuiManager::StaticGetUISystemDebug().UnsupressHUD();
+		ImGuiManager::StaticGetUISystemDebug().ShowAllNPCIndicators();
 		SetPlayerFrozen(false);
 		SetTimeFrozen(false);
 		StopAllEffects();

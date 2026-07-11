@@ -46,8 +46,10 @@ public:
 
 	void Init();
 
-	int GetShowModMenuWindowInput() const;
-	int GetImGuiInteractiveInput() const;
+	// Resolved path to gf2asi.ini, so other systems (e.g. KeybindManager) can
+	// load and persist their own sections against the same file.
+	const std::wstring& GetConfigFilePath() const { return ConfigFilePath; }
+
 	int GetFlyModeUpInput() const;
 	int GetFlyModeDownInput() const;
 	bool WantsPreOrderBonus() const { return bWantsPreOrderBonus; }
@@ -65,12 +67,6 @@ private:
 
 	// Resolved path to the config file, cached by Init() so saves target the same file
 	std::wstring ConfigFilePath;
-
-	// Virtual Key to show the ImGui Demo Window
-	int ShowModMenuWindowInput = VK_F1;
-
-	// Virtual Key to show the ImGui Demo Window
-	int ImGuiInteractiveInput = VK_F2;
 
 	// Virtual Key to get up in fly mode
 	int FlyModeUpInput = VK_PRIOR;

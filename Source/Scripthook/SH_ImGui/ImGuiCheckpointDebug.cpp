@@ -38,7 +38,7 @@ namespace SH
 				if (ChapterSection.m_ChapterDebugName == nullptr && InCheckpoint.GetChapterDebugName().IsValid())
 				{
 					// better than nothing
-					ChapterSection.m_ChapterDebugName = InCheckpoint.GetChapterDebugName().c_str();
+					ChapterSection.m_ChapterDebugName = InCheckpoint.GetChapterDebugName().raw_c_str();
 				}
 
 				break;
@@ -49,7 +49,7 @@ namespace SH
 		{
 			ImGuiChapter& NewChapter = Chapters.emplace_back();
 			NewChapter.m_ChapterID = InCheckpoint.GetChapterNumber();
-			NewChapter.m_ChapterDebugName = InCheckpoint.GetChapterDebugName().c_str();
+			NewChapter.m_ChapterDebugName = InCheckpoint.GetChapterDebugName().raw_c_str();
 			NewChapter.m_Checkpoints.insert(&InCheckpoint);
 
 			// re-order
@@ -81,7 +81,7 @@ namespace SH
 		if (EARS::Modules::Checkpoint* CurrentCheckpoint = CheckpointMgr.GetCurrentCheckpoint())
 		{
 			const String& DebugName = CurrentCheckpoint->GetDebugName();
-			ImGui::Text("Current Checkpoint: [%u-%u] %s", CurrentCheckpoint->GetChapterNumber(), CurrentCheckpoint->GetCheckpointNumber(), DebugName.c_str());
+			ImGui::Text("Current Checkpoint: [%u-%u] %s", CurrentCheckpoint->GetChapterNumber(), CurrentCheckpoint->GetCheckpointNumber(), DebugName.raw_c_str());
 		}
 		else
 		{
@@ -107,7 +107,7 @@ namespace SH
 						CheckpointFlags |= ImGuiTreeNodeFlags_Selected;
 					}
 
-					if(ImGui::TreeNodeEx(CurrentCheckpoint, CheckpointFlags, DebugName.c_str()))
+					if(ImGui::TreeNodeEx(CurrentCheckpoint, CheckpointFlags, DebugName.raw_c_str()))
 					{
 						if (ImGui::IsItemClicked())
 						{

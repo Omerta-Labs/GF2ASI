@@ -20,7 +20,11 @@ namespace EARS
 		public:
 
 			// Increment the 'suppress' counter.
-			// If Suppress > 0, hide hud
+			// If Suppress > 0, hide hud.
+			// While suppressed, UIHud::IsWeaponWheelDisabled() returns true, so the
+			// weapon wheel cannot be opened (PrepareToShowWeaponWheel early-outs).
+			// Used by the game's own pause menu (UIBase::MenuPushPause/MenuPopPause),
+			// Player::Teleport, F2F and executions - refcounted, so nesting is safe.
 			void Suppress();
 
 			// Decrement the 'suppress' counter

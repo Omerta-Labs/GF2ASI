@@ -7,6 +7,7 @@
 #include "Addons/imgui/backends/imgui_impl_dx9.h"
 #include "Addons/imgui/backends/imgui_impl_win32.h"
 #include "Scripthook/SH_ObjectManager/ObjectManager.h"
+#include "Scripthook/SH_ImGui/KeybindManager.h"
 
 // Godfather
 #include "SDK/EARS_Framework/Core/Camera/CameraManager.h"
@@ -277,6 +278,73 @@ void ImGuiManager::Open()
 	AddFont("scripts/Roboto-Medium.ttf");
 
 	PrivateImGui::SetupImGuiStyle();
+
+	RegisterShortcutActions();
+}
+
+void ImGuiManager::RegisterShortcutActions()
+{
+	SH::KeybindManager& Keybinds = *SH::KeybindManager::Get();
+
+	// Menu shortcuts are always available; gameplay shortcuts guard on the local
+	// player so a stray key press at the front end is a harmless no-op.
+	Keybinds.RegisterAction({ "menu.toggle", "Toggle Mod Menu", "Menu", VK_F1,
+		[this]() { bShowModMenuWindow = !bShowModMenuWindow; },
+		[this]() { return bShowModMenuWindow; } });
+
+	Keybinds.RegisterAction({ "menu.interactive", "Toggle Cursor Interaction", "Menu", VK_F2,
+		[this]() { bImGuiInteractive = !bImGuiInteractive; },
+		[this]() { return bImGuiInteractive; } });
+
+	Keybinds.RegisterAction({ "player.godmode", "Toggle God Mode", "Player", VK_F5,
+		[this]()
+		{
+			EARS::Modules::Player* LocalPlayer = EARS::Modules::Player::GetLocalPlayer();
+			if (!LocalPlayer)
+			{
+				return;
+			}
+
+			bPlayerGodModeActive = !bPlayerGodModeActive;
+			SetPlayerGodMode(*LocalPlayer);
+		},
+		[this]() { return bPlayerGodModeActive; } });
+
+	Keybinds.RegisterAction({ "player.fly", "Toggle Fly Mode", "Player", VK_F6,
+		[]()
+		{
+			if (!EARS::Modules::Player::GetLocalPlayer())
+			{
+				return;
+			}
+
+			EARS::Modules::PlayerDebugOptions& DebugOptions = *EARS::Modules::PlayerDebugOptions::GetInstance();
+			DebugOptions.SetIsInDebugFly(!DebugOptions.IsInDebugFly());
+		},
+		[]()
+		{
+			EARS::Modules::PlayerDebugOptions* DebugOptions = EARS::Modules::PlayerDebugOptions::GetInstance();
+			return DebugOptions && DebugOptions->IsInDebugFly();
+		} });
+
+	Keybinds.RegisterAction({ "world.freeze", "Freeze Game Logic", "World", VK_F7,
+		[this]()
+		{
+			ToggleFreezeLogic();
+		},
+		[this]() { return bFreezeLogic; } });
+
+	Keybinds.RegisterAction({ "camera.photomode", "Toggle Photo Mode", "Camera", VK_F8,
+		[this]() { PhotoModeSystem.Toggle(); },
+		[this]() { return PhotoModeSystem.IsActive(); } });
+
+	Keybinds.LoadBindings(Settings::GetCheckedRef().GetConfigFilePath());
+}
+
+void ImGuiManager::SetPlayerGodMode(EARS::Modules::Player& InPlayer) const
+{
+	EARS::Modules::StandardDamageComponent* DamageComp = InPlayer.GetDamageComponent();
+	DamageComp->SetInvincible(bPlayerGodModeActive);
 }
 
 void ImGuiManager::OnEndScene()
@@ -435,6 +503,16 @@ void ImGuiManager::CloseLevelServices()
 	}
 }
 
+SH::ImGuiCheckpointDebug& ImGuiManager::StaticGetCheckpointDebug()
+{
+	return ImGuiManager::GetCheckedRef().GetCheckpointDebug();
+}
+
+SH::ImGuiUISystem& ImGuiManager::StaticGetUISystemDebug()
+{
+	return ImGuiManager::GetCheckedRef().GetUISystemDebug();
+}
+
 LRESULT ImGuiManager::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -469,25 +547,14 @@ void ImGuiManager::DrawTab_PlayerSettings()
 				bool bNewGodModeActive = bPlayerGodModeActive;
 				if (ImGui::Checkbox("God Mode", &bNewGodModeActive))
 				{
-					EARS::Modules::StandardDamageComponent* DamageComp = LocalPlayer->GetDamageComponent();
-					DamageComp->SetInvincible(bNewGodModeActive);
-
 					bPlayerGodModeActive = bNewGodModeActive;
+					SetPlayerGodMode(*LocalPlayer);
 				}
 
 				bool bNewFreezeGameLogic = bFreezeLogic;
 				if (ImGui::Checkbox("Freeze Game Logic", &bNewFreezeGameLogic))
 				{
-					if (bNewFreezeGameLogic)
-					{
-						RWS::MainLoop::Logic::PushPause(16);
-					}
-					else
-					{
-						RWS::MainLoop::Logic::PopPause(16);
-					}
-
-					bFreezeLogic = bNewFreezeGameLogic;
+					ToggleFreezeLogic();
 				}
 
 				if (ImGui::Button("Inspect Player"))
@@ -578,6 +645,15 @@ void ImGuiManager::DrawTab_CheckpointSettings()
 	if (ImGui::BeginTabItem("Checkpoints", nullptr, ImGuiTabItemFlags_None))
 	{
 		GetCheckpointDebug().DisplayTab();
+		ImGui::EndTabItem();
+	}
+}
+
+void ImGuiManager::DrawTab_PhotoMode()
+{
+	if (ImGui::BeginTabItem("Photo Mode", nullptr, ImGuiTabItemFlags_None))
+	{
+		PhotoModeSystem.DrawTab();
 		ImGui::EndTabItem();
 	}
 }
@@ -744,90 +820,47 @@ void ImGuiManager::DrawTab_BuildingSettings()
 
 	if (ImGui::BeginTabItem("Buildings", nullptr, ImGuiTabItemFlags_None))
 	{
-		/*if (ImGui::TreeNodeEx("Active Buildings", ImGuiTreeNodeFlags_Framed))
+		ImGui::BeginChild("building_store_table");
+		if (ImGui::BeginTable("active_building_table", 5, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
 		{
-			if (ImGui::BeginTable("active_building_table", 4, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
-			{
-				ImGui::TableSetupColumn("VenueID", ImGuiTableColumnFlags_WidthFixed, 100.0f);
-				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 100.0f);
-				ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 100.0f);
-				ImGui::TableSetupColumn("Family", ImGuiTableColumnFlags_WidthFixed, 300.0f);
-				ImGui::TableHeadersRow();
+			const float AvailWidth = ImGui::GetContentRegionAvail().x;
+			ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.08f);
+			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.42f);
+			ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.1f);
+			ImGui::TableSetupColumn("Family", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.2f);
+			ImGui::TableSetupColumn("Teleport", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.2f);
+			ImGui::TableHeadersRow();
 
-				BuildingMgr->ForEachActiveBuilding([&](const EARS::Modules::Building& ActiveBuilding) 
-					{
-						ImGui::PushID(&ActiveBuilding);
+			BuildingMgr->ForEachBuildingStore([&](EARS::Modules::BuildingStore& ActiveStore)
+				{
+					ImGui::PushID(&ActiveStore);
 
-						ImGui::TableNextRow();
-						ImGui::TableNextColumn();
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0);
 
-						EARS::Modules::BuildingStore& ActiveStore = *ActiveBuilding.GetStorageUnit();
-						const String* BuildingString = ActiveStore.GetDisplayName();
+					const String* BuildingString = ActiveStore.GetDisplayName();
 
-						ImGui::Text("%u", ActiveStore.GetVenueID());
-						ImGui::TableNextColumn();
-						ImGui::Text("%s", BuildingString->c_str());
-						ImGui::TableNextColumn();
-						ImGui::Text("%s", BuildingMgr->GetBuildingTypeInternalName(ActiveStore.GetBuildingType()));
-						ImGui::TableNextColumn();
-						DrawFamilyComboBox(ActiveStore);
-						ImGui::TableNextColumn();
+					const EARS::Modules::Family* OwningFamily = FamilyMgr->GetFamily(ActiveStore.GetFamilyID());
+					const String* FamilyString = OwningFamily->GetInternalName();
 
-						ImGui::PopID();
-					});
+					ImGui::Text("%u", ActiveStore.GetVenueID());
+					ImGui::TableNextColumn();
+					ImGui::Text("%s", BuildingString->c_str());
+					ImGui::TableNextColumn();
+					ImGui::Text("%s", BuildingMgr->GetBuildingTypeInternalName(ActiveStore.GetBuildingType()));
+					ImGui::TableNextColumn();
+					DrawFamilyComboBox(ActiveStore);
+					ImGui::TableNextColumn();
+					DrawPlayerTeleportButton(ActiveStore);
+					ImGui::TableNextColumn();
 
-				ImGui::EndTable();
-			}
-
-			ImGui::TreePop();
-		}*/
-
-		if (ImGui::TreeNodeEx("Buildings", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::BeginChild("building_store_table");
-			if (ImGui::BeginTable("active_building_table", 5, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
-			{
-				const float AvailWidth = ImGui::GetContentRegionAvail().x;
-				ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.08f);
-				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.42f);
-				ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.1f);
-				ImGui::TableSetupColumn("Family", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.2f);
-				ImGui::TableSetupColumn("Teleport", ImGuiTableColumnFlags_WidthFixed, AvailWidth * 0.2f);
-				ImGui::TableHeadersRow();
-
-				BuildingMgr->ForEachBuildingStore([&](EARS::Modules::BuildingStore& ActiveStore) 
-					{
-						ImGui::PushID(&ActiveStore);
-
-						ImGui::TableNextRow();
-						ImGui::TableSetColumnIndex(0);
-
-						const String* BuildingString = ActiveStore.GetDisplayName();
-						
-						const EARS::Modules::Family* OwningFamily = FamilyMgr->GetFamily(ActiveStore.GetFamilyID());
-						const String* FamilyString = OwningFamily->GetInternalName();
-
-						ImGui::Text("%u", ActiveStore.GetVenueID());
-						ImGui::TableNextColumn();
-						ImGui::Text("%s", BuildingString->c_str());
-						ImGui::TableNextColumn();
-						ImGui::Text("%s", BuildingMgr->GetBuildingTypeInternalName(ActiveStore.GetBuildingType()));
-						ImGui::TableNextColumn();
-						DrawFamilyComboBox(ActiveStore);
-						ImGui::TableNextColumn();
-						DrawPlayerTeleportButton(ActiveStore);
-						ImGui::TableNextColumn();
-
-						ImGui::PopID();
-					});
+					ImGui::PopID();
+				});
 
 
-				ImGui::EndTable();
-			}
-			ImGui::EndChild();
-
-			ImGui::TreePop();
+			ImGui::EndTable();
 		}
+		ImGui::EndChild();
 
 		ImGui::EndTabItem();
 	}
@@ -1006,6 +1039,8 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 
 	if (ImGui::BeginTabItem("Player Family Tree Settings", nullptr, ImGuiTabItemFlags_None))
 	{
+		ImGui::BeginChild("family_tree_settings_window");
+
 		EARS::Modules::CorleoneFamilyData* FamilyData = EARS::Modules::CorleoneFamilyData::GetInstance();
 		if (!FamilyData)
 		{
@@ -1205,6 +1240,7 @@ void ImGuiManager::DrawTab_PlayerFamilyTreeSettings()
 				});
 		}
 
+		ImGui::EndChild();
 		ImGui::EndTabItem();
 	}
 }
@@ -1265,8 +1301,118 @@ void ImGuiManager::DrawTab_SimMgrSettings()
 
 		}
 
+		ImGui::BeginChild("simgroup_test");
+		SimMgr.ForEachPacket([&](const RWS::CAttributePacket& Pckt)
+			{
+				const EARS::Common::guid128_t ID = Pckt.GetInstanceID();
+				ImGui::Text("[%u] %u - %u - %u - %u", ID.a, ID.b, ID.c, ID.d, Pckt.GetStreamHandle());
+			});
+		ImGui::EndChild();
+
 		ImGui::EndTabItem();
 	}
+}
+
+void ImGuiManager::DrawTab_Keybinds()
+{
+	if (!ImGui::BeginTabItem("Keybinds", nullptr, ImGuiTabItemFlags_None))
+	{
+		return;
+	}
+
+	SH::KeybindManager& Keybinds = SH::KeybindManager::GetCheckedRef();
+
+	ImGui::TextWrapped("Bind keyboard shortcuts to menu actions. Click Rebind then press a key; "
+		"values are stored as Windows virtual-key codes in gf2asi.ini.");
+
+	if (Keybinds.IsRebinding())
+	{
+		ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "Press a key to bind, or Escape to cancel...");
+	}
+	else
+	{
+		// Keep the layout stable whether or not a capture is in progress
+		ImGui::TextDisabled("Ready.");
+	}
+
+	const ImGuiTableFlags TableFlags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp;
+	if (ImGui::BeginTable("KeybindTable", 4, TableFlags))
+	{
+		ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableSetupColumn("State", ImGuiTableColumnFlags_WidthFixed);
+		ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed);
+		ImGui::TableSetupColumn("##Buttons", ImGuiTableColumnFlags_WidthFixed);
+		ImGui::TableHeadersRow();
+
+		for (const SH::ShortcutAction& Action : Keybinds.GetActions())
+		{
+			ImGui::TableNextRow();
+			ImGui::PushID(Action.Id.c_str());
+
+			// Action name, with the category and id available on hover
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(Action.DisplayName.c_str());
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("%s  (%s)", Action.Id.c_str(), Action.Category.c_str());
+			}
+
+			// Live toggle state, for actions that report it
+			ImGui::TableNextColumn();
+			if (Action.IsActive)
+			{
+				const bool bActive = Action.IsActive();
+				ImGui::TextColored(bActive ? ImVec4(0.4f, 1.0f, 0.4f, 1.0f) : ImVec4(0.6f, 0.6f, 0.6f, 1.0f),
+					bActive ? "ON" : "off");
+			}
+			else
+			{
+				ImGui::TextDisabled("-");
+			}
+
+			// Current binding
+			ImGui::TableNextColumn();
+			const bool bCapturingThis = Keybinds.IsRebinding() && Keybinds.GetRebindTargetId() == Action.Id;
+			const int VirtualKey = Keybinds.GetBinding(Action.Id);
+			if (bCapturingThis)
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "[ ... ]");
+			}
+			else if (VirtualKey == 0)
+			{
+				ImGui::TextDisabled("Unbound");
+			}
+			else
+			{
+				const std::string KeyName = SH::KeybindManager::GetKeyDisplayName(VirtualKey);
+				ImGui::TextUnformatted(KeyName.c_str());
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Virtual-key 0x%02X", VirtualKey);
+				}
+			}
+
+			// Rebind / clear controls, locked out while another capture is running
+			ImGui::TableNextColumn();
+			ImGui::BeginDisabled(Keybinds.IsRebinding());
+			if (ImGui::SmallButton("Rebind"))
+			{
+				Keybinds.BeginRebind(Action.Id);
+			}
+			ImGui::SameLine();
+			if (ImGui::SmallButton("Clear"))
+			{
+				Keybinds.SetBinding(Action.Id, 0);
+			}
+			ImGui::EndDisabled();
+
+			ImGui::PopID();
+		}
+
+		ImGui::EndTable();
+	}
+
+	ImGui::EndTabItem();
 }
 
 void ImGuiManager::DrawTab_Support()
@@ -1308,10 +1454,12 @@ void ImGuiManager::DrawTab_Support()
 		TextURL("Ko-fi", "https://ko-fi.com/greavesy");
 		TextURL("Boosty", "https://boosty.to/greavesy/donate");
 
+#if DEBUG
 		if(ImGui::Button("Show ImGui Style Editor"))
 		{
 			bShowImGuiStyleEditor = true;
 		}
+#endif // DEBUG
 
 		ImGui::EndTabItem();
 	}
@@ -1319,16 +1467,8 @@ void ImGuiManager::DrawTab_Support()
 
 void ImGuiManager::OnTick()
 {
-	const Settings& OwnSettingsMgr = Settings::GetCheckedRef();
-	if (GetAsyncKeyState(OwnSettingsMgr.GetShowModMenuWindowInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F1)
-	{
-		bShowModMenuWindow = !bShowModMenuWindow;
-	}
-
-	if (GetAsyncKeyState(OwnSettingsMgr.GetImGuiInteractiveInput()) & 1) //ImGui::IsKeyPressed(ImGuiKey_F2)
-	{
-		bImGuiInteractive = !bImGuiInteractive;
-	}
+	// Poll keyboard shortcuts and fire their actions (menu toggle, god mode, etc.)
+	SH::KeybindManager::GetCheckedRef().PollAndDispatch();
 
 	// Update cursor visibility
 	// Should only really be present when any ImGui windows are open - 
@@ -1346,7 +1486,9 @@ void ImGuiManager::OnTick()
 			hook::Type<RWS::CEventId> PlayerDisableControlsEventId = hook::Type<RWS::CEventId>(0x112B56C);
 			MemUtils::CallCdeclMethod<void, RWS::CEventId&, bool>(0x0408A00, PlayerDisableControlsEventId, false);
 
-			CameraMgr->DisableUpdate();
+			EARS::Modules::Player* LclPlayer = EARS::Modules::Player::GetLocalPlayer();
+			LclPlayer->SetPlayerFlag(EARS::Modules::PlayerFlag::WEAPON_WHEEL_SHOWING);
+			//CameraMgr->DisableUpdate();
 		}
 		else
 		{
@@ -1354,7 +1496,10 @@ void ImGuiManager::OnTick()
 			hook::Type<RWS::CEventId> PlayerEnableControlsEventId = hook::Type<RWS::CEventId>(0x112B39C);
 			MemUtils::CallCdeclMethod<void, RWS::CEventId&, bool>(0x0408A00, PlayerEnableControlsEventId, false);
 
-			CameraMgr->EnableUpdate();
+			EARS::Modules::Player* LclPlayer = EARS::Modules::Player::GetLocalPlayer();
+			LclPlayer->ClearPlayerFlag(EARS::Modules::PlayerFlag::WEAPON_WHEEL_SHOWING);
+
+			//CameraMgr->EnableUpdate();
 		}
 	}
 
@@ -1370,13 +1515,19 @@ void ImGuiManager::OnTick()
 
 	ImGui::NewFrame();
 	
+#if DEBUG
 	if(bShowImGuiStyleEditor)
 	{
 		ImGui::ShowStyleEditor(&ImGui::GetStyle());
 	}
+#endif // DEBUG
 
 	if (bShowModMenuWindow)
 	{
+		// force every frame when the UI is active
+		EARS::Modules::Player* LclPlayer = EARS::Modules::Player::GetLocalPlayer();
+		LclPlayer->SetPlayerFlag(EARS::Modules::PlayerFlag::WEAPON_WHEEL_SHOWING);
+
 		if (ImGui::Begin("Scripthook Menu", &bShowModMenuWindow))
 		{
 			if (ImGui::BeginTabBar("mod_menu_tab_bar"))
@@ -1385,7 +1536,7 @@ void ImGuiManager::OnTick()
 
 				DrawTab_CheckpointSettings();
 
-				PhotoModeSystem.DrawTab();
+				DrawTab_PhotoMode();
 
 				DrawTab_TimeOfDaySettings();
 
@@ -1410,6 +1561,8 @@ void ImGuiManager::OnTick()
 				DrawTab_PlayerFamilyTreeSettings();
 
 				UISystem.DrawTab();
+
+				DrawTab_Keybinds();
 
 				DrawTab_Support();
 
@@ -1447,6 +1600,23 @@ bool ImGuiManager::SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, boo
 	}
 
 	return false;
+}
+
+void ImGuiManager::SetPlayerFlyMode(bool bIsActive)
+{
+}
+
+void ImGuiManager::ToggleFreezeLogic()
+{
+	bFreezeLogic = !bFreezeLogic;
+	if (bFreezeLogic)
+	{
+		RWS::MainLoop::Logic::PushPause(16);
+	}
+	else
+	{
+		RWS::MainLoop::Logic::PopPause(16);
+	}
 }
 
 void ImGuiManager::InitialiseNPCInspector(EARS::Modules::Sentient* InSentient, const bool bIsPlayer)

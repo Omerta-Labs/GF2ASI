@@ -15,6 +15,8 @@ public:
 
 	const char* c_str() const;
 
+	const char* raw_c_str() const;
+
 	// inline
 	bool IsValid() const { return m_Length != 0; }
 

@@ -6,6 +6,9 @@
 #include "SDK/EARS_Common/DoubleInternalLinkedList2.h"
 #include "SDK/EARS_Common/Guid.h"
 
+// SDK Framework
+#include "SDK/EARS_Framework/Core/AttributeHandler/CClassFactory.h"
+
 // Forward declare
 namespace EARS
 {
@@ -220,8 +223,17 @@ namespace RWS
 		EARS::Framework::Component* GetComponent(const uint32_t Index) const;
 
 		// operator overloads
-		void* operator new(size_t Size, size_t AdditionalSize);
 		void operator delete(void* Pointer, size_t Size);
+		void* operator new(size_t Size, size_t AdditionalSize);	
+
+		// construct-in-place: memory is already allocated + aligned, so just return it
+		void* operator new(size_t, void* Ptr) noexcept { return Ptr; }
+		void* operator new(size_t, std::align_val_t, void* Ptr) noexcept { return Ptr; }
+
+		// matching placement deletes (only ever called if the constructor throws).
+		// Nothing to free here — this operator new didn't allocate; the caller owns the memory.
+		void  operator delete(void*, void*) noexcept {}
+		void  operator delete(void*, std::align_val_t, void*) noexcept {}
 
 	private:
 

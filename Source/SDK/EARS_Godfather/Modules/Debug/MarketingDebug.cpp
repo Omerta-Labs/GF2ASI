@@ -163,16 +163,23 @@ namespace EARS::Modules
 
 		const uint16_t ControllerID = LclPlayer->GetControllerID();
 
+		// While the ImGui menu is open it owns the mouse and keyboard, so ignore all camera
+		// input - otherwise interacting with the menu also flies the camera around.
+		const ImGuiManager* ImGuiMgr = ImGuiManager::Get();
+		const bool bCursorCaptured = (ImGuiMgr != nullptr) && ImGuiMgr->HasCursorControl();
+
 		float LeftStickX = 0.0f;
 		float LeftStickY = 0.0f;
-		ControllerMgr->GetStickDir(ControllerID, 0, &LeftStickX, &LeftStickY, false, false, -1.0f, -1.0f, -1.0f);
-
 		float RightStickX = 0.0f;
 		float RightStickY = 0.0f;
-		ControllerMgr->GetStickDir(ControllerID, 1, &RightStickX, &RightStickY, false, false, -1.0f, -1.0f, -1.0f);
+		if (!bCursorCaptured)
+		{
+			ControllerMgr->GetStickDir(ControllerID, 0, &LeftStickX, &LeftStickY, false, false, -1.0f, -1.0f, -1.0f);
+			ControllerMgr->GetStickDir(ControllerID, 1, &RightStickX, &RightStickY, false, false, -1.0f, -1.0f, -1.0f);
+		}
 
 		// Hold Left-Bottom (L1/LB) to move faster.
-		const bool bSpeedModifierHeld = InputMgr->CheckButtonsANY(ControllerID, ButtonMask::CTRL_BUTTON_LEFT_BOTTOM, ButtonStatus::BUTTON_STATUS_DOWN);
+		const bool bSpeedModifierHeld = !bCursorCaptured && InputMgr->CheckButtonsANY(ControllerID, ButtonMask::CTRL_BUTTON_LEFT_BOTTOM, ButtonStatus::BUTTON_STATUS_DOWN);
 		const float SpeedModifier = bSpeedModifierHeld ? ACTIVE_SETTINGS.m_MoveSpeedModifier : 1.0f;
 
 		float& Pitch = m_CameraData.m_Rotation[0];
@@ -192,8 +199,6 @@ namespace EARS::Modules
 		// the screen centre). Ignore the mouse for those frames and for one update after
 		// control returns, so the garbage drains without kicking the camera. Deltas too
 		// large to be a real hand movement are discarded for the same reason.
-		const ImGuiManager* ImGuiMgr = ImGuiManager::Get();
-		const bool bCursorCaptured = (ImGuiMgr != nullptr) && ImGuiMgr->HasCursorControl();
 		const bool bMouseDeltaSane = (std::fabs(MouseDeltaX) <= FREECAM_MOUSE_DELTA_MAX) && (std::fabs(MouseDeltaY) <= FREECAM_MOUSE_DELTA_MAX);
 		if (bCursorCaptured || m_bSwallowMouseDelta || !bMouseDeltaSane)
 		{

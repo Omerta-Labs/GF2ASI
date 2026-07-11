@@ -30,6 +30,7 @@ namespace EARS
 	{
 		class Family;
 		class MarketingCameraInfo;
+		class Player;
 	}
 
 	namespace Vehicles
@@ -94,6 +95,10 @@ public:
 
 	/** Fetch Checkpoint tab debug*/
 	SH::ImGuiCheckpointDebug& GetCheckpointDebug() { return CheckpointDebug; }
+	SH::ImGuiUISystem& GetUISystemDebug() { return UISystem; }
+
+	static SH::ImGuiCheckpointDebug& StaticGetCheckpointDebug();
+	static SH::ImGuiUISystem& StaticGetUISystemDebug();
 
 	/**
 	 * API for ImGui to listen for Windows messages
@@ -111,6 +116,8 @@ private:
 	void DrawTab_PlayerSettings();
 
 	void DrawTab_CheckpointSettings();
+
+	void DrawTab_PhotoMode();
 
 	void DrawTab_TimeOfDaySettings();
 
@@ -130,9 +137,20 @@ private:
 
 	void DrawTab_Support();
 
-	void ApplyGodfatherIIStyle();
+	// Table of every registered shortcut with in-menu rebinding controls
+	void DrawTab_Keybinds();
+
+	// Register the mod's shortcut actions with the KeybindManager and load their
+	// bindings from the ini. Called once from Open().
+	void RegisterShortcutActions();
+
+	void SetPlayerGodMode(EARS::Modules::Player& InPlayer) const;
 
 	bool SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, bool bGodModeActive) const;
+
+	void SetPlayerFlyMode(bool bIsActive);
+
+	void ToggleFreezeLogic();
 
 	// Initialise an NPC Inspector for a given object in the game world
 	void InitialiseNPCInspector(EARS::Modules::Sentient* InSentient, const bool bIsPlayer);

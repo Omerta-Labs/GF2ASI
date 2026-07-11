@@ -14,6 +14,15 @@ namespace SH
 		void DrawTab();
 
 		/**
+		 * Toggle photo mode on/off. Used by the keybind shortcut so it stays in sync
+		 * with the mod menu's Enter/Exit buttons.
+		 */
+		void Toggle();
+
+		/** Whether photo mode is currently active. */
+		bool IsActive() const { return PhotoModeCameraInfo != nullptr; }
+
+		/**
 		 * Update system when level services close.
 		 * Ensures photo mode is fully exited so we don't hold onto a stale camera.
 		 */
@@ -36,10 +45,6 @@ namespace SH
 
 		// Ramp out any effects we enabled and reset their toggles
 		void StopAllEffects();
-
-		void ShowAllNPCIndicators();
-
-		void HideAllNPCIndicators();
 
 		EARS::Modules::MarketingCameraInfo* PhotoModeCameraInfo = nullptr;
 
