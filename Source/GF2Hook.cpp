@@ -17,6 +17,7 @@
 #include "Scripthook/SH_PlayerMasterSM/PlayerDebugOptions_Modded.h"
 #include "Scripthook/SH_GammaFix/GammaFix.h"
 #include "Scripthook/SH_EdgeAA/EdgeAA.h"
+#include "Scripthook/SH_ModManager/ModManager.h"
 #include "Scripthook/HookMods.h"
 
 #include "SDK/EARS_Common/Guid.h"
@@ -37,7 +38,6 @@
 #include <Addons/Hook.h>
 
 // Disable all Multiplayer, not setup for GF2 Steam exe!
-#define ENABLE_GF2_MULTIPLAYER 0
 #define ENABLE_GF2_DISPL_BEGINSCENE_HOOK 0
 #define ENABLE_GF2_GODFATHER_SERVICES_TICK_HOOK 0
 #define ENABLE_GF2_SPAWN_ENTITY_HOOKS 0
@@ -156,157 +156,11 @@ struct AptGlobal : public AptValue, public AptNativeHash
 };
 */
 
-#if ENABLE_GF2_MULTIPLAYER
-struct ConnectionParams
-{
-	const char* serverPartition;
-	const char* clientVersion;
-	unsigned int titleID;
-	unsigned int port;
-	const char* titleString;
-	const char* sku;
-	//Fesl::ServerInfo::FeslEnvironment environment;
-	//const char* (__cdecl* localeCB)();
-	//void(__cdecl* servicesCB)(Fesl::TitleParameters*);
-	//void(__cdecl* listenersCB)(Fesl::ServiceHub*);
-	//void(__cdecl* connGoneCB)(int);
-};
-
-struct InternetAddress
-{
-	void* vtable = nullptr;
-	unsigned int mAddr;
-	unsigned __int16 mPort;
-};
-
-struct AriesPacket
-{
-	int mKind;
-	int mCode;
-	char* mBody;
-	unsigned int mSize;
-	bool mMode;
-	InternetAddress mAddress;
-};
-
-uint64_t ConnectSocket_old;
-typedef int(__thiscall* ConnectSocket)(void* pThis, void* fa, bool bUseSSL);
-int __fastcall HOOK_ConnectSocket(void* pThis, void* ecx, void* fa, bool bUseSSL)
-{
-	C_Logger::Printf("Fesl::ConnectSocket");
-
-	bUseSSL = true;
-
-	ConnectSocket funcCast = (ConnectSocket)ConnectSocket_old;
-	const int value = funcCast(pThis, fa, bUseSSL);
-	return value;
-}
-
-uint64_t DisonnectSocket_old;
-typedef int(__thiscall* DisconnectSocket)(void* pThis);
-int __fastcall HOOK_DisconnectSocket(void* pThis, void* ecx)
-{
-	C_Logger::Printf("Fesl::DisconnectSocket");
-
-	DisconnectSocket funcCast = (DisconnectSocket)DisonnectSocket_old;
-	const int value = funcCast(pThis);
-	return value;
-}
-
-uint64_t Idle_old;
-typedef int(__thiscall* Idle)(void* pThis, float curMilis);
-int __fastcall HOOK_Idle(void* pThis, void* ecx, float curMilis)
-{
-	C_Logger::Printf("Fesl::Idle");
-
-	Idle funcCast = (Idle)Idle_old;
-	const int value = funcCast(pThis, curMilis);
-	return value;
-}
-
-//uint64_t HelloReceived_old;
-//typedef void(__thiscall* HelloReceived)(void* pThis, void* fa);
-//void __fastcall HOOK_HelloReceived(void* pThis, void* ecx, void* fa)
-//{
-//	HelloReceived funcCast = (HelloReceived)HelloReceived_old;
-//	funcCast(pThis, fa);
-//}
-
-uint64_t GodfatherConnectionManager_CTOR_old;
-typedef void*(__thiscall* GodfatherConnectionManager_CTOR)(void* pThis, void* params, void* alloc);
-void* __fastcall HOOK_GodfatherConnectionManager_CTOR(void* pThis, void* ecx, ConnectionParams* params, void* alloc)
-{
-	C_Logger::Printf("GodfatherConnectionManager_CTOR [%u -> %u]", params->port, 18020);
-
-	//params->port = 18020;
-	//params->titleString = "gf2";
-
-	GodfatherConnectionManager_CTOR funcCast = (GodfatherConnectionManager_CTOR)GodfatherConnectionManager_CTOR_old;
-	auto value = funcCast(pThis, params, alloc);
-	return value;
-}
-
-uint64_t ProtoAriesConnect_old;
-int _cdecl HOOK_ProtoAriesConnect(uint32_t a1, const char* a2, uint32_t a3, uint32_t a4)
-{
-	const char* CustomFilter = "gf2.xyz";
-
-	// localhost -> 2130706433
-
-	C_Logger::Printf("ProtoAriesConnect [%s -> %s] [%u -> %u]", a2, CustomFilter, a3, 2130706433);
-	auto r = PLH::FnCast(ProtoAriesConnect_old, &HOOK_ProtoAriesConnect)(a1, a2, 2130706433, a4);
-	return r;
-}
-
-uint64_t HOOK_ProtoAriesPeek_old;
-int _cdecl HOOK_ProtoAriesPeek(uint32_t a1, void* a2, void* a3, void* a4)
-{
-	auto r = PLH::FnCast(HOOK_ProtoAriesPeek_old, &HOOK_ProtoAriesPeek)(a1, a2, a3, a4);
-	C_Logger::Printf("ProtoAriesPeek [%u -> %u]", a3, a4);
-
-	return r;
-}
-
-uint64_t HOOK_ProtoAriesSend_old;
-int _cdecl HOOK_ProtoAriesSend(void* a1, uint32_t a2, void* a3, const char* a4, uint32_t a5)
-{
-	auto r = PLH::FnCast(HOOK_ProtoAriesSend_old, &HOOK_ProtoAriesSend)(a1, a2, a3, a4, a5);
-	C_Logger::Printf("[ProtoAriesSend] -> [%u] \n [%s]", a2, a4);
-
-	return r;
-}
-
-uint64_t HOOK_ProtoAriesRecv_old;
-int _cdecl HOOK_ProtoAriesRecv(void* a1, AriesPacket* a2, uint32_t* a3, void* a4, void* a5)
-{
-	auto r = PLH::FnCast(HOOK_ProtoAriesRecv_old, &HOOK_ProtoAriesRecv)(a1, a2, a3, a4, a5);
-	C_Logger::Printf("[ProtoAriesRecv] -> [%u - %u] \n [%s]", a2->mKind, a2->mCode, a2->mBody);
-
-	return r;
-}
-
-uint64_t HOOK_ProtoSSLRecv_old;
-int _cdecl HOOK_ProtoSSLRecv(int* a1, char* buf, int len)
-{
-	auto r = PLH::FnCast(HOOK_ProtoSSLRecv_old, &HOOK_ProtoSSLRecv)(a1, buf, len);
-	C_Logger::Printf("[HOOK_ProtoSSLRecv] -> [%u - %s]", len, buf);
-
-	return r;
-}
-
-uint64_t HOOK_ProtoSSLSend_old;
-int _cdecl HOOK_ProtoSSLSend(int* a1, char* buf, int len)
-{
-	auto r = PLH::FnCast(HOOK_ProtoSSLSend_old, &HOOK_ProtoSSLSend)(a1, buf, len);
-	C_Logger::Printf("[HOOK_ProtoSSLSend] -> [%u - %s]", len, buf);
-
-	return r;
-}
-#endif // ENABLE_GF2_MULTIPLAYER
-
 /**
- * Hook to dump which Stream files are loaded
- * (Doesn't actually do that though)
+ * Hook on StreamManager::Load (by name). Logs stream requests and gives the
+ * ModManager its window to apply stream patches: replacements are registered
+ * before the first load resolves, additions are queued once the first game
+ * load has been issued (mirrors GFStreamAdditionHandler timing).
  */
 uint64_t StreamManager_Load_Old;
 typedef void* (__thiscall* StreamManager_Load)(void* pThis, const char*, float, uint32_t, void*, void*);
@@ -314,8 +168,30 @@ void* __fastcall HOOK_StreamManager_Load(void* pThis, void* ecx, const char* a1,
 {
 	tConsole::fPrintf("StreamManager::Load [%s]", a1);
 
+	EARS::Framework::StreamManager* StreamMgr = reinterpret_cast<EARS::Framework::StreamManager*>(pThis);
+	SH::ModManager::GetInstance().OnStreamManagerLoadBegin(StreamMgr);
+
 	StreamManager_Load funcCast = (StreamManager_Load)StreamManager_Load_Old;
 	auto value = funcCast(pThis, a1, a2, a3, a4, a5);
+
+	SH::ModManager::GetInstance().OnStreamManagerLoadEnd(StreamMgr);
+	return value;
+}
+
+uint64_t StreamManager_LoadHierarchy_Old;
+typedef void* (__thiscall* StreamManager_LoadHierarchy)(void* pThis, EARS::Framework::StreamFile*, float, const char*, uint32_t);
+void* __fastcall HOOK_StreamManager_LoadHierarchy(void* pThis, void* ecx, EARS::Framework::StreamFile* stream, float priority, const char* dlPrefix, uint32_t loadFlags)
+{
+	if (stream)
+	{
+		tConsole::fPrintf("StreamManager::LoadHierarchy [0x%X] - [%s]", stream->GetGUID(), stream->GetFileName());
+	}
+
+	EARS::Framework::StreamManager* Mgr = EARS::Framework::StreamManager::GetInstance();
+
+	StreamManager_LoadHierarchy funcCast = (StreamManager_LoadHierarchy)StreamManager_LoadHierarchy_Old;
+	auto value = funcCast(pThis, stream, priority, dlPrefix, loadFlags);
+
 	return value;
 }
 
@@ -696,6 +572,9 @@ void GF2Hook::Init_AttachHooks()
 
 	PLH::x86Detour detour170((char*)0x0403A50, (char*)&HOOK_StreamManager_Load, &StreamManager_Load_Old, dis);
 	detour170.hook();
+
+	PLH::x86Detour detour1720((char*)0x0403C40, (char*)&HOOK_StreamManager_LoadHierarchy, &StreamManager_LoadHierarchy_Old, dis);
+	detour1720.hook();
 
 	PLH::x86Detour detour171((char*)0x0448140, (char*)&HOOK_SimManager_LoadResource, &SimManager_LoadResource_Old, dis);
 	detour171.hook();

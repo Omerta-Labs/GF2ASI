@@ -8,6 +8,10 @@
 #include "Scripthook/SH_PlayerMasterSM/PlayerAnimViewSM.h"
 #include "Scripthook/SH_PlayerMasterSM/PlayerMasterSM_Modded.h"
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
+#include "Scripthook/SH_ModManager/ModManager.h"
+
+#include "Scripthook/SH_HashedNames/HashedNameRegistry.h"
+#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
 
 // SDK
 #include "SDK/EARS_Framework/Toolkits/StateMachine/SMBuilder.h"
@@ -23,6 +27,8 @@
 #include "SDK/EARS_Godfather/Modules/Debug/DemoPackageManager.h"
 #include "SDK/EARS_Godfather/Modules/Debug/DemoPackage.h"
 
+#include "SDK/rwfilesystem/include/rwfilesysmanager.h"
+
 // Pl2
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
@@ -35,13 +41,35 @@
 #define IMPLEMENT_VEHICLE_ENTRY_SM (DEBUG && 0)
 #define OVERRIDE_LAUNCH_CMD (DEBUG && 0)
 #define IMPLEMENT_SEND_MSG (DEBUG && 0)
+#define IMPLEMENT_HASH_REGISTRY 0
 
 // PURPOSE: Route all SendMsg(s) directly into ours
 uint64_t HOOK__SendMsg_Old;
 bool _cdecl HOOK_SendMsg(RWS::CMsg& InEventId, bool bSendToInactive)
 {
-	//tConsole::fPrintf("EventID: %u", InEventId.GetEventID());
-	return PLH::FnCast(HOOK__SendMsg_Old, &HOOK_SendMsg)(InEventId, bSendToInactive);
+	return RWS::SendMsg(InEventId, bSendToInactive);
+}
+
+// PURPOSE: Capture every name the engine hashes so hashes reverse-resolve to names.
+// HashString_SDBM (0x4DAFD0) is __cdecl(const char*) returning the hash in eax; it is
+// the sole source of names, since RegisterMsg receives only the (already discarded) hash.
+uint64_t HOOK_HashString_SDBM_Old;
+uint32_t _cdecl HOOK_HashString_SDBM(const char* pString)
+{
+	const uint32_t Hash = PLH::FnCast(HOOK_HashString_SDBM_Old, &HOOK_HashString_SDBM)(pString);
+	SH::HashedNameRegistry::GetInstance().Register(Hash, pString);
+	return Hash;
+}
+
+// PURPOSE: Tag which hashes are registered RWS messages (event ids). The name, if any,
+// was captured by the HashString_SDBM hook that ran immediately before this registration.
+// RegisterMsg (0x408260) is static __cdecl(CEventId&, uint id, const char* name); the name
+// arg is dropped in release, so only the id is reliable here.
+uint64_t HOOK_RegisterMsg_Old;
+void _cdecl HOOK_RegisterMsg(RWS::CEventId* pEventId, uint32_t EventId)
+{
+	SH::HashedNameRegistry::GetInstance().MarkAsMessage(EventId);
+	PLH::FnCast(HOOK_RegisterMsg_Old, &HOOK_RegisterMsg)(pEventId, EventId);
 }
 
 EARS::StateMachineSys::StateMachine* S_PlayerMasterSM_FactoryFn(unsigned int id, EARS::StateMachineSys::StateMachineParams* pSMParams)
@@ -156,6 +184,23 @@ void __fastcall HOOK_CheckpointManager_RemoveCheckpoint(EARS::Modules::Checkpoin
 
 	EARS::Modules::CheckpointManager& CheckpointMgr = *EARS::Modules::CheckpointManager::GetInstance();
 	CheckpointMgr.RemoveCheckpoint(*pCheckpoint);
+}
+
+// PURPOSE: A chance to implement mod sub-directory BEFORE looking through a BIGFILE(.VIV).
+uint64_t RWS_CEventHandler_RegisterStreamChunkHandlers_Old;
+void _cdecl HOOK_RWS_CEventHandler_RegisterStreamChunkHandlers()
+{
+	PLH::FnCast(RWS_CEventHandler_RegisterStreamChunkHandlers_Old, &HOOK_RWS_CEventHandler_RegisterStreamChunkHandlers)();
+
+	using namespace rw::core::filesys;
+	if (Manager* FileMgr = Manager::GetInstance())
+	{
+		FileMgr->AddSearchLocation("mods", Manager::SearchPathFlags::ADD_TO_HEAD);
+	}
+
+	// StreamManager does not exist yet at this point; discover mod packages now,
+	// stream patches are applied from the StreamManager::Load detour once it does.
+	SH::ModManager::GetInstance().ScanMods();
 }
 
 #if IMPLEMENT_DEMO_PACKAGE_POPUP
@@ -289,6 +334,14 @@ void Mod::ApplyHooks()
 	detour204.hook();
 #endif // IMPLEMENT_SEND_MSG
 
+#if IMPLEMENT_HASH_REGISTRY
+	PLH::x86Detour detour205((char*)0x04DAFD0, (char*)&HOOK_HashString_SDBM, &HOOK_HashString_SDBM_Old, dis);
+	detour205.hook();
+
+	PLH::x86Detour detour206((char*)0x0408260, (char*)&HOOK_RegisterMsg, &HOOK_RegisterMsg_Old, dis);
+	detour206.hook();
+#endif // IMPLEMENT_HASH_REGISTRY
+
 #if RUN_MASTER_SM_IN_ASI
 	PLH::x86Detour detour203((char*)0x07AAA00, (char*)&HOOK_PlayerMasterSM_BuildStateMachine, &HOOK_PlayerMasterSM_BuildStateMachine_Old, dis);
 	detour203.hook();
@@ -313,4 +366,7 @@ void Mod::ApplyHooks()
 
 	EARS::Apt::UIFrontend::CopyStates();
 #endif // IMPLEMENT_DEMO_PACKAGE_POPUP
+
+	PLH::x86Detour detour209((char*)0x04876E0, (char*)&HOOK_RWS_CEventHandler_RegisterStreamChunkHandlers, &RWS_CEventHandler_RegisterStreamChunkHandlers_Old, dis);
+	detour209.hook();
 }

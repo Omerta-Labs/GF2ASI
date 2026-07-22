@@ -47,7 +47,7 @@
 
 #define ENABLE_ENTITY_SPAWN_DEBUG 0
 
-#define SHOW_ATTRIBUTEPACKET_WINDOW 0
+#define SHOW_ATTRIBUTEPACKET_WINDOW 1
 
 #if DEBUG
 #define SHOW_DEMOGRAPHICS_TAB 0
@@ -1300,14 +1300,6 @@ void ImGuiManager::DrawTab_SimMgrSettings()
 			}
 
 		}
-
-		ImGui::BeginChild("simgroup_test");
-		SimMgr.ForEachPacket([&](const RWS::CAttributePacket& Pckt)
-			{
-				const EARS::Common::guid128_t ID = Pckt.GetInstanceID();
-				ImGui::Text("[%u] %u - %u - %u - %u", ID.a, ID.b, ID.c, ID.d, Pckt.GetStreamHandle());
-			});
-		ImGui::EndChild();
 
 		ImGui::EndTabItem();
 	}

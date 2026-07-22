@@ -43,6 +43,10 @@ namespace EARS
 
 		uint32_t HashMem_SDBM(const void* pVoidData, uint32_t dataLen);
 
+		// Case-insensitive SDBM hash of a null-terminated string (engine addr 0x4DAFD0).
+		// This is how RWS event ids are derived: id == HashString_SDBM(eventName).
+		uint32_t HashString_SDBM(const char* pString);
+
 		// TODO: Make inline
 		template<>
 		struct CompareFunc<uint32_t>

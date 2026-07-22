@@ -12,6 +12,61 @@ uint32_t EARS::Framework::StreamManager::Load(uint32_t StreamGuid, float Priorit
 	return MemUtils::CallClassMethod<uint32_t, EARS::Framework::StreamManager*, uint32_t, float, uint32_t>(0x404280, this, StreamGuid, Priority, LoadFlags);
 }
 
+uint32_t EARS::Framework::StreamManager::Load(const char* StreamName, float Priority, uint32_t LoadFlags, const EARS::Common::guid32_t* DLStreamGuid, const char* DLPrefix)
+{
+	return MemUtils::CallClassMethod<uint32_t, EARS::Framework::StreamManager*, const char*, float, uint32_t, const EARS::Common::guid32_t*, const char*>(0x403A50, this, StreamName, Priority, LoadFlags, DLStreamGuid, DLPrefix);
+}
+
+void EARS::Framework::StreamManager::AddDevice(const char* DevicePrefix)
+{
+	MemUtils::CallClassMethod<void, EARS::Framework::StreamManager*, const char*>(0x4066A0, this, DevicePrefix);
+}
+
+bool EARS::Framework::StreamManager::MarkStreamFileForReplacement(EARS::Common::guid32_t StreamGuid, const String& DLPrefix, uint32_t NameHash, uint32_t TOCRootHash, uint32_t Version)
+{
+	return MemUtils::CallStdMethod<bool, EARS::Framework::StreamManager*, uint32_t, const String*, uint32_t, uint32_t, uint32_t>(0x4064D0, this, StreamGuid.ToUint32(), &DLPrefix, NameHash, TOCRootHash, Version);
+}
+
+void EARS::Framework::StreamManager::ClearStreamFileForReplacement(EARS::Common::guid32_t StreamGuid, const String& DLPrefix, uint32_t NameHash, uint32_t TOCRootHash, uint32_t Version)
+{
+	MemUtils::CallStdMethod<void, EARS::Framework::StreamManager*, uint32_t, const String*, uint32_t, uint32_t, uint32_t>(0x406380, this, StreamGuid.ToUint32(), &DLPrefix, NameHash, TOCRootHash, Version);
+}
+
+uint32_t EARS::Framework::StreamManager::GetStreamHandle(const char* StreamFileName, bool bIsDownloaded) const
+{
+	return MemUtils::CallClassMethod<uint32_t, const EARS::Framework::StreamManager*, const char*, bool>(0x405900, this, StreamFileName, bIsDownloaded);
+}
+
+const EARS::Framework::StreamFile* EARS::Framework::StreamManager::Lookup(EARS::Common::guid32_t StreamGuid, const char* OptionalName) const
+{
+	return MemUtils::CallClassMethod<const EARS::Framework::StreamFile*, const EARS::Framework::StreamManager*, uint32_t, const char*>(0x405720, this, StreamGuid.ToUint32(), OptionalName);
+}
+
+const Array<EARS::Framework::StreamManager::ReplacementRecord>& EARS::Framework::StreamManager::GetReplacementRecords() const
+{
+	return m_ReplacementRecords;
+}
+
+uint32_t EARS::Framework::StreamManager::GetNumStreamTOCs() const
+{
+	return m_TOCArray.GetSize();
+}
+
+EARS::Framework::StreamTOC* EARS::Framework::StreamManager::GetStreamTOC(uint32_t Index) const
+{
+	if (Index >= GetNumStreamTOCs())
+	{
+		return nullptr;
+	}
+
+	return m_TOCArray[Index];
+}
+
+const Array<String>& EARS::Framework::StreamManager::GetDownloadedContentPrefixes() const
+{
+	return m_DownloadPrefixes;
+}
+
 uint32_t EARS::Framework::StreamManager::GetStreamHandle(uint32_t StreamGuid) const
 {
 	return MemUtils::CallClassMethod<uint32_t, const EARS::Framework::StreamManager*, uint32_t>(0x04059B0, this, StreamGuid);

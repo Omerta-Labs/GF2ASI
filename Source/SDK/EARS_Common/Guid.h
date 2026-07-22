@@ -19,7 +19,7 @@ namespace EARS
 
 			guid32_t();
 			explicit guid32_t(uint32_t Value);
-			explicit guid32_t(const guid32_t& Guid);
+			guid32_t(const guid32_t& Guid);
 			explicit guid32_t(const guid128_t& Guid);
 
 			void Clear();

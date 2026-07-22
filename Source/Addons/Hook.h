@@ -28,6 +28,18 @@ namespace MemUtils
 	Ret CallStdMethod(unsigned long address, Args... args) {
 		return (reinterpret_cast<Ret(_stdcall*)(Args...)>(address))(args...);
 	}
+
+	// Invokes a function that receives its single pointer argument in EAX and takes no
+	// stack arguments (IDA "__usercall f@<eax>(arg@<eax>)"; callee returns via bare retn).
+	// No standard MSVC calling convention passes the first argument in EAX, hence the thunk.
+	inline void CallEaxVoidMethod(unsigned long address, void* eaxArg) {
+		__asm
+		{
+			mov eax, eaxArg
+			mov edx, address
+			call edx
+		}
+	}
 }
 
 const std::uint32_t JUMP_OPCODE = 0xE9;
