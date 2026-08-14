@@ -95,6 +95,6 @@ uint32_t EARS::Common::guid128_t::operator[](const uint32_t index) const
 		case 1: return b;
 		case 2: return c;
 		case 3: return d;
-		default: assert(false);
+		default: assert(false); return 0;
 	}
 }
