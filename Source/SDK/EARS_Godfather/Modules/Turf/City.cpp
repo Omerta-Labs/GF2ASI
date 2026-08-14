@@ -52,8 +52,8 @@ void EARS::Modules::City::RequestTeleport() const
 		TestIt++;
 	}*/
 
-	// RWS::SendMsg
-	MemUtils::CallCdeclMethod<void, RWS::CEventId*, bool>(0x0402050, &m_TeleportMsg, false);
+	// Triggers teleport request
+	RWS::SendMsg(m_TeleportMsg, /*bSendToInactive*/false);
 }
 
 String* EARS::Modules::City::GetDisplayName()

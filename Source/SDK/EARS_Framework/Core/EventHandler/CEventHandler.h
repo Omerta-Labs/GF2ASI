@@ -4,6 +4,7 @@
 #include "SDK/EARS_Common/CommonTypes.h"
 #include "SDK/EARS_Common/DoubleInternalLinkedList.h"
 #include "SDK/EARS_Common/DoubleInternalLinkedList2.h"
+#include "SDK/EARS_Common/SingleInternalLinkedListLightweight.h"
 
 // CPP
 #include <cstdint>
@@ -28,9 +29,9 @@ namespace RWS
 			
 		}
 
-		TType* GetNext() const { return m_HashNext; }
+		TType* GetHashNext() const { return m_HashNext; }
 
-		void SetNext(TType* InNext) { m_HashNext = InNext; }
+		void SetHashNext(TType* InNext) { m_HashNext = InNext; }
 
 	private:
 
@@ -43,7 +44,19 @@ namespace RWS
 	{
 	public:
 
-		RWS::CEventHandler* m_EventHandler = nullptr;	// TODO: Actually a union with next unlinked message
+		// To handle m_NextPendingUnlink linked list
+		RWS::CLinkedMsg* GetNext() const { return m_NextPendingUnlink; }
+		void SetNext(RWS::CLinkedMsg* InNext) { m_NextPendingUnlink = InNext; }
+
+		// NB: Just a guess
+		bool HasValidEventHandler() const { return (m_bPendingUnlink == false); }
+
+		union
+		{
+			RWS::CEventHandler* m_EventHandler;
+			RWS::CLinkedMsg* m_NextPendingUnlink;
+		};
+
 		uint32_t m_MsgId = 0;
 		uint16_t m_Linked : 15;
 		uint16_t m_bPendingUnlink : 1;
@@ -61,22 +74,45 @@ namespace RWS
 	{
 	public:
 
+		void ProcessPendingUnlinks();
+
 		uint32_t GetMsgID() const { return m_MsgID; }
 
 		uint32_t GetKey() const { return GetMsgID(); }
 
 		RWS::CLinkedMsg::MsgList* GetMsgListFront() const { return m_MsgList.GetFront(); }
 
+		bool HasAnyListeners() const { return (m_MsgList.IsEmpty() == false); }
+
+		bool IsHandlingEvent() const { return m_bHandlingEvent == 1; }
+		void SetHandlingEvent(bool bValue) { m_bHandlingEvent = bValue; }
+
+		bool HasPendingUnlinks() const { return (m_PendingUnlinks.IsEmpty() == false); }
+
 	private:
 
 		EARS::Common::DoubleInternalLinkedList<RWS::CLinkedMsg::MsgList> m_MsgList;
-		char m_Padding[4];
-		uint32_t m_MsgID;
+		EARS::Common::SingleInternalLinkedListLightweight<RWS::CLinkedMsg> m_PendingUnlinks;
+		uint32_t m_MsgID = 0;
+		uint16_t m_NumRegistered = 0;
+		uint16_t m_bHandlingEvent : 1 = false;
+		uint16_t m_NumLinked : 15 = 0;
 	};
+
+	static_assert(sizeof(CRegisteredMsgs) == 24);
 
 	class CEventId
 	{
 	public:
+
+		CEventId() = default;
+
+		// Construct directly from an event id (i.e. an SDBM name hash). Lets callers
+		// address a message by id without needing the engine's registered CEventId object.
+		explicit CEventId(uint32_t InEventId)
+			: m_EventId(InEventId)
+		{
+		}
 
 		uint32_t GetMsgId() const { return m_EventId; }
 
@@ -127,6 +163,13 @@ namespace RWS
 		// Check whether this CMsg is of a specific type.
 		bool IsEvent(const RWS::CEventId& Event) const;
 
+		uint32_t GetEventID() const { return m_EventId; }
+
+		bool IsBroadcasting() const { return m_bBroadcast; }
+		void SetBroadcasting(bool bValue ) { m_bBroadcast = bValue; }
+
+		RWS::CRegisteredMsgs* GetRegisteredInfo() const;
+
 		// NB: CONSIDER THIS UNSAFE ALWAYS! reinterpret_cast is extremely unsafe, with very little type safety.
 		template<typename TDataType>
 		const TDataType* GetDataAs() const
@@ -141,13 +184,17 @@ namespace RWS
 		bool m_bBroadcast = false;
 	};
 
+	extern bool SendMsg(const RWS::CEventId& InEventId, bool bSendToInactive);
+	extern bool SendMsg(const RWS::CEventId& InEventId, void* InData, bool bSendToInactive);
+	extern bool SendMsg(RWS::CMsg& InMsg, bool bSendToInactive);
+
 	class CEventHandler
 	{
 	public:
 		CEventHandler();
 		virtual ~CEventHandler();
 
-		virtual void HandleEvents(const RWS::CMsg& MsgEvent) {}
+		virtual void HandleEvents(const RWS::CMsg& MsgEvent) { /* nothing by default */ }
 		virtual void DisableMessages();
 		virtual void EnableMessages();
 
@@ -164,6 +211,11 @@ namespace RWS
 		bool IsHeavyWeight() const;
 
 		bool IsSuperHeavyWeight() const;
+
+		// NB: In original game exe this implemented the logic.
+		// But instead I have moved it into CRegisteredMsgs
+		// The content of the function appears to be more suited abstracted in CRegisteredMsgs
+		static void ProcessPendingUnlinks(RWS::CRegisteredMsgs& RegisteredMsg) { RegisteredMsg.ProcessPendingUnlinks(); }
 
 	private:
 
@@ -211,12 +263,12 @@ public:
 
 	static RWS::CRegisteredMsgs* GetHashNext(const RWS::CRegisteredMsgs& Value)
 	{
-		return Value.GetNext();
+		return Value.GetHashNext();
 	}
 
 	static void SetHashNext(RWS::CRegisteredMsgs& Value, RWS::CRegisteredMsgs* Next)
 	{
-		Value.SetNext(Next);
+		Value.SetHashNext(Next);
 	}
 };
 
