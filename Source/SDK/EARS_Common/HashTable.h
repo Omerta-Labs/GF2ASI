@@ -190,7 +190,7 @@ namespace EARS
 				{
 					if (const THashTableType* CurHashTable = m_HashTable)
 					{
-						while (!m_Entry && m_NextBin < CurHashTable->GetNumBins())
+						while (!m_Entry && m_NextBin < TBinCount)
 						{
 							m_Entry = CurHashTable->m_BinArray[m_NextBin++];
 						}
