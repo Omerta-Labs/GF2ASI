@@ -20,6 +20,13 @@ namespace Mod
 	 *    captured desktop ramp when the slider returns to default.
 	 *
 	 * Controlled by [Fixes] ApplyBrightnessFix in gf2asi.ini (default on).
+	 *
+	 * Separately, [Fixes] GammaContrast sets the first slot of the curve the
+	 * game passes to Displ_SetGamma - the exponent the ramp is raised to.
+	 * Range is [0.8, 1.2]; the PC build runs at 0.8, the console versions at
+	 * 1.0. The in-game video calibration screen that would otherwise drive it
+	 * is dead on PC, so this always replaces whatever the game asks for, with
+	 * the brightness fix on or off.
 	 */
 	class GammaFix
 	{

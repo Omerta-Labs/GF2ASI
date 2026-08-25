@@ -3,6 +3,7 @@
 #include "Utils/Singleton.h"
 
 // C++
+#include <cstdint>
 #include <string>
 #include <windows.h>
 
@@ -40,6 +41,22 @@ struct EdgeAATuning
 	bool bDeferredMode = false;
 };
 
+/**
+ * Tuning for the mobface head shot capture (see SH_MugShotFix). The member
+ * initialisers are the defaults; the [MugShot] section of gf2asi.ini
+ * overrides them.
+ */
+struct MugShotTuning
+{
+	// Raise the head shot render target above its stock 128x128.
+	bool bEnable = true;
+
+	// Square size of the head shot texture, in pixels. Clamped to [128, 4096],
+	// where 128 is the stock size. The texture is A8R8G8B8 with one mip, so it
+	// costs size * size * 4 bytes - 1 MB at 512, 4 MB at 1024.
+	uint32_t Resolution = 512;
+};
+
 class Settings : public SH::Singleton<Settings>
 {
 public:
@@ -55,7 +72,10 @@ public:
 	bool WantsPreOrderBonus() const { return bWantsPreOrderBonus; }
 	bool ApplyCPUFix() const { return bApplyCPUFix; }
 	bool ApplyBrightnessFix() const { return bApplyBrightnessFix; }
+	bool ApplyVSyncFix() const { return bApplyVSyncFix; }
+	float GetGammaContrast() const { return GammaContrast; }
 	const EdgeAATuning& GetEdgeAATuning() const { return EdgeAA; }
+	const MugShotTuning& GetMugShotTuning() const { return MugShot; }
 
 	/**
 	 * Persist the current photo mode camera settings to the config file.
@@ -85,6 +105,21 @@ private:
 	// Default off until it has been tested enough for release.
 	bool bApplyBrightnessFix = false;
 
+	// Whether the VSync option should present every refresh instead of every
+	// second one. Stock, enabling VSync locks the game to 30 FPS whatever
+	// resolution and refresh rate are selected. See SH_VSyncFix.
+	bool bApplyVSyncFix = true;
+
+	// Value for the first slot of the gamma triple the game hands to
+	// Displ_SetGamma - the exponent the ramp is raised to. Valid range is
+	// [0.8, 1.2]; the PC build runs at 0.8, the console versions default to
+	// 1.0. Higher is darker and punchier, lower is brighter and flatter.
+	// See SH_GammaFix.
+	float GammaContrast = 0.8f;
+
 	// Tuning for the forced EdgeAA post-process, see SH_EdgeAA
 	EdgeAATuning EdgeAA;
+
+	// Tuning for the mobface head shot capture, see SH_MugShotFix
+	MugShotTuning MugShot;
 };

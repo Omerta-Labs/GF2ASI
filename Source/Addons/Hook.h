@@ -9,11 +9,37 @@
 
 #include <stdbool.h>
 #include <Windows.h>
-#include <stdlib.h> 
+#include <stdlib.h>
+#include <string.h>
 #include <psapi.h>
 
 namespace MemUtils
 {
+	// Overwrites a value inside the executable image, lifting the page
+	// protection for the duration. For the fixes that have to change a single
+	// instruction operand rather than detour a whole function - usually because
+	// the function takes arguments in registers no MSVC calling convention can
+	// express.
+	template <typename T>
+	bool WriteMemory(uintptr_t address, const T& value)
+	{
+		void* const Target = reinterpret_cast<void*>(address);
+
+		DWORD OldProtect = 0;
+		if (!VirtualProtect(Target, sizeof(T), PAGE_EXECUTE_READWRITE, &OldProtect))
+		{
+			return false;
+		}
+
+		memcpy(Target, &value, sizeof(T));
+
+		DWORD UnusedProtect = 0;
+		VirtualProtect(Target, sizeof(T), OldProtect, &UnusedProtect);
+		FlushInstructionCache(GetCurrentProcess(), Target, sizeof(T));
+
+		return true;
+	}
+
 	template <typename Ret, typename C, typename... Args>
 	Ret CallClassMethod(unsigned long address, C _this, Args... args) {
 		return (reinterpret_cast<Ret(__thiscall*)(C, Args...)>(address))(_this, args...);

@@ -23,9 +23,12 @@ namespace
 	hook::Type<IDirect3DDevice9*> Dx9Device = hook::Type<IDirect3DDevice9*>(0x1205750);
 	hook::Type<D3DPRESENT_PARAMETERS> Dx9PresentParams = hook::Type<D3DPRESENT_PARAMETERS>(0x11D9188);
 
-	// Last curve requested through Displ_SetGamma: gamma, contrast, brightness.
-	// The game only ever varies gamma (clamped to [0.8, 1.2] by GameData); it
-	// always passes contrast = 1 and brightness = 0.
+	// Last curve requested through Displ_SetGamma, which builds the ramp as
+	//   ramp[i] = saturate(pow(i / 255, p[0]) * p[1] + (1 - p[1]) * 0.5 + p[2])
+	// p[0] is the video calibration curve (settings.txt Window.Gamma, clamped
+	// to [0.8, 1.2] by the options code and left at 0.8 when the key is
+	// missing), p[1] is contrast and is always 1, and p[2] is the brightness
+	// slider (Window.Bright / 22, 0 by default).
 	float LastGammaParams[3] = { 1.0f, 1.0f, 0.0f };
 
 	// Desktop gamma ramp captured before the game touches the hardware ramp,
@@ -187,15 +190,25 @@ namespace
 
 void __cdecl HOOK_Displ_SetGamma(float* xGamContBrite)
 {
+	// Work on a copy so the override reaches both the stock path below and the
+	// windowed post-process, and so the game's own array is left untouched.
+	float Params[3] = { xGamContBrite[0], xGamContBrite[1], xGamContBrite[2] };
+
+	// [Fixes] GammaContrast replaces the curve the game asks for. Nothing
+	// reachable in the PC menus changes it (the video calibration screen is
+	// dead), so it is always applied, and independent of the brightness fix so
+	// it still works with that off.
+	Params[0] = Settings::GetCheckedRef().GetGammaContrast();
+
 	if (!Settings::GetCheckedRef().ApplyBrightnessFix())
 	{
-		PLH::FnCast(Displ_SetGamma_Old, &HOOK_Displ_SetGamma)(xGamContBrite);
+		PLH::FnCast(Displ_SetGamma_Old, &HOOK_Displ_SetGamma)(Params);
 		return;
 	}
 
-	LastGammaParams[0] = xGamContBrite[0];
-	LastGammaParams[1] = xGamContBrite[1];
-	LastGammaParams[2] = xGamContBrite[2];
+	LastGammaParams[0] = Params[0];
+	LastGammaParams[1] = Params[1];
+	LastGammaParams[2] = Params[2];
 
 	// Option 1: in windowed mode SetGammaRamp is a silent no-op, so skip it and
 	// let OnEndScene apply the same curve as a post-process instead.

@@ -6,6 +6,7 @@
 #include "SDK/EARS_Godfather/Modules/Debug/MarketingDebug.h"
 
 // C++
+#include <algorithm>
 #include <cmath>
 #include <cwchar>
 #include <filesystem>
@@ -73,6 +74,11 @@ void Settings::Init()
 		bWantsPreOrderBonus = GetPrivateProfileIntW(L"Mods", L"UnlockPreOrderCrew", true, WidePath.data());
 		bApplyCPUFix = GetPrivateProfileIntW(L"Fixes", L"ApplyCpuFix", true, WidePath.data());
 		bApplyBrightnessFix = GetPrivateProfileIntW(L"Fixes", L"ApplyBrightnessFix", true, WidePath.data());
+		bApplyVSyncFix = GetPrivateProfileIntW(L"Fixes", L"ApplyVSyncFix", bApplyVSyncFix, WidePath.data()) != 0;
+
+		// Held to the same range the game's own options code clamps to
+		GammaContrast = GetPrivateProfileFloatW(L"Fixes", L"GammaContrast", GammaContrast, WidePath.data());
+		GammaContrast = std::clamp(GammaContrast, 0.8f, 1.2f);
 
 		// Photo mode camera tuning. The struct's member initialisers are the defaults, so a
 		// missing key leaves that value at its factory setting. Angular values are radians.
@@ -96,13 +102,22 @@ void Settings::Init()
 		EdgeAA.DepthWeight = GetPrivateProfileFloatW(L"EdgeAA", L"DepthWeight", EdgeAA.DepthWeight, WidePath.data());
 		EdgeAA.bDeferredMode = GetPrivateProfileIntW(L"EdgeAA", L"DeferredMode", EdgeAA.bDeferredMode, WidePath.data()) != 0;
 
+		// Mobface head shot capture size, patched in by SH_MugShotFix. The
+		// range check lives with the patch, so an out of range value still gets
+		// reported once rather than silently corrected here.
+		MugShot.bEnable = GetPrivateProfileIntW(L"MugShot", L"Enable", MugShot.bEnable, WidePath.data()) != 0;
+		MugShot.Resolution = GetPrivateProfileIntW(L"MugShot", L"Resolution", MugShot.Resolution, WidePath.data());
+
 		tConsole::fPrintf("Fly Mode Up Input: 0x%X", FlyModeUpInput);
 		tConsole::fPrintf("Fly Mode Down Input: 0x%X", FlyModeDownInput);
 		tConsole::fPrintf("Wants Pre-Order: %u", bWantsPreOrderBonus);
 		tConsole::fPrintf("Wants CPU fix: %u", bApplyCPUFix);
 		tConsole::fPrintf("Wants Brightness fix: %u", bApplyBrightnessFix);
+		tConsole::fPrintf("Wants VSync fix: %u", bApplyVSyncFix);
+		tConsole::fPrintf("Gamma contrast: %.2f", GammaContrast);
 		tConsole::fPrintf("EdgeAA enhance: %u (BlurWidth=%.2f, SampleLength=%.2f, Barrier=%.2f, DepthWeight=%g, Deferred=%u)",
 			EdgeAA.bEnable, EdgeAA.BlurWidth, EdgeAA.SampleLength, EdgeAA.Barrier, EdgeAA.DepthWeight, EdgeAA.bDeferredMode);
+		tConsole::fPrintf("MugShot head shot: %u (Resolution=%u)", MugShot.bEnable, MugShot.Resolution);
 		tConsole::fPrintf("PhotoMode Camera: MoveSpeed=%.2f, Boost=x%.2f, RotateSpeed=%.2f rad/s, StickSmooth=%u (RampUp=%.2fs, Decay=%.2fs), MouseSens=x%.2f, MouseSmooth=%u (%.2fs)",
 			CurrentSettings.m_MoveSpeed, CurrentSettings.m_MoveSpeedModifier, CurrentSettings.m_RotateSpeed,
 			CurrentSettings.m_bGamepadRotationSmoothing, CurrentSettings.m_RotationSmoothRampUp, CurrentSettings.m_RotationSmoothDecay,

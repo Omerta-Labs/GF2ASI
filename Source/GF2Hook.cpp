@@ -17,6 +17,8 @@
 #include "Scripthook/SH_PlayerMasterSM/PlayerDebugOptions_Modded.h"
 #include "Scripthook/SH_GammaFix/GammaFix.h"
 #include "Scripthook/SH_EdgeAA/EdgeAA.h"
+#include "Scripthook/SH_VSyncFix/VSyncFix.h"
+#include "Scripthook/SH_MugShotFix/MugShotFix.h"
 #include "Scripthook/SH_ModManager/ModManager.h"
 #include "Scripthook/HookMods.h"
 
@@ -626,6 +628,15 @@ void GF2Hook::Init_AttachHooks()
 	EARS::Modules::ScoreKeeper::StaticApplyHooks();
 	Mod::GammaFix::StaticApplyHooks();
 	Mod::EdgeAA::StaticApplyHooks();
+
+	// Only rewrites two instruction operands, but it has to land before the
+	// mobface resource loads - that is the one point the head shot texture is
+	// allocated
+	Mod::MugShotFix::StaticApplyHooks();
+
+	// Has to land before LLRender_Init creates the device, so the first
+	// CreateDevice already gets a full rate present interval
+	Mod::VSyncFix::StaticApplyHooks();
 }
 
 void GF2Hook::Init_GameSystems()
