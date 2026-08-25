@@ -31,6 +31,30 @@ namespace RWS
 			uint32_t m_Flags = 0;
 		};
 
+		/**
+		 * Partial.
+		 *
+		 * The X360 debug build lays this out as
+		 *   { const char* m_pName; uint32_t m_typeID; const char* m_pTypeName; void* m_pData; guid128_t* m_pGUID }
+		 * but the PC build reads the resource pointer at +0x08 rather than +0x0C, so PC is
+		 * short one of the leading fields. Only m_pData is confirmed here (via
+		 * EARS::Modules::ControllerDataManager::UnloadResource); the surrounding fields and
+		 * the overall size are left opaque deliberately. It is only ever passed by
+		 * reference, so the unverified tail size does not matter.
+		 */
+		class CResourceUnloadInfo
+		{
+		public:
+
+			void* GetResourceData() const { return m_pData; }
+
+		private:
+
+			char m_Padding_UnloadInfo[0x8];		// 0x00
+			void* m_pData = nullptr;			// 0x08
+			char m_Padding_UnloadInfo1[0x8];	// 0x0C
+		};
+
 		virtual ~CResourceHandler() { /* implemented by game code */ }
 
 	private:

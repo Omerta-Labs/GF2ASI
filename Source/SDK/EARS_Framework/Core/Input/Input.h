@@ -3,6 +3,7 @@
 // SDK
 #include "SDK/EARS_Common/Singleton.h"
 #include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/rwcontroller/rwcontroller.h"
 
 namespace EARS
 {
@@ -74,6 +75,19 @@ namespace EARS
 
 		/**
 		 * Core Manager for dealing with the Input Device states
+		 *
+		 * Sits on top of rw::core::controller: every frame it walks the rw Manager's
+		 * devices, folds each rw DeviceState down into one of the Controller_Info entries
+		 * below, and (on PC) merges several physical devices onto a single virtual pad.
+		 *
+		 * That fold is lossy. A keyboard has hundreds of keys and only sixteen of them can
+		 * survive into Controller_Info::m_DigitalButtons, so anything wanting a free choice
+		 * of key has to read the rw DeviceState directly - see GetKeyboardDeviceState and
+		 * IsKeyDown below.
+		 *
+		 * The per-frame update lives at 0x0040FD70. It is not bound here: the retail build
+		 * passes its this pointer in eax rather than ecx, so it cannot be called from C++
+		 * without inline assembly. Hook it by address if you need to run either side of it.
 		 */
 		class InputDeviceManager : RWS::CEventHandler, Singleton<EARS::Framework::InputDeviceManager>
 		{
@@ -103,8 +117,32 @@ namespace EARS
 			uint8_t GetKeyboardDeviceSlot() const { return m_KeyboardDeviceSlot; }
 			uint8_t GetActiveDeviceSlot() const { return m_ActiveDeviceSlot; }
 
+			/* Bitmask of currently held mouse buttons (PC only) */
+			uint32_t GetMouseButtons() const { return m_MouseButtons; }
+
 			/* Sentinel stored in the device slot bytes when no device is assigned */
 			static constexpr uint8_t INVALID_DEVICE_SLOT = 0x12;
+
+			/**
+			 * Raw RenderWare state for the attached keyboard, or null when there isn't one.
+			 *
+			 * This is the unfiltered device - every key, not just the ones mapped onto the
+			 * virtual pad. Button indices are DIK_* scancodes.
+			 *
+			 * Resolved through rw::core::controller::Manager rather than through the device
+			 * slot bytes above, because those index this class's own m_InputDevices array
+			 * (which holds EARS wrapper objects, not rw DeviceStates).
+			 */
+			static const rw::core::controller::DeviceState* GetKeyboardDeviceState();
+
+			/* Raw RenderWare state for the attached mouse, or null. Buttons and axes only -
+			 * the accumulated per-frame deltas the game actually uses are the m_Mouse*
+			 * fields on this class, fed in by the mouse device wrapper. */
+			static const rw::core::controller::DeviceState* GetMouseDeviceState();
+
+			/* Is this key down right now? DIKScanCode is a DirectInput DIK_* scancode, e.g.
+			 * DIK_F2 == 0x3C. False when no keyboard is attached. */
+			static bool IsKeyDown(uint32_t DIKScanCode);
 
 			/** Fetch the singleton of the InputDeviceManager */
 			static InputDeviceManager* GetInstance();
@@ -114,7 +152,8 @@ namespace EARS
 			char m_Padding_InputDevice[0x1C];
 			Controller_Info m_Controllers[16];		// 0x2C
 			char m_Padding_InputDevice1[0x80];		// 0x46C
-			void* m_InputDevices[16];				// 0x4EC - per-slot device objects (XInput/keyboard/mouse)
+			void* m_InputDevices[16];				// 0x4EC - per-slot EARS wrapper objects around the rw devices
+													//         (pad/wheel, mouse 0x130 bytes, keyboard 0x1C0 bytes)
 			bool m_bMergeDevices;					// 0x52C - when set, source slots are merged into the target slot each frame
 			bool m_MergeSourceSlots[16];			// 0x52D
 			uint8_t m_MergeTargetSlot;				// 0x53D

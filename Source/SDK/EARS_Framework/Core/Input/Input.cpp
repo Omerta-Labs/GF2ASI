@@ -25,6 +25,34 @@ namespace EARS
 			return nullptr;
 		}
 
+		const rw::core::controller::DeviceState* InputDeviceManager::GetKeyboardDeviceState()
+		{
+			const rw::core::controller::Manager* pManager = rw::core::controller::Manager::GetInstance();
+			if (pManager == nullptr)
+			{
+				return nullptr;
+			}
+
+			return pManager->FindFirstDeviceStateOfType(rw::core::controller::DeviceInfo::KEYBOARD);
+		}
+
+		const rw::core::controller::DeviceState* InputDeviceManager::GetMouseDeviceState()
+		{
+			const rw::core::controller::Manager* pManager = rw::core::controller::Manager::GetInstance();
+			if (pManager == nullptr)
+			{
+				return nullptr;
+			}
+
+			return pManager->FindFirstDeviceStateOfType(rw::core::controller::DeviceInfo::MOUSE);
+		}
+
+		bool InputDeviceManager::IsKeyDown(uint32_t DIKScanCode)
+		{
+			const rw::core::controller::DeviceState* Keyboard = GetKeyboardDeviceState();
+			return (Keyboard != nullptr) && Keyboard->GetButtonPressed(DIKScanCode);
+		}
+
 		InputDeviceManager* InputDeviceManager::GetInstance()
 		{
 			return *(InputDeviceManager**)0x12233B4;
