@@ -9,7 +9,7 @@
 
 /**
  * Tuning for the forced EdgeAA post-process (see SH_EdgeAA). The member
- * initialisers are the defaults; the [EdgeAA] section of gf2asi.ini
+ * initialisers are the defaults; the [EdgeAA] section of gf2asi_settings.ini
  * overrides them.
  */
 struct EdgeAATuning
@@ -43,7 +43,7 @@ struct EdgeAATuning
 
 /**
  * Tuning for the mobface head shot capture (see SH_MugShotFix). The member
- * initialisers are the defaults; the [MugShot] section of gf2asi.ini
+ * initialisers are the defaults; the [MugShot] section of gf2asi_settings.ini
  * overrides them.
  */
 struct MugShotTuning
@@ -63,9 +63,12 @@ public:
 
 	void Init();
 
-	// Resolved path to gf2asi.ini, so other systems (e.g. KeybindManager) can
-	// load and persist their own sections against the same file.
-	const std::wstring& GetConfigFilePath() const { return ConfigFilePath; }
+	// Resolved path to gf2asi_settings.ini, holding everything that is not a key binding.
+	const std::wstring& GetSettingsFilePath() const { return SettingsFilePath; }
+
+	// Resolved path to gf2asi_keybinds.ini, so KeybindManager can load and persist the
+	// [Keybinds] section against the same file this class reads flyup/flydown from.
+	const std::wstring& GetKeybindsFilePath() const { return KeybindsFilePath; }
 
 	int GetFlyModeUpInput() const;
 	int GetFlyModeDownInput() const;
@@ -78,20 +81,30 @@ public:
 	const MugShotTuning& GetMugShotTuning() const { return MugShot; }
 
 	/**
-	 * Persist the current photo mode camera settings to the config file.
+	 * Persist the current photo mode camera settings to gf2asi_settings.ini.
 	 * Creates the file (and section) if it doesn't exist yet.
 	 */
 	void SaveCameraSettings() const;
 
 private:
 
-	// Resolved path to the config file, cached by Init() so saves target the same file
-	std::wstring ConfigFilePath;
+	/**
+	 * Seed the split config files from a pre-split gf2asi.ini, so an existing install
+	 * keeps its settings and key bindings across the rename. Only fills in files that
+	 * are not there yet, and leaves the legacy file on disk untouched.
+	 */
+	void MigrateLegacyConfigFile() const;
 
-	// Virtual Key to get up in fly mode
+	// Resolved paths to the two config files, cached by Init() so saves target the
+	// same files the load read from
+	std::wstring SettingsFilePath;
+	std::wstring KeybindsFilePath;
+
+	// Virtual Key to get up in fly mode, read from [Keybinds] flyup in the keybinds file.
+	// Held rather than pressed, which is why it is not a KeybindManager ShortcutAction.
 	int FlyModeUpInput = VK_PRIOR;
 
-	// Virtual Key to get down in fly mode
+	// Virtual Key to get down in fly mode, read from [Keybinds] flydown alongside the above
 	int FlyModeDownInput = VK_NEXT;
 
 	// Whether or not the Player wants Pre-order bonus unlocked
