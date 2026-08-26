@@ -11,6 +11,8 @@
 
 // Godfather
 #include "SDK/EARS_Framework/Core/Camera/CameraManager.h"
+#include "SDK/EARS_Framework/Core/Graphics/MaterialHash.h"
+#include "SDK/EARS_Framework/Core/Graphics/MaterialManager.h"
 #include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
 #include "SDK/EARS_Framework/Core/StreamManager/StreamManager.h"
 #include "SDK/EARS_Framework/MainLoop/Logic.h"
@@ -293,7 +295,18 @@ void ImGuiManager::RegisterShortcutActions()
 		[this]() { return bShowModMenuWindow; } });
 
 	Keybinds.RegisterAction({ "menu.interactive", "Toggle Cursor Interaction", "Menu", VK_F2,
-		[this]() { bImGuiInteractive = !bImGuiInteractive; },
+		[this]()
+		{
+			// Photo mode composes its shot through this menu and drives the camera from
+			// the same mouse, so handing input back to the game mid-shot fights it for
+			// both the pointer and the player's control state. Ignore the shortcut.
+			if (PhotoModeSystem.IsActive())
+			{
+				return;
+			}
+
+			bImGuiInteractive = !bImGuiInteractive;
+		},
 		[this]() { return bImGuiInteractive; } });
 
 	Keybinds.RegisterAction({ "player.godmode", "Toggle God Mode", "Player", VK_F5,
@@ -338,7 +351,7 @@ void ImGuiManager::RegisterShortcutActions()
 		[this]() { PhotoModeSystem.Toggle(); },
 		[this]() { return PhotoModeSystem.IsActive(); } });
 
-	Keybinds.LoadBindings(Settings::GetCheckedRef().GetConfigFilePath());
+	Keybinds.LoadBindings(Settings::GetCheckedRef().GetKeybindsFilePath());
 }
 
 void ImGuiManager::SetPlayerGodMode(EARS::Modules::Player& InPlayer) const
@@ -450,6 +463,26 @@ bool ImGuiManager::HasCursorControl() const
 	return bTakeoverCursor;
 }
 
+void ImGuiManager::NotifySuppressedCursorPos(const int InX, const int InY)
+{
+	SuppressedCursorPosX = InX;
+	SuppressedCursorPosY = InY;
+	bHasSuppressedCursorPos = true;
+}
+
+void ImGuiManager::RestoreGameCursorPos()
+{
+	if (!bHasSuppressedCursorPos)
+	{
+		return;
+	}
+
+	// Safe to go straight at the API: the detour only swallows the call while
+	// bTakeoverCursor is set, and this runs after it has been cleared.
+	::SetCursorPos(SuppressedCursorPosX, SuppressedCursorPosY);
+	bHasSuppressedCursorPos = false;
+}
+
 void ImGuiManager::OpenLevelServices()
 {
 	// apply more events
@@ -467,6 +500,11 @@ void ImGuiManager::CloseLevelServices()
 	// reset any existing state applied to player / ui
 	bPlayerGodModeActive = false;
 	bPlayerVehicleGodModeActive = false;
+
+	// The player this was applied to is going away. Drop the takeover so the next tick
+	// with the menu still open re-applies it against the incoming player, rather than
+	// the state compare in OnTick seeing no change and skipping it.
+	bTakeoverCursor = false;
 
 	// reset things used by mod menu
 	TargetFamily = nullptr;
@@ -1263,7 +1301,7 @@ void ImGuiManager::DrawTab_SimMgrSettings()
 {
 	if (ImGui::BeginTabItem("Sim Manager"))
 	{
-		EARS::Framework::SimManager& SimMgr = *EARS::Framework::SimManager::GetInstance();
+		/*EARS::Framework::SimManager& SimMgr = *EARS::Framework::SimManager::GetInstance();
 		EARS::Framework::StreamManager& StreamMgr = *EARS::Framework::StreamManager::GetInstance();
 
 		static RWS::CAttributePacket* FoundPacket = nullptr;
@@ -1299,7 +1337,92 @@ void ImGuiManager::DrawTab_SimMgrSettings()
 				EntityIt++;
 			}
 
-		}
+		}*/
+
+#if DEBUG
+		ImGui::BeginChild("MaterialList");
+
+		static ImGuiTextFilter MaterialSearchFilter;
+		MaterialSearchFilter.Draw();
+
+		const uint32_t GeneratedHash = MemUtils::CallCdeclMethod<uint32_t, const char*>(0x60D740, MaterialSearchFilter.InputBuf);
+
+		const static const char* PassNames[5] = 
+		{
+			"MAT_PASS_SHADOW",
+			"MAT_PASS_DEPTH",
+			"MAT_PASS_COLOUR",
+			"MAT_PASS_DEPTH_LOW",
+			"MAT_PASS_COLOUR_LOW"
+		};
+
+		MaterialManager::ForEachMaterial([&](Material& CurrentMat)
+			{
+				if (GeneratedHash != 0 && GeneratedHash == CurrentMat.m_NameHash)
+				{
+					ImGui::Value("Hash", CurrentMat.m_NameHash);
+
+					ImGui::PushID(&CurrentMat);
+					for (uint32_t PassID = 0; PassID < 5; PassID++)
+					{
+						ImGui::SeparatorText(PassNames[PassID]);
+						ImGui::PushID(PassID);
+
+						const uint32_t StartIndex = CurrentMat.m_PassStart[PassID];
+						const uint32_t EndIndex = CurrentMat.m_PassEnd[PassID];
+						for (uint32_t ParamIdx = StartIndex; ParamIdx < EndIndex; ParamIdx++)
+						{
+							MatParam& CurrentParam = CurrentMat.m_ParamData[ParamIdx];
+							ImGui::Text("Name: 0x%X", CurrentParam.m_ParamNameHash);
+
+							ImGui::PushID(&CurrentParam);
+							switch (CurrentParam.m_ParamType)
+							{
+								case MAT_PARAM_FLOAT1:
+								{
+									ImGui::InputScalarN("##value", ImGuiDataType_Float, &CurrentParam.m_ParamValue.value, 1);
+									break;
+								}
+								case MAT_PARAM_FLOAT2:
+								{
+									ImGui::InputScalarN("##value", ImGuiDataType_Float, CurrentParam.m_ParamValue.pValues, 2);
+									break;
+								}
+								case MAT_PARAM_FLOAT3:
+								{
+									ImGui::InputScalarN("##value", ImGuiDataType_Float, CurrentParam.m_ParamValue.pValues, 3);
+									break;
+								}
+								case MAT_PARAM_FLOAT4:
+								{
+									ImGui::InputScalarN("##value", ImGuiDataType_Float, CurrentParam.m_ParamValue.pValues, 4);
+									break;
+								}
+								case MAT_PARAM_TEX:
+								{
+									ImGui::Value("Texture Unfound", CurrentParam.m_ParamValue.textureRef);
+									break;
+								}
+								case MAT_PARAM_TEX_FOUND:
+								{
+									ImGui::InputScalarN("##value", ImGuiDataType_S32, &CurrentParam.m_ParamValue.textureRef, 1);
+									break;
+								}
+							}
+							ImGui::PopID();
+						}
+						ImGui::PopID();
+					}
+					ImGui::PopID();
+
+				}
+				else if(GeneratedHash == 0)
+				{
+					ImGui::Value("Hash", CurrentMat.m_NameHash);
+				}
+			});
+		ImGui::EndChild();
+#endif // DEBUG
 
 		ImGui::EndTabItem();
 	}
@@ -1315,7 +1438,7 @@ void ImGuiManager::DrawTab_Keybinds()
 	SH::KeybindManager& Keybinds = SH::KeybindManager::GetCheckedRef();
 
 	ImGui::TextWrapped("Bind keyboard shortcuts to menu actions. Click Rebind then press a key; "
-		"values are stored as Windows virtual-key codes in gf2asi.ini.");
+		"values are stored as Windows virtual-key codes in gf2asi_keybinds.ini.");
 
 	if (Keybinds.IsRebinding())
 	{
@@ -1463,14 +1586,24 @@ void ImGuiManager::OnTick()
 	SH::KeybindManager::GetCheckedRef().PollAndDispatch();
 
 	// Update cursor visibility
-	// Should only really be present when any ImGui windows are open - 
+	// Should only really be present when any ImGui windows are open -
 	// The ingame cursor (for menus) is expected to be powered by Apt.
-	const bool bCursorVisibilityThisFrame = bShowModMenuWindow;
+	// Interaction is a separate toggle from visibility: with it off the menu stays
+	// on screen but the game keeps the mouse and keyboard.
+	// Each transition sends exactly one control event. Player::DisablePlayerControl and
+	// EnablePlayerControl are refcounted on the game side (m_PlayerDisableCount), so the
+	// pairing is what matters - never re-send on a frame where the state has not moved.
+	const bool bCursorVisibilityThisFrame = bShowModMenuWindow && bImGuiInteractive;
 	if (bCursorVisibilityThisFrame != bTakeoverCursor)
 	{
 		bTakeoverCursor = bCursorVisibilityThisFrame;
 
 		EARS::Framework::CameraManager* CameraMgr = EARS::Framework::CameraManager::GetInstance();
+
+		// Null at the front end and across level loads. The control events are
+		// broadcast either way so the state stays consistent for whoever spawns
+		// next; only the per-player flag needs a live player.
+		EARS::Modules::Player* LclPlayer = EARS::Modules::Player::GetLocalPlayer();
 
 		if (bTakeoverCursor)
 		{
@@ -1478,8 +1611,10 @@ void ImGuiManager::OnTick()
 			hook::Type<RWS::CEventId> PlayerDisableControlsEventId = hook::Type<RWS::CEventId>(0x112B56C);
 			MemUtils::CallCdeclMethod<void, RWS::CEventId&, bool>(0x0408A00, PlayerDisableControlsEventId, false);
 
-			EARS::Modules::Player* LclPlayer = EARS::Modules::Player::GetLocalPlayer();
-			LclPlayer->SetPlayerFlag(EARS::Modules::PlayerFlag::WEAPON_WHEEL_SHOWING);
+			if (LclPlayer)
+			{
+				LclPlayer->SetPlayerFlag(EARS::Modules::PlayerFlag::WEAPON_WHEEL_SHOWING);
+			}
 			//CameraMgr->DisableUpdate();
 		}
 		else
@@ -1488,8 +1623,15 @@ void ImGuiManager::OnTick()
 			hook::Type<RWS::CEventId> PlayerEnableControlsEventId = hook::Type<RWS::CEventId>(0x112B39C);
 			MemUtils::CallCdeclMethod<void, RWS::CEventId&, bool>(0x0408A00, PlayerEnableControlsEventId, false);
 
-			EARS::Modules::Player* LclPlayer = EARS::Modules::Player::GetLocalPlayer();
-			LclPlayer->ClearPlayerFlag(EARS::Modules::PlayerFlag::WEAPON_WHEEL_SHOWING);
+			if (LclPlayer)
+			{
+				LclPlayer->ClearPlayerFlag(EARS::Modules::PlayerFlag::WEAPON_WHEEL_SHOWING);
+			}
+
+			// The game measures mouse movement as an offset from where it last parked
+			// the pointer. Put it back before handing input over, or the first frame of
+			// player camera input is a full-screen jump.
+			RestoreGameCursorPos();
 
 			//CameraMgr->EnableUpdate();
 		}
@@ -1500,7 +1642,19 @@ void ImGuiManager::OnTick()
 	std::lock_guard<std::recursive_mutex> ContextLock(ImGuiContextLock);
 
 	ImGuiIO& IO = ImGui::GetIO();
-	IO.MouseDrawCursor = bShowModMenuWindow;
+	IO.MouseDrawCursor = bTakeoverCursor;
+
+	// The window hook feeds every input message to the backend and the Win32 handler
+	// swallows none of them, so ImGui would still hover and click against a cursor the
+	// game is busy recentring. Mask its input off while it does not own the mouse.
+	if (bTakeoverCursor)
+	{
+		IO.ConfigFlags &= ~(ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoKeyboard);
+	}
+	else
+	{
+		IO.ConfigFlags |= (ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoKeyboard);
+	}
 
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -1516,9 +1670,18 @@ void ImGuiManager::OnTick()
 
 	if (bShowModMenuWindow)
 	{
-		// force every frame when the UI is active
-		EARS::Modules::Player* LclPlayer = EARS::Modules::Player::GetLocalPlayer();
-		LclPlayer->SetPlayerFlag(EARS::Modules::PlayerFlag::WEAPON_WHEEL_SHOWING);
+		// Re-assert the camera-input block every frame while we own input: UIHud's own
+		// HideWeaponWheel path clears this flag out from under us if the wheel closes
+		// while the menu is up. Keyed on the takeover rather than on the window being
+		// visible, or pass-through mode would clear the flag and have it set straight
+		// back here on the same tick, leaving the player camera dead.
+		if (bTakeoverCursor)
+		{
+			if (EARS::Modules::Player* LclPlayer = EARS::Modules::Player::GetLocalPlayer())
+			{
+				LclPlayer->SetPlayerFlag(EARS::Modules::PlayerFlag::WEAPON_WHEEL_SHOWING);
+			}
+		}
 
 		if (ImGui::Begin("Scripthook Menu", &bShowModMenuWindow))
 		{

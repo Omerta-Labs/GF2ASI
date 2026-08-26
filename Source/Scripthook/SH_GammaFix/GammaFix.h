@@ -19,7 +19,7 @@ namespace Mod
 	 *    default identity curve. We skip identity ramps and restore the
 	 *    captured desktop ramp when the slider returns to default.
 	 *
-	 * Controlled by [Fixes] ApplyBrightnessFix in gf2asi.ini (default on).
+	 * Controlled by [Fixes] ApplyBrightnessFix in gf2asi_settings.ini (default on).
 	 *
 	 * Separately, [Fixes] GammaContrast sets the first slot of the curve the
 	 * game passes to Displ_SetGamma - the exponent the ramp is raised to.

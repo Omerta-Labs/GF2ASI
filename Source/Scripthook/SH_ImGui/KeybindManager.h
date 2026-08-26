@@ -20,7 +20,7 @@ namespace SH
 	 */
 	struct ShortcutAction
 	{
-		// Stable identifier, also the key written to the [Keybinds] ini section.
+		// Stable identifier, also the key written to the [Keybinds] section of the keybinds ini.
 		// Convention: "category.name", e.g. "player.godmode".
 		std::string Id;
 
@@ -52,7 +52,7 @@ namespace SH
 
 	/**
 	 * Owns the shortcut action registry and their key bindings, loads/saves them from
-	 * the [Keybinds] ini section, and dispatches key presses each tick.
+	 * the [Keybinds] section of the keybinds ini, and dispatches key presses each tick.
 	 *
 	 * All access happens on the SIM thread (registration during Open, dispatch in
 	 * ImGuiManager::OnTick, rebinding from the mod menu draw in the same tick), so no

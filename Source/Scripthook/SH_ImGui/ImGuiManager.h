@@ -84,6 +84,22 @@ public:
 	bool HasCursorControl() const;
 
 	/**
+	 * Whether the menu takes input while it is on screen. Turning this off leaves the
+	 * menu visible but hands the mouse and keyboard back to the game, so the player
+	 * keeps their camera controls.
+	 */
+	bool IsMenuInteractive() const { return bImGuiInteractive; }
+	void SetMenuInteractive(bool bInteractive) { bImGuiInteractive = bInteractive; }
+
+	/**
+	 * Records where the game last tried to warp the cursor while we were suppressing
+	 * its recentring, so the pointer can be put back when control returns.
+	 *
+	 * Called from the SetCursorPos detour on the SIM thread, the same thread as OnTick.
+	 */
+	void NotifySuppressedCursorPos(int InX, int InY);
+
+	/**
 	 * Update manager when level services become active
 	 */
 	void OpenLevelServices();
@@ -112,6 +128,9 @@ private:
 	{
 		RwV3d TeleportLocation;
 	};
+
+	/** Put the pointer back where the game last wanted it, if we withheld a warp. */
+	void RestoreGameCursorPos();
 
 	void DrawTab_PlayerSettings();
 
@@ -187,12 +206,22 @@ private:
 	// Should we render the Parted Model window
 	bool bShowModMenuWindow = false;
 
-	// Whether or not any ImGui windows are interactive
-	bool bImGuiInteractive = false;
+	// Whether the mod menu takes the mouse and keyboard when it is on screen.
+	// Turning this off leaves the menu visible but hands input back to the game,
+	// so live readouts can be watched while playing. Defaults on, otherwise
+	// opening the menu would present a window that cannot be clicked.
+	bool bImGuiInteractive = true;
 
 	// Should we enter a state where we take control of the Cursor?
 	// In this state, we disable Player inputs, and get ImGui to visualise a cursor.
 	bool bTakeoverCursor = false;
+
+	// Last position the game asked for while its recentring was suppressed.
+	// Restored when the takeover ends so the game's next mouse delta is measured
+	// from where it expects the pointer to be, instead of kicking the camera.
+	bool bHasSuppressedCursorPos = false;
+	int SuppressedCursorPosX = 0;
+	int SuppressedCursorPosY = 0;
 
 	bool bPlayerGodModeActive = false;
 

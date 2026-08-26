@@ -452,6 +452,11 @@ namespace SH
 
 		CameraMgr->PushCameraInfo(0, PhotoModeCameraInfo, 0.0f, EARS::Framework::CAMERA_INTERP_NONE, true);
 
+		// Photo mode needs the menu to own the mouse: its sliders are the controls, and
+		// the pass-through mode would otherwise hand the same mouse to the game camera.
+		// Force it back on here; the F2 shortcut is blocked for as long as we are active.
+		ImGuiManager::GetCheckedRef().SetMenuInteractive(true);
+
 		ImGuiManager::StaticGetUISystemDebug().SupressHUD();
 		ImGuiManager::StaticGetUISystemDebug().HideAllNPCIndicators();
 		SetPlayerFrozen(true);

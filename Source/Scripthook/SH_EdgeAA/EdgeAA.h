@@ -4,7 +4,7 @@ namespace Mod
 {
 	/**
 	 * Forces the game's EdgeAA post-process on every frame and exposes its
-	 * tuning parameters through gf2asi.ini.
+	 * tuning parameters through gf2asi_settings.ini.
 	 *
 	 * EdgeAA (EARS::Alchemy::ScreenEdgeAA) is a depth-based edge detect +
 	 * directional blur pass, not hardware MSAA. The engine treats it as a
@@ -21,7 +21,7 @@ namespace Mod
 	 * PrepareRender entirely while the renderer-side disable flag is set
 	 * (QualityOptions.EdgeAA off), so OnEndScene re-arms that flag as well.
 	 *
-	 * Controlled by the [EdgeAA] section in gf2asi.ini (default on).
+	 * Controlled by the [EdgeAA] section in gf2asi_settings.ini (default on).
 	 */
 	class EdgeAA
 	{

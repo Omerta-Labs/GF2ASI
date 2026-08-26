@@ -48,7 +48,7 @@ namespace Mod
 	 * aliasing rather than remove it; 512 is a good balance and 1024 is about
 	 * the point of diminishing returns.
 	 *
-	 * Controlled by [MugShot] Enable and Resolution in gf2asi.ini.
+	 * Controlled by [MugShot] Enable and Resolution in gf2asi_settings.ini.
 	 */
 	class MugShotFix
 	{

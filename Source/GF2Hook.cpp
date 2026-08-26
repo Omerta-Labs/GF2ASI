@@ -352,12 +352,15 @@ int __stdcall WndProc_GF2(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 uint64_t SetCursorPos_old;
 void HOOK_SetCursorPos(int x, int y)
 {
-	if (const ImGuiManager* ImGuiMgr = ImGuiManager::Get())
+	if (ImGuiManager* ImGuiMgr = ImGuiManager::Get())
 	{
 		if (ImGuiMgr->HasCursorControl())
 		{
-			// TODO: We can do better than this
-			// avoid the game from forcing the mouse to the centre
+			// avoid the game from forcing the mouse to the centre.
+			// Remember where it wanted the pointer: the game measures mouse movement as
+			// an offset from that position, so it has to be put back when we hand input
+			// over again, or its first delta is the width of the screen.
+			ImGuiMgr->NotifySuppressedCursorPos(x, y);
 			return;
 		}
 	}

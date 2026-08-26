@@ -41,7 +41,7 @@ namespace Mod
 	 *    do the sync. In windowed mode it paces to one real refresh period
 	 *    instead of two hardcoded 60 Hz ones.
 	 *
-	 * Controlled by [Fixes] ApplyVSyncFix in gf2asi.ini (default on).
+	 * Controlled by [Fixes] ApplyVSyncFix in gf2asi_settings.ini (default on).
 	 */
 	class VSyncFix
 	{
