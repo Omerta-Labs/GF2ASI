@@ -1,0 +1,43 @@
+# SDK files with no counterpart in the original source tree -- ours, not
+# reconstructions. Listed here so Tools/sdk_coverage.py stops reporting them as
+# unmatched and the report stays a real worklist.
+#
+# One path per line, relative to Source/SDK, case-insensitive.
+#
+# Before adding anything: run Tools/triage_unmatched.py. If it resolves the file,
+# it is a renamed original and belongs in rename_overrides.txt instead. A file
+# earns a place here only when the linker map has no symbol for any type it
+# declares, which means the original never compiled such a file.
+
+# --- ears_common: helpers written for this project. The original has array.h
+#     and math.h, but nothing matching these; no symbols for BitArray,
+#     StaticBitArray, Flags16 or Flags32 anywhere in the map.
+EARS_Common/BitArray.h
+EARS_Common/Bitflags.cpp
+EARS_Common/CommonTypes.cpp
+EARS_Common/RwMaths.cpp
+EARS_Common/RwMaths.h
+EARS_Common/SingleInternalLinkedListLightweight.h
+
+# --- Inline file split out of a header that the original kept whole.
+EARS_Common/SafePtr.inl
+
+# --- ears_framework: our own additions. SMBuilder has no original at all;
+#     PersistenceRegistry is our name for part of the persistence system.
+EARS_Framework/Core/Component/Component.cpp
+EARS_Framework/Core/Persistence/PersistenceRegistry.h
+EARS_Framework/Modules/BehaviorInfo/BehaviorInfo.cpp
+EARS_Framework/Modules/ControllerManager/Bitmask.cpp
+EARS_Framework/Toolkits/StateMachine/SMBuilder.cpp
+EARS_Framework/Toolkits/StateMachine/SMBuilder.h
+
+# --- ears_godfather: scaffolding and constants we introduced. PlayerCamera.cpp
+#     and ScoreEvent.cpp hold code the original kept in other files; the
+#     *Defines.h headers are ours.
+EARS_Godfather/Modules/Player/PlayerCamera.cpp
+EARS_Godfather/Modules/Player/PlayerDefines.h
+EARS_Godfather/Modules/Scoring/ScoreEvent.cpp
+
+# --- Header-only in the original: cctnamenode.h exists, cctnamenode.cpp
+#     does not.
+EARS_RT_CCT/src/CCTNameNode.cpp

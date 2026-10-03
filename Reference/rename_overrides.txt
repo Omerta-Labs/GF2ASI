@@ -1,0 +1,31 @@
+# Hand-resolved original paths that the automated passes in
+# Tools/triage_unmatched.py cannot derive.
+#
+# Format:  <path under Source/SDK>  TAB  <package>/<path within package>
+# Blank lines and # comments are ignored. Read as pass 0, ahead of everything
+# else, so a verified answer is never overridden by a guess.
+#
+# Add a row here when you have confirmed the original path from the manifest or
+# the linker map but no rule gets there on its own -- a cross-package move, or a
+# RenderWare unity-build object the map cannot attribute to a file.
+
+# --- RenderWare: unity builds, so the map resolves only to bb_runtime objects.
+#     Both packages put their public header at include/rw/core/<area>/manager.h
+#     and prefix the implementation file, which no name transform predicts.
+rwfilesystem/include/rwfilesysmanager.h	rwfilesystem/include/rw/core/filesys/manager.h
+rwcontroller/rwcontroller.h	rwcontroller/include/rw/core/controller/manager.h
+rwcontroller/rwcontroller.cpp	rwcontroller/source/rwcontrollermanager.cpp
+
+# --- Cross-package: these live in a different package than the directory they
+#     were reconstructed into, so a same-package lookup can never find them.
+EARS_Godfather/System/Memory/GlobalHeapAllocator.h	ears_framework/src/framework/core/memory/globalheapallocator.h
+EARS_Godfather/System/Memory/GlobalHeapAllocator.cpp	ears_framework/src/framework/core/memory/globalheapallocator.cpp
+EARS_Common/IAllocator.h	allocator/include/allocator/iallocator.h
+
+# --- CCT highlevel: these sit under a highlevel/ subdirectory and two of them
+#     drop the ChrCntl_ prefix altogether, so the ChrCntrl_ alias misses them.
+#     chrcntl_extensions is C, not C++ -- the extension changes too.
+EARS_RT_CCT/include/ChrCntrl_Secondary.h	ears_rt_cct/include/ears_rt_cct/highlevel/secondary.h
+EARS_RT_CCT/src/ChrCntrl_Secondary.cpp	ears_rt_cct/src/highlevel/secondary.cpp
+EARS_RT_CCT/include/ChrCntrl_Extensions.h	ears_rt_cct/include/ears_rt_cct/highlevel/chrcntl_extensions.h
+EARS_RT_CCT/src/ChrCntrl_Extensions.cpp	ears_rt_cct/src/highlevel/chrcntl_extensions.c

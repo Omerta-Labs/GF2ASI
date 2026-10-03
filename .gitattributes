@@ -1,2 +1,8 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Generated reference data and the tools that write it: keep LF in the working
+# tree so regenerating the manifest produces an empty diff rather than a
+# line-ending churn across ~5900 lines.
+Reference/*.txt text eol=lf
+Tools/*.py      text eol=lf
