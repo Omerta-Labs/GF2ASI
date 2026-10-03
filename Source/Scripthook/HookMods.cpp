@@ -35,11 +35,10 @@
 
 #define RUN_MASTER_SM_IN_ASI 1
 #define IMPLEMENT_DEBUG_FLY_SM 0
-#define IMPLEMENT_ANIM_VIEWER_SM (DEBUG && 0)
 #define IMPLEMENT_PHOTO_MODE_SM (DEBUG && 0)
 #define IMPLEMENT_DEMO_PACKAGE_POPUP (DEBUG && 0)
 #define IMPLEMENT_VEHICLE_ENTRY_SM (DEBUG && 0)
-#define OVERRIDE_LAUNCH_CMD (DEBUG && 0)
+#define OVERRIDE_LAUNCH_CMD (DEBUG && 1)
 #define IMPLEMENT_SEND_MSG (DEBUG && 0)
 #define IMPLEMENT_HASH_REGISTRY 0
 
@@ -97,9 +96,7 @@ void _cdecl HOOK_BuildStateMachines()
 	EARS::Modules::PlayerDebugFlySM::BuildStateMachine();
 #endif // IMPLEMENT_DEBUG_FLY_SM
 
-#if IMPLEMENT_ANIM_VIEWER_SM
 	SH::PlayerAnimViewSM::BuildStateMachine();
-#endif // IMPLEMENT_ANIM_VIEWER_SM
 }
 
 // PURPOSE: Ability to extend the PlayerMasterSM with our own states, messages and transitions.
@@ -132,16 +129,14 @@ void _cdecl HOOK_PlayerMasterSM_BuildStateMachine()
 	DebugFlyState->AddTransition("start", 1);
 #endif // IMPLEMENT_DEBUG_FLY_SM
 
-#if IMPLEMENT_ANIM_VIEWER_SM
 	// TRANSITIONS TO DEBUG STATE ADDED FOR MOD
-	StartState->AddTransition("debugAnimView", 0x11);
+	StartState->AddTransition("debugAnimView", 0x12);
 
 	// DEBUG STATE ADDED FOR MOD
 	EARS::Framework::SMBuilderState* DebugAnimViewState = Builder.AddState("debugAnimView", -1);
-	DebugAnimViewState->AddChild("playerDebugAnimViewStateTable", false);
-	DebugAnimViewState->AddChild("playerCameraStateTable", false);
-	DebugAnimViewState->AddTransition("start", 2);
-#endif // IMPLEMENT_ANIM_VIEWER_SM
+	DebugAnimViewState->AddChild("playerDebugAnimViewStateTable", true);
+	DebugAnimViewState->AddChild("playerCameraStateTable", true);
+	DebugAnimViewState->AddTransition("start", 0x13);
 
 	// TODO: While the scripthook features are defined in derived type, we still want to replace original PlayerMasterSM.
 	Builder.CompileAndRegister(0xB08AE1F6, S_PlayerMasterSM_FactoryFn, "PlayerMasterSM");

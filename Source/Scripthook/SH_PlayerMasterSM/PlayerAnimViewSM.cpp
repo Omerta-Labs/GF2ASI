@@ -11,7 +11,7 @@
 
 namespace Private
 {
-	const uint32_t ANIM_VEW_SM_HASH = EARS::Common::HashMem_SDBM("PlayerAnimViewSM", 17);
+	const uint32_t ANIM_VEW_SM_HASH = EARS::Common::HashMem_SDBM("PlayerAnimViewSM", 16);
 
 	EARS::StateMachineSys::StateMachine* S_PlayerAnimViewSM_FactoryFn(unsigned int id, EARS::StateMachineSys::StateMachineParams* pSMParams)
 	{

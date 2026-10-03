@@ -41,10 +41,15 @@ namespace SH
 
 	bool PlayerMasterSM_Modded::CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, EARS::StateMachineSys::Transition::TransitionData* TransData)
 	{
-		if (TransID == 0x11)
+		if (TransID == 0x12) // enter
 		{
 			const SH::PlayerDebugOptions_Modded& DebugOptions = *SH::PlayerDebugOptions_Modded::GetInstance();
 			return DebugOptions.IsInAnimViewMode();
+		}
+		else if (TransID == 0x13) // exit
+		{
+			const SH::PlayerDebugOptions_Modded& DebugOptions = *SH::PlayerDebugOptions_Modded::GetInstance();
+			return !DebugOptions.IsInAnimViewMode();
 		}
 
 		return EARS::Modules::PlayerMasterSM::CheckTransition(SimTime, FrameTime, TransID, TransData);
