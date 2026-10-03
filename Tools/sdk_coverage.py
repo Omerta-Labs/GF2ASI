@@ -31,6 +31,7 @@ REPO = Path(__file__).resolve().parent.parent
 DEFAULT_SDK = REPO / "Source" / "SDK"
 DEFAULT_MANIFEST = REPO / "Reference" / "original_tree.txt"
 DEFAULT_OWNED = REPO / "Reference" / "project_owned.txt"
+DEFAULT_CONSOLIDATED = REPO / "Reference" / "consolidated.txt"
 
 SOURCE_EXT = (".cpp", ".hpp", ".inl", ".h", ".c")
 
@@ -77,14 +78,20 @@ def load_manifest(path: Path) -> dict[str, list[str]]:
 
 
 def load_owned(path: Path) -> set[str]:
-    """Project-relative paths that have no original and should not be flagged."""
+    """Project-relative paths to exclude from the unmatched report.
+
+    Reads both project_owned.txt (one path per line) and consolidated.txt
+    (path TAB evidence), so either format works here.
+    """
     if not path.is_file():
         return set()
-    return {
-        l.strip().lower().replace("\\", "/")
-        for l in path.read_text(encoding="utf-8").splitlines()
-        if l.strip() and not l.lstrip().startswith("#")
-    }
+    paths = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        paths.add(line.split("	")[0].strip().lower().replace("\\", "/"))
+    return paths
 
 
 def candidates(intra_paths: list[str], basename: str) -> list[str]:
@@ -115,6 +122,9 @@ def main() -> int:
     parser.add_argument("--sdk", type=Path, default=DEFAULT_SDK)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--owned", type=Path, default=DEFAULT_OWNED)
+    parser.add_argument("--consolidated", type=Path, default=DEFAULT_CONSOLIDATED,
+                        help="files whose types are original but whose original "
+                             "file carries another name; resolved in Phase 2d")
     parser.add_argument("--package", help="restrict the report to one package")
     parser.add_argument("--verbose", action="store_true", help="also list placed files")
     parser.add_argument("--only", choices=("placed", "misplaced", "unmatched"),
@@ -128,11 +138,13 @@ def main() -> int:
 
     packages = load_manifest(args.manifest)
     owned = load_owned(args.owned)
+    consolidated = load_owned(args.consolidated)
 
     placed: list[tuple[str, str]] = []
     misplaced: list[tuple[str, list[str]]] = []
     unmatched: list[str] = []
     skipped = 0
+    pending_merge = 0
     covered: dict[str, set[str]] = collections.defaultdict(set)
     unknown_dirs: set[str] = set()
 
@@ -149,6 +161,9 @@ def main() -> int:
             continue
         if rel.lower() in owned:
             skipped += 1
+            continue
+        if rel.lower() in consolidated:
+            pending_merge += 1
             continue
 
         project_rel = rel.split("/", 1)[1].lower() if "/" in rel else rel.lower()
@@ -212,7 +227,8 @@ def main() -> int:
     print(f"{'TOTAL':20} {have_total:6} {total_total:6} {pct:5.1f}%")
 
     print(f"\nplaced {len(placed)}  misplaced {len(misplaced)}  "
-          f"unmatched {len(unmatched)}  project-owned {skipped}")
+          f"unmatched {len(unmatched)}  to-merge {pending_merge}  "
+          f"project-owned {skipped}")
     if unknown_dirs:
         print(f"unmapped directories under {args.sdk.name}: "
               f"{', '.join(sorted(unknown_dirs))}")

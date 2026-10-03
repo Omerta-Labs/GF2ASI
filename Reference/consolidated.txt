@@ -1,0 +1,32 @@
+# Files whose types are original, but where no original file carries that name:
+# the code lived inside another file. The merge target is settled in Phase 2d
+# (decision D2 -- merge to match the original layout).
+#
+# Format:  <path under Source/SDK>  TAB  <evidence, and target if known>
+#
+# These are excluded from the unmatched report so it stays a worklist, but they
+# are NOT project-owned -- each one is real reconstruction that needs a home.
+# Verified with Tools/pdb_find_type.py; the counts are mangled names in the
+# singleplayer debug PDB.
+
+# --- ears_common. The original kept these header-only, so there is a .h in the
+#     manifest but no .cpp, and our split files need folding back in.
+EARS_Common/Bitflags.cpp	Flags16 (9), Flags32 (41) -> include/ears_common/bitflags.h, header-only
+EARS_Common/CommonTypes.cpp	-> include/ears_common/commontypes.h, header-only
+EARS_Common/RwMaths.cpp	RwV3d (896), RwMatrixTag (129) -> include/ears_common/rwtypes.h, header-only
+EARS_Common/SafePtr.inl	SafePtr (1403) -> include/ears_common/safeptr.h
+EARS_Common/BitArray.h	BitArray<0x10000,unsigned int> (18), StaticBitArray (bare, never instantiated out of line). Global namespace, and no bitarray.h in ANY package -- home file not yet identified.
+
+# --- ears_framework
+EARS_Framework/Core/Component/Component.cpp	Component (1450, too generic to attribute on its own)
+EARS_Framework/Core/Persistence/PersistenceRegistry.h	IPersistable (39) -> src/framework/core/persistence/, defining file inlined
+EARS_Framework/Modules/BehaviorInfo/BehaviorInfo.cpp	BehaviorInfo (8) -> modules/player/player.h (5x) or modules/npc/npc.h (1x)
+
+# --- ears_godfather. PDB has the types but the map has no out-of-line
+#     definition, so the defining file is a header.
+EARS_Godfather/Modules/Player/PlayerCamera.cpp	PlayerCamera (33), no map attribution
+EARS_Godfather/Modules/Player/PlayerDefines.h	no types; check against modules/player/ headers in Phase 2d
+EARS_Godfather/Modules/Scoring/ScoreEvent.cpp	ScoreEvent (40), no map attribution
+
+# --- ears_rt_cct
+EARS_RT_CCT/src/CCTNameNode.cpp	CCTNameNode (41) -> src/chrcntl_character.cpp (3x); cctnamenode.h exists for the header

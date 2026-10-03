@@ -95,11 +95,35 @@ unresolved rather than guessed at.
 Treat the output as a proposal. `symbol` hits resting on one generic type name
 (an interface, say) are the ones worth eyeballing; the others are deterministic.
 
+## pdb_find_type.py
+
+Asks the PDBs whether a type existed in the original build. This is the check
+`map_symbol_to_obj.py` cannot make.
+
+```bash
+python Tools/pdb_find_type.py BitArray SMBuilder
+python Tools/pdb_find_type.py --all RwMatrixTag
+```
+
+A fully inlined template emits no out-of-line code, so no symbol for it ever
+reaches the linker map — yet the type is unquestionably original.
+`BitArray<0x10000,unsigned int>` and
+`EARS::Common::SingleInternalLinkedListLightweight<RWS::CLinkedMsg>` are both
+like this, and so is `EARS::Framework::SMBuilder`.
+
+**"Absent from the map" does not mean "ours". Only "absent from the PDBs too"
+does.** Run this before concluding a file has no original, and check the types
+the file declares — not its stem, which is not a type name.
+
+Output gives each distinct mangled name, so you also get the namespace and, for
+a template, the arguments it was instantiated with.
+
 ## Reference data these read
 
 | File | Purpose |
 |---|---|
 | `../Reference/original_tree.txt` | the manifest, generated |
-| `../Reference/project_owned.txt` | files with no original, so not a gap |
+| `../Reference/project_owned.txt` | files with no original at all |
+| `../Reference/consolidated.txt` | original types, but the original file is named something else; resolved in Phase 2d |
 | `../Reference/rename_overrides.txt` | hand-confirmed paths no rule derives |
 | `../Reference/build_baseline.md` | pre-restructure build config |

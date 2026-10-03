@@ -29,3 +29,12 @@ EARS_RT_CCT/include/ChrCntrl_Secondary.h	ears_rt_cct/include/ears_rt_cct/highlev
 EARS_RT_CCT/src/ChrCntrl_Secondary.cpp	ears_rt_cct/src/highlevel/secondary.cpp
 EARS_RT_CCT/include/ChrCntrl_Extensions.h	ears_rt_cct/include/ears_rt_cct/highlevel/chrcntl_extensions.h
 EARS_RT_CCT/src/ChrCntrl_Extensions.cpp	ears_rt_cct/src/highlevel/chrcntl_extensions.c
+
+# --- Confirmed original files whose types are templates or fully inlined, so
+#     the linker map alone could not find them. Tools/pdb_find_type.py shows the
+#     types in the PDB; the manifest then names the file.
+#     SMBuilder is an original EARS::Framework class, not ours as first assumed.
+EARS_Framework/Toolkits/StateMachine/SMBuilder.cpp	ears_framework/src/framework/toolkits/statemachine/smbuilder.cpp
+EARS_Framework/Toolkits/StateMachine/SMBuilder.h	ears_framework/src/framework/toolkits/statemachine/smbuilder.h
+EARS_Common/RwMaths.h	ears_common/include/ears_common/rwtypes.h
+EARS_Common/SingleInternalLinkedListLightweight.h	ears_common/include/ears_common/singleinternallinkedlist.h

@@ -15,8 +15,11 @@ all report the same object were one file in the original.
            ears_godfather/src/modules/npc/statemachines/npcsearchsm.cpp
            ears_godfather/src/modules/npc/statemachines/npcsearchsm.h
 
-A name with no symbols at all is reconstruction of our own, not a renamed
-original -- RwMaths and Bitflags both come back empty.
+A name with no symbols here is NOT proof the type is ours. A fully inlined
+template emits no out-of-line code, so nothing reaches the map even though the
+type is original -- BitArray and SMBuilder both come back empty here and are
+both original. Confirm with Tools/pdb_find_type.py before concluding anything
+from a miss.
 
 Usage:
     python map_symbol_to_obj.py AmbushSM DrawGunSM HolsterGunSM
@@ -86,7 +89,8 @@ def resolve(name: str, entries: list[tuple[str, str]],
             tally[obj] += 1
     if not tally:
         if not quiet:
-            print(f"{name}\n  (no symbols -- project-owned, not a renamed original)\n")
+            print(f"{name}\n  (not in the map -- may still be an inlined template;"
+                  f" check with pdb_find_type.py)\n")
         return False
 
     print(name)
