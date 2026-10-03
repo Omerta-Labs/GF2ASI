@@ -203,8 +203,9 @@ namespace EARS
 				EARS::Modules::Family::Action m_Action = Action::ACTION_INVALID;
 				void* m_VenueOfInterest = nullptr; // EARS::Modules::BuildingStore
 				bool m_bIsPlayerInferred = false;
-				Array<EARS::Modules::SimNPC*> m_RespondersToUse;
+				Array<EARS::Modules::SimNPC*> m_RespondersToUse;											// 0x10 - 0x1C
 			};
+			static_assert(sizeof(Decision) == 0x1C, "Expected EARS::Modules::Family::Decision to have a size of 0x1C");
 
 			/**
 			 * Find Made Man using SimNPC. Output is the index in Made Man array.
@@ -252,11 +253,11 @@ namespace EARS
 			float m_MinTurnInterval = 0.0f;
 			float m_MaxTurnInterval = 0.0f;
 			float m_ResponseDelay = 0.0f;																// 0x150 - 0x154
-			char m_FamilyPadding_4[0x38];
-			//float m_TimeSinceLastAction = 0.0f;
-			//float m_TimeSinceLastActedUpon = 0.0f;
-			//bool m_DesiresToRespond = 0.0f;
-			//EARS::Modules::Family::Bonuses m_bonuses;
+			float m_TimeSinceLastAction = 0.0f;															// 0x154 - 0x158
+			float m_TimeSinceLastActedUpon = 0.0f;														// 0x158 - 0x15C
+			bool m_bDesiresToRespond = false;															// 0x15C - 0x15D
+			char m_FamilyPadding_4[0x2F];
+			//EARS::Modules::Family::Bonuses m_bonuses;												// 0x160 - 0x18C
 			Array<EARS::Modules::Family::OmertaEntry> m_OmertaTable;									// 0x18C - 0x198
 			char m_FamilyPadding_5[4]; //float m_MaxOmerta;
 			void* m_VenueConsidering = nullptr;		// EARS::Modules::BuildingStore						// 0x19C - 0x1A0													
