@@ -23,6 +23,9 @@ Source/Addons/imgui/imgui_widgets.cpp
 Source/Addons/tConsole.cpp
 Source/Addons/tLog.cpp
 Source/GF2Hook.cpp
+Source/Platform/Diagnostics.cpp
+Source/Platform/Host.cpp
+Source/Platform/ModPoints.cpp
 Source/SDK/ears_common/src/guid.cpp
 Source/SDK/ears_common/src/hash.cpp
 Source/SDK/ears_common/src/safeptr.cpp
@@ -196,7 +199,6 @@ Source/SDK/ears_godfather/src/modules/player/targetlockedon/playerstrafemovement
 Source/SDK/ears_godfather/src/modules/player/vehicle/playervehiclesm.cpp
 Source/SDK/ears_godfather/src/modules/scoring/ScoreEvent.cpp
 Source/SDK/ears_godfather/src/modules/scoring/moneyledger.cpp
-Source/SDK/ears_godfather/src/modules/scoring/scorekeeper.cpp
 Source/SDK/ears_godfather/src/modules/sentient/sentient.cpp
 Source/SDK/ears_godfather/src/modules/sentient/statemachines/grabreactsm.cpp
 Source/SDK/ears_godfather/src/modules/sentient/statemachines/sentientsm.cpp
@@ -252,6 +254,9 @@ Source/Scripthook/SH_ObjectManager/ObjectManager.cpp
 Source/Scripthook/SH_PlayerMasterSM/PlayerAnimViewSM.cpp
 Source/Scripthook/SH_PlayerMasterSM/PlayerDebugOptions_Modded.cpp
 Source/Scripthook/SH_PlayerMasterSM/PlayerMasterSM_Modded.cpp
+Source/Scripthook/SH_SDKHooks/DemographicRegionHooks.cpp
+Source/Scripthook/SH_SDKHooks/ModLoaderInit.cpp
+Source/Scripthook/SH_SDKHooks/ScoreKeeperHooks.cpp
 Source/Scripthook/SH_VSyncFix/VSyncFix.cpp
 Source/Scripthook/ScripthookEvents.cpp
 dllmain.cpp

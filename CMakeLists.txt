@@ -1,25 +1,20 @@
 #=============================================================================
 # GF2ASI -- The Godfather II script hook
 #
-# Replaces premake5.lua. Phase 1 of the restructure: same single target, same
-# compiler and linker settings, no source changes. Reference/build_baseline.md
-# records what this has to reproduce.
+# Three targets, each depending only on the one below it:
+#
+#   GF2ASI   SharedLib   start-up, detours, the menu
+#   GF2Mod   StaticLib   logging, settings, ImGui, mod loading, game fixes
+#   GF2SDK   StaticLib   reconstructed game code, plus the platform primitives
+#                        it is built on
 #
 # Generate (32-bit is mandatory -- the game is a 32-bit process):
 #
-#   cmake -S . -B build -G "Visual Studio 17 2022" -A Win32
-#
-# Then open build/GF2ASI.sln, or build from the command line:
-#
+#   cmake --preset vs2022
 #   cmake --build build --config Release
-#
-# Phase 3 splits this into GF2SDK / GF2Mod / GF2ASI. Until then the single
-# Source/ include root is what keeps that split free of include rewrites.
 #=============================================================================
 
 cmake_minimum_required(VERSION 3.21)
-
-# MSVC_RUNTIME_LIBRARY instead of hand-patching /MT into the flags.
 cmake_policy(SET CMP0091 NEW)
 
 project(GF2ASI LANGUAGES CXX)
@@ -32,9 +27,9 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
 if(NOT MSVC)
     message(FATAL_ERROR
-        "GF2ASI builds with MSVC only. Source/SDK/Platform uses __asm for the "
-        "thunks that pass arguments in registers no calling convention can "
-        "express, which clang-cl does not support in 32-bit mode.")
+        "GF2ASI builds with MSVC only. Source/Platform/MemUtils.h uses __asm "
+        "for the thunk that passes an argument in EAX, which clang-cl does not "
+        "support in 32-bit mode.")
 endif()
 
 if(NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -53,110 +48,37 @@ set(GF2ASI_GAME_DIR "J:/Games/The Godfather II" CACHE PATH
     "and this is where the Visual Studio debugger launches from.")
 
 #-----------------------------------------------------------------------------
-# Sources
+# Shared settings
 #-----------------------------------------------------------------------------
-# Globbed, as premake did. CONFIGURE_DEPENDS re-runs the glob when the set of
-# files changes, which matters a great deal for Phase 2: the SDK restructure
-# renames roughly 500 files and nothing here should need touching.
-#
-# Headers are listed only so they appear in the IDE; they are not compiled.
+# Applied to every target through an interface library, so the three cannot
+# drift apart in ways that only show up at link time.
 
-file(GLOB_RECURSE GF2ASI_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_SOURCE_DIR}/Source/*.cpp"
-    "${CMAKE_SOURCE_DIR}/Source/*.c"
-)
-file(GLOB_RECURSE GF2ASI_HEADERS CONFIGURE_DEPENDS
-    "${CMAKE_SOURCE_DIR}/Source/*.h"
-    "${CMAKE_SOURCE_DIR}/Source/*.hpp"
-    "${CMAKE_SOURCE_DIR}/Source/*.inl"
+add_library(gf2_settings INTERFACE)
+
+target_compile_options(gf2_settings INTERFACE
+    /std:c++latest      # what premake's cppdialect "C++20" emitted
+    /MP
 )
 
-# Vendored imgui and the Discord SDK live under Source/Addons and are part of
-# the build; everything under Vendors/ is prebuilt and must not be compiled.
-list(FILTER GF2ASI_SOURCES EXCLUDE REGEX "/Vendors/")
-list(FILTER GF2ASI_HEADERS EXCLUDE REGEX "/Vendors/")
-
-# Natvis visualisers for the SDK container types. premake never picked these up,
-# so they have been sitting unused; MSVC loads them from the project.
-file(GLOB GF2ASI_NATVIS CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/Natvis/*.natvis")
-
-add_library(GF2ASI SHARED
-    "${CMAKE_SOURCE_DIR}/dllmain.cpp"
-    "${CMAKE_SOURCE_DIR}/framework.h"
-    ${GF2ASI_SOURCES}
-    ${GF2ASI_HEADERS}
-    ${GF2ASI_NATVIS}
-)
-
-# Mirror the tree in the IDE rather than dumping 500 files into one folder.
-source_group(TREE "${CMAKE_SOURCE_DIR}" FILES
-    ${GF2ASI_SOURCES} ${GF2ASI_HEADERS} ${GF2ASI_NATVIS})
-
-#-----------------------------------------------------------------------------
-# Output
-#-----------------------------------------------------------------------------
-
-set_target_properties(GF2ASI PROPERTIES
-    OUTPUT_NAME "GF2ASI"
-    SUFFIX ".asi"                       # loaded by an ASI loader, not as a DLL
-    PREFIX ""
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-    VS_DEBUGGER_COMMAND "${GF2ASI_GAME_DIR}/godfather2.exe"
-    VS_DEBUGGER_WORKING_DIRECTORY "${GF2ASI_GAME_DIR}"
-)
-
-#-----------------------------------------------------------------------------
-# Compiler
-#-----------------------------------------------------------------------------
-
-target_compile_options(GF2ASI PRIVATE
-    /std:c++latest      # what premake's cppdialect "C++20" actually emitted
-    /MP                 # premake flags("MultiProcessorCompile")
-)
-
-# Deliberately NOT adding /permissive-, /W4 or /WX here. Phase 1 reproduces the
-# old build; tightening conformance would surface new errors in SDK code and
-# muddle "the port broke it" with "the port exposed it". Worth doing per target
-# once Phase 3 has split them.
-
-target_compile_definitions(GF2ASI PRIVATE
-    # MBCS, not Unicode: the SDK's string types and the Win32 calls around them
-    # are all narrow. CMake does not define UNICODE itself, so this only has to
-    # assert the positive.
+target_compile_definitions(gf2_settings INTERFACE
     _MBCS
 
-    # DEBUG, not _DEBUG. Source tests `#if DEBUG` -- see HookMods.cpp's
-    # IMPLEMENT_* switches -- so relying on MSVC's own _DEBUG would silently
-    # compile out every debug-only path.
+    # DEBUG, not _DEBUG. Source tests `#if DEBUG` -- see the IMPLEMENT_*
+    # switches in HookMods.cpp -- so relying on MSVC's own _DEBUG would
+    # silently compile out every debug-only path.
     $<$<CONFIG:Debug>:DEBUG=1>
     $<$<CONFIG:Release>:NDEBUG>
 )
 
-#-----------------------------------------------------------------------------
-# Includes
-#-----------------------------------------------------------------------------
-# $(ProjectDir)Source/Packages from the premake file is dropped: it does not
-# exist and never did.
-
-target_include_directories(GF2ASI PRIVATE
-    "${CMAKE_SOURCE_DIR}"
-    "${CMAKE_SOURCE_DIR}/Source"
-)
-
-# Each SDK package's own source root, so an include directive reads exactly as
-# it did in the original: "modules/families/family.h", not
-# "SDK/ears_godfather/src/modules/families/family.h". Code transcribed out of
-# the original build compiles as written, which is the point.
+# Repository root, Source/, and each SDK package's own source root, so an SDK
+# include reads as it did in the original: "modules/families/family.h" rather
+# than "SDK/ears_godfather/src/modules/families/family.h".
 #
-# Keep this list in step with INCLUDE_ROOTS in Tools/check_includes.py.
-#
-# ears_framework needs both its roots: src/framework/ and
-# src/game_framework/framework/ hold disjoint files that share the framework/...
-# prefix. A handful of headers sit in src/ for packages that otherwise use
-# include/ (ears_trinity, ears_rt_cct, ears_rt_llrender), so those are listed
-# too.
-foreach(_root
+# ears_framework needs both of its roots: src/framework/ and
+# src/game_framework/framework/ hold disjoint files sharing the framework/...
+# prefix. Three packages that otherwise use include/ keep a few headers in
+# src/, so those are listed too.
+set(GF2ASI_SDK_ROOTS
     allocator/include
     ears_common/include
     ears_common/src
@@ -175,15 +97,23 @@ foreach(_root
     rwcontroller/include
     rwfilesystem/include
 )
+
+target_include_directories(gf2_settings INTERFACE
+    "${CMAKE_SOURCE_DIR}"
+    "${CMAKE_SOURCE_DIR}/Source"
+)
+foreach(_root ${GF2ASI_SDK_ROOTS})
     if(NOT IS_DIRECTORY "${CMAKE_SOURCE_DIR}/Source/SDK/${_root}")
         message(FATAL_ERROR
             "SDK include root Source/SDK/${_root} does not exist. The package "
-            "layout and this list have drifted apart.")
+            "layout and GF2ASI_SDK_ROOTS have drifted apart.")
     endif()
-    target_include_directories(GF2ASI PRIVATE "${CMAKE_SOURCE_DIR}/Source/SDK/${_root}")
+    target_include_directories(gf2_settings INTERFACE
+        "${CMAKE_SOURCE_DIR}/Source/SDK/${_root}")
 endforeach()
 
-target_include_directories(GF2ASI SYSTEM PRIVATE
+# Third-party headers, marked SYSTEM so their warnings stay out of the way.
+target_include_directories(gf2_settings SYSTEM INTERFACE
     "${CMAKE_SOURCE_DIR}/Vendors/d3d9/include"
     "${CMAKE_SOURCE_DIR}/Vendors/detours"
     "${CMAKE_SOURCE_DIR}/Vendors/polyhook/include"
@@ -193,12 +123,130 @@ target_include_directories(GF2ASI SYSTEM PRIVATE
 )
 
 #-----------------------------------------------------------------------------
+# Sources
+#-----------------------------------------------------------------------------
+# Globbed with CONFIGURE_DEPENDS, so the file list follows the tree without a
+# manual regenerate. Headers are listed only to place them in the IDE.
+
+function(gf2_collect out_sources out_headers)
+    set(_sources "")
+    set(_headers "")
+    foreach(_dir ${ARGN})
+        file(GLOB_RECURSE _s CONFIGURE_DEPENDS
+            "${CMAKE_SOURCE_DIR}/${_dir}/*.cpp" "${CMAKE_SOURCE_DIR}/${_dir}/*.c")
+        file(GLOB_RECURSE _h CONFIGURE_DEPENDS
+            "${CMAKE_SOURCE_DIR}/${_dir}/*.h" "${CMAKE_SOURCE_DIR}/${_dir}/*.hpp"
+            "${CMAKE_SOURCE_DIR}/${_dir}/*.inl")
+        list(APPEND _sources ${_s})
+        list(APPEND _headers ${_h})
+    endforeach()
+    set(${out_sources} ${_sources} PARENT_SCOPE)
+    set(${out_headers} ${_headers} PARENT_SCOPE)
+endfunction()
+
+#-----------------------------------------------------------------------------
+# GF2SDK -- reconstructed game code
+#-----------------------------------------------------------------------------
+# Source/SDK mirrors the original package tree exactly; Source/Platform holds
+# the primitives it is built on (calling into the game image, and the sinks the
+# host fills in). Checked by Tools/check_layers.py: nothing here may include
+# from Addons/, Scripthook/ or Utils/, or reference polyhook or ImGui.
+
+gf2_collect(GF2SDK_SOURCES GF2SDK_HEADERS "Source/SDK" "Source/Platform")
+
+add_library(GF2SDK STATIC ${GF2SDK_SOURCES} ${GF2SDK_HEADERS})
+target_link_libraries(GF2SDK PUBLIC gf2_settings)
+source_group(TREE "${CMAKE_SOURCE_DIR}" FILES ${GF2SDK_SOURCES} ${GF2SDK_HEADERS})
+
+#-----------------------------------------------------------------------------
+# GF2Mod -- modding infrastructure and game fixes
+#-----------------------------------------------------------------------------
+# Logging, settings, vendored ImGui and the Discord SDK, the mod loader, the
+# hashed-name registry, the object manager, the modded state machines, and the
+# four game fixes. The fixes live here because they depend only on settings,
+# logging and the SDK -- none of them touches ImGui.
+
+gf2_collect(GF2MOD_SOURCES GF2MOD_HEADERS
+    "Source/Addons"
+    "Source/Utils"
+    "Source/Scripthook/SH_ModManager"
+    "Source/Scripthook/SH_Discord"
+    "Source/Scripthook/SH_HashedNames"
+    "Source/Scripthook/SH_ObjectManager"
+    "Source/Scripthook/SH_PlayerMasterSM"
+    "Source/Scripthook/SH_GammaFix"
+    "Source/Scripthook/SH_EdgeAA"
+    "Source/Scripthook/SH_VSyncFix"
+    "Source/Scripthook/SH_MugShotFix"
+)
+
+add_library(GF2Mod STATIC
+    ${GF2MOD_SOURCES} ${GF2MOD_HEADERS}
+    "${CMAKE_SOURCE_DIR}/framework.h"
+)
+target_link_libraries(GF2Mod PUBLIC gf2_settings GF2SDK)
+source_group(TREE "${CMAKE_SOURCE_DIR}" FILES ${GF2MOD_SOURCES} ${GF2MOD_HEADERS})
+
+#-----------------------------------------------------------------------------
+# GF2ASI -- start-up, detours and the menu
+#-----------------------------------------------------------------------------
+# dllmain and GF2Hook own the start-up order and install every detour; nothing
+# self-registers, so no object here can be dropped for want of a reference.
+# SH_ImGui is the menu. Phase 4 moves the ImGui runtime -- context, backends,
+# device reset, draw snapshot -- down into GF2Mod and leaves the panels here.
+
+gf2_collect(GF2ASI_SOURCES GF2ASI_HEADERS
+    "Source/Scripthook/SH_ImGui"
+    "Source/Scripthook/SH_SDKHooks"
+)
+
+file(GLOB GF2ASI_NATVIS CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/Natvis/*.natvis")
+
+add_library(GF2ASI SHARED
+    ${GF2ASI_SOURCES} ${GF2ASI_HEADERS}
+    "${CMAKE_SOURCE_DIR}/dllmain.cpp"
+    "${CMAKE_SOURCE_DIR}/Source/GF2Hook.cpp"
+    "${CMAKE_SOURCE_DIR}/Source/GF2Hook.h"
+    "${CMAKE_SOURCE_DIR}/Source/Scripthook/HookMods.cpp"
+    "${CMAKE_SOURCE_DIR}/Source/Scripthook/HookMods.h"
+    "${CMAKE_SOURCE_DIR}/Source/Scripthook/ScripthookEvents.cpp"
+    "${CMAKE_SOURCE_DIR}/Source/Scripthook/ScripthookEvents.h"
+    ${GF2ASI_NATVIS}
+)
+target_link_libraries(GF2ASI PRIVATE gf2_settings GF2Mod)
+source_group(TREE "${CMAKE_SOURCE_DIR}" FILES
+    ${GF2ASI_SOURCES} ${GF2ASI_HEADERS} ${GF2ASI_NATVIS})
+
+#-----------------------------------------------------------------------------
+# Output and runtime
+#-----------------------------------------------------------------------------
+
+set_target_properties(GF2ASI PROPERTIES
+    OUTPUT_NAME "GF2ASI"
+    SUFFIX ".asi"                       # loaded by an ASI loader, not as a DLL
+    PREFIX ""
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    VS_DEBUGGER_COMMAND "${GF2ASI_GAME_DIR}/godfather2.exe"
+    VS_DEBUGGER_WORKING_DIRECTORY "${GF2ASI_GAME_DIR}"
+)
+
+# Static runtime on every target; a mismatch between a static library and the
+# DLL that consumes it is a link error with an unhelpful message.
+foreach(_t GF2SDK GF2Mod GF2ASI)
+    set_property(TARGET ${_t} PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endforeach()
+
+#-----------------------------------------------------------------------------
 # Libraries
 #-----------------------------------------------------------------------------
 # Full paths rather than a name plus a search directory, so a missing vendor
-# library fails at generate time instead of producing a confusing link error.
+# library fails at generate time instead of as a confusing link error.
 # d3d9/d3dx9 come from Vendors/d3d9/libs, NOT a system DirectX SDK -- the legacy
 # June 2010 SDK is not installed on build machines.
+#
+# Attached to GF2ASI: the static libraries do not link, so their undefined
+# references are resolved once, here.
 
 set(PH "${CMAKE_SOURCE_DIR}/Vendors/polyhook/libs")
 
@@ -221,14 +269,10 @@ target_link_libraries(GF2ASI PRIVATE
 #-----------------------------------------------------------------------------
 # Deploy
 #-----------------------------------------------------------------------------
-# premake wrote the .asi straight into the game's scripts folder. Building to
-# bin/ and copying afterwards keeps the build working on a machine that has no
-# game install, which the old setup did not.
 
 if(EXISTS "${GF2ASI_GAME_DIR}")
     add_custom_command(TARGET GF2ASI POST_BUILD
-        COMMAND "${CMAKE_COMMAND}" -E make_directory
-                "${GF2ASI_GAME_DIR}/scripts"
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${GF2ASI_GAME_DIR}/scripts"
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different
                 "$<TARGET_FILE:GF2ASI>" "${GF2ASI_GAME_DIR}/scripts/"
         COMMENT "Deploying $<TARGET_FILE_NAME:GF2ASI> to ${GF2ASI_GAME_DIR}/scripts"
@@ -242,7 +286,9 @@ endif()
 
 set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT GF2ASI)
 
-list(LENGTH GF2ASI_SOURCES GF2ASI_TU_COUNT)
-math(EXPR GF2ASI_TU_COUNT "${GF2ASI_TU_COUNT} + 1")   # dllmain.cpp
-message(STATUS "GF2ASI: ${GF2ASI_TU_COUNT} translation units "
-               "(257 after the Phase 2 merges -- see Reference/build_baseline.md)")
+list(LENGTH GF2SDK_SOURCES _n_sdk)
+list(LENGTH GF2MOD_SOURCES _n_mod)
+list(LENGTH GF2ASI_SOURCES _n_asi)
+math(EXPR _n_asi "${_n_asi} + 5")       # dllmain, GF2Hook, HookMods, ScripthookEvents
+message(STATUS "GF2ASI: ${_n_sdk} SDK + ${_n_mod} Mod + ${_n_asi} ASI "
+               "translation units (262 total -- see Reference/build_baseline.md)")
