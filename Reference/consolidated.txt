@@ -11,10 +11,6 @@
 
 # --- ears_common. The original kept these header-only, so there is a .h in the
 #     manifest but no .cpp, and our split files need folding back in.
-ears_common/src/Bitflags.cpp	Flags16 (9), Flags32 (41) -> include/ears_common/bitflags.h, header-only
-ears_common/src/CommonTypes.cpp	-> include/ears_common/commontypes.h, header-only
-ears_common/src/RwMaths.cpp	RwV3d (896), RwMatrixTag (129) -> include/ears_common/rwtypes.h, header-only
-ears_common/include/ears_common/SafePtr.inl	SafePtr (1403) -> include/ears_common/safeptr.h
 ears_common/include/ears_common/BitArray.h	BitArray<0x10000,unsigned int> (18), StaticBitArray (bare, never instantiated out of line). Global namespace, and no bitarray.h in ANY package -- home file not yet identified.
 
 # --- ears_framework
@@ -29,4 +25,11 @@ ears_godfather/src/modules/player/PlayerDefines.h	no types; check against module
 ears_godfather/src/modules/scoring/ScoreEvent.cpp	ScoreEvent (40), no map attribution
 
 # --- ears_rt_cct
-ears_rt_cct/src/CCTNameNode.cpp	CCTNameNode (41) -> src/chrcntl_character.cpp (3x); cctnamenode.h exists for the header
+
+# Resolved in 2d-iii:
+#   CommonTypes.cpp -> src/hash.cpp (a rename: HashString_SDBM and
+#     HashMem_SDBM are both in Hash.obj, so commontypes.h was never its home)
+#   Bitflags.cpp    -> inlined into include/ears_common/bitflags.h
+#   RwMaths.cpp     -> inlined into include/ears_common/rwtypes.h
+#   SafePtr.inl     -> spliced into include/ears_common/safeptr.h
+#   CCTNameNode.cpp -> merged into src/chrcntl_character.cpp
