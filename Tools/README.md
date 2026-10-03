@@ -200,6 +200,43 @@ Vendored imgui and the Discord SDK are skipped. They are compiled, but their
 platform-conditional includes (Carbon, emscripten, optional stb and freetype
 backends) are `#ifdef`'d out on Windows and only produce noise.
 
+## function_coverage.py
+
+Per-function coverage, cross-referenced against the linker map. `sdk_coverage.py`
+counts files; this counts what is inside them.
+
+```bash
+python Tools/function_coverage.py --summary
+python Tools/function_coverage.py > coverage.csv
+python Tools/function_coverage.py --file modules/families/family.cpp --summary
+```
+
+The expected set is every `.text` symbol in an EARS or RenderWare object, with
+class and function pulled out of the mangled name. The done set comes from
+parsing our own sources for the matching file. Both sides key on
+`(class, function)`, so a difference in our parameter or return types does not
+register as missing.
+
+Matching is **case-insensitive**, which is not laziness: the original has
+`NPC::ActivateHudIndicator` where we wrote `ActivateHUDIndicator`. Our acronym
+casing often differs, and `--summary` lists every such divergence so it can be
+aligned if you want.
+
+Three things to know before trusting a figure:
+
+- Functions the original defined inline in a header are emitted into whichever
+  objects used them, not into their own file's object. They are attributed to
+  the wrong file or missed, so per-file totals understate header-heavy types.
+  `npc.cpp` reads 2 of 345 because most of what we have is inline in `npc.h`.
+- Addresses are Xbox 360 (`0x82xxxxxx`). The PC build the project targets has
+  different ones, so treat them as a cross-reference for locating the PC
+  equivalent, never as something to paste into a thunk.
+- Templates, vtables, RTTI, string literals and compiler-generated destructors
+  are counted separately and excluded from the tallies — around 31k symbols.
+
+The CSV is not committed. It is ~41k rows and regenerating it would produce a
+large diff every time, which would bury the signal rather than track it.
+
 ## Reference data these read
 
 | File | Purpose |
