@@ -27,6 +27,7 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* AmbushSM::S_AmbushSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new AmbushSM(InID, InSMParams);
+	}
 
 	NPCRandomSearchSM::NPCRandomSearchSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams)
 		: EARS::Framework::AnimateStateMachine(TableID, SMParams)
@@ -57,6 +58,7 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* NPCRandomSearchSM::S_NPCRandomSearchSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new NPCRandomSearchSM(InID, InSMParams);
+	}
 
 	NPCSearchSM::NPCSearchSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams)
 		: EARS::Framework::AnimateStateMachine(TableID, SMParams)
@@ -87,4 +89,5 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* NPCSearchSM::S_NPCSearchSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new NPCSearchSM(InID, InSMParams);
+	}
 }

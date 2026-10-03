@@ -31,6 +31,7 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* ShootSM::S_ShootSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new ShootSM(InID, InSMParams);
+	}
 
 	ContinualBurstFireSM::ContinualBurstFireSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams)
 		: EARS::Framework::AnimateStateMachine(TableID, SMParams)
@@ -61,6 +62,7 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* ContinualBurstFireSM::S_ContinualBurstFireSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new ContinualBurstFireSM(InID, InSMParams);
+	}
 
 	BurstFireSM::BurstFireSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams)
 		: EARS::Modules::SentientSM(TableID, SMParams)
@@ -90,4 +92,5 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* BurstFireSM::S_BurstFireSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new BurstFireSM(InID, InSMParams);
+	}
 }

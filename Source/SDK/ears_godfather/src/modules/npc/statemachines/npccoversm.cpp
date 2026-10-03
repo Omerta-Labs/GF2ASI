@@ -31,6 +31,7 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* CoverDashSM::S_CoverDashSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new CoverDashSM(InID, InSMParams);
+	}
 
 	CoverPeekSM::CoverPeekSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams)
 		: EARS::Modules::SentientSM(TableID, SMParams)
@@ -60,4 +61,5 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* CoverPeekSM::S_CoverPeekSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new CoverPeekSM(InID, InSMParams);
+	}
 }

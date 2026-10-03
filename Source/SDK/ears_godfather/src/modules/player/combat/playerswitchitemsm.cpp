@@ -28,6 +28,7 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* PlayerSwitchItemSM::S_PlayerSwitchItemSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new PlayerSwitchItemSM(InID, InSMParams);
+	}
 
 	PlayerInventoryBrowserSM::PlayerInventoryBrowserSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams)
 		: EARS::Modules::PlayerSM(TableID, SMParams)
@@ -52,4 +53,5 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* PlayerInventoryBrowserSM::S_PlayerInventoryBrowserSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new PlayerInventoryBrowserSM(InID, InSMParams);
+	}
 }

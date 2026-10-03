@@ -15,8 +15,7 @@ namespace EARS
 		class PlayerLogicalInfo;
 		class PlayerUpperBodyInfo;
 
-
-		class PlayerSM : public EARS::Modules::SentientSM
+		class PlayerSM : public SentientSM
 		{
 		public:
 

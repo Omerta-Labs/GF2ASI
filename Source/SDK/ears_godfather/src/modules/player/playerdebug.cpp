@@ -1,12 +1,15 @@
 #include "playerdebug.h"
 
 #include "playerdebug.h"
+#include "ears_statemachine/statemachine.h"
 #include "framework/core/camera/cameramanager.h"
 #include "framework/core/input/input.h"
 #include "framework/toolkits/statemachine/smbuilder.h"
 #include "modules/player/player.h"
 #include "modules/player/playerdebug.h"
 #include "Addons/Hook.h"
+
+// C++
 #include <cmath>
 
 namespace PrivateDebug
@@ -49,17 +52,13 @@ namespace EARS
 		PlayerDebugOptions* PlayerDebugOptions::GetInstance()
 		{
 			return PrivateDebug::StaticDebugOptions;
+		}
 
-	EARS::StateMachineSys::StateMachine* S_PlayerDebugFlySM_FactoryFn(unsigned int id, EARS::StateMachineSys::StateMachineParams* pSMParams)
-	{
-		return new EARS::Modules::PlayerDebugFlySM(id, pSMParams);
-	}
-}
+		EARS::StateMachineSys::StateMachine* S_PlayerDebugFlySM_FactoryFn(unsigned int id, EARS::StateMachineSys::StateMachineParams* pSMParams)
+		{
+			return new EARS::Modules::PlayerDebugFlySM(id, pSMParams);
+		}
 
-namespace EARS
-{
-	namespace Modules
-	{
 		EARS::Modules::PlayerDebugFlySM::PlayerDebugFlySM(unsigned int TableID, EARS::StateMachineSys::StateMachineParams* SmParams)
 			: EARS::Modules::PlayerSM(TableID, SmParams)
 		{
@@ -239,7 +238,9 @@ namespace EARS
 			ExitState->AddEnterMessage(0x33);
 			ExitState->AddEnterMessage(0x2);
 
-			Builder.CompileAndRegister(0x29CC4DD4, Private::S_PlayerDebugFlySM_FactoryFn, "PlayerDebugFlySM");
+			Builder.CompileAndRegister(0x29CC4DD4, S_PlayerDebugFlySM_FactoryFn, "PlayerDebugFlySM");
 
 			Builder.Destroy();
+		}
+	}
 }

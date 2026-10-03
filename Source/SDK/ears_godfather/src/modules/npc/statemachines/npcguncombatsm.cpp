@@ -30,6 +30,7 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* ReloadGunSM::S_ReloadGunSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new ReloadGunSM(InID, InSMParams);
+	}
 
 	DrawGunSM::DrawGunSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams)
 		: EARS::Modules::SentientSM(TableID, SMParams)
@@ -59,6 +60,7 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* DrawGunSM::S_DrawGunSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new DrawGunSM(InID, InSMParams);
+	}
 
 	HolsterGunSM::HolsterGunSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams)
 		: EARS::Modules::SentientSM(TableID, SMParams)
@@ -88,4 +90,5 @@ namespace EARS::Modules
 	EARS::StateMachineSys::StateMachine* HolsterGunSM::S_HolsterGunSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams)
 	{
 		return new HolsterGunSM(InID, InSMParams);
+	}
 }

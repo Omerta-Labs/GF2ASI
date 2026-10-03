@@ -43,7 +43,7 @@ namespace EARS::Modules
 	 * To make this work and included in the PlayerMasterSM, you need to inject some code into the SMBuilder.
 	 * See HookMods.cpp for more, but this is generally outside of the SDK remit as it is still theoretically mod code.
 	 */
-	class PlayerDebugFlySM : public EARS::Modules::PlayerSM
+	class PlayerDebugFlySM : public PlayerSM
 	{
 	public:
 
