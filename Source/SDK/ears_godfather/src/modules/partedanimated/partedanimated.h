@@ -1,8 +1,8 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/string.h"
-#include "SDK/ears_framework/src/framework/core/animated/animated.h"
+#include "ears_common/string.h"
+#include "framework/core/animated/animated.h"
 
 namespace EARS
 {

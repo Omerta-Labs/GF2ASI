@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_statemachine/include/ears_statemachine/statemachine.h"
+#include "ears_statemachine/statemachine.h"
 
 // C++
 #include <stdint.h>

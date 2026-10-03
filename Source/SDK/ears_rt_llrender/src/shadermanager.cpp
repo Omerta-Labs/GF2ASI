@@ -1,4 +1,4 @@
-#include "SDK/ears_rt_llrender/include/ears_rt_llrender/shadermanager.h"
+#include "ears_rt_llrender/shadermanager.h"
 
 #include "Addons/Hook.h"
 #include "Addons/tConsole.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK/ears_godfather/src/modules/player/playersm.h"
+#include "modules/player/playersm.h"
 #include "Addons/Hook.h"
 
 namespace EARS::Modules

@@ -1,9 +1,9 @@
 #include "animated.h"
 
 // SDK
-#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_animview.h"
-#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_character.h"
-#include "SDK/ears_rt_cct/include/ears_rt_cct/highlevel/secondary.h"
+#include "ears_rt_cct/chrcntl_animview.h"
+#include "ears_rt_cct/chrcntl_character.h"
+#include "ears_rt_cct/highlevel/secondary.h"
 
 // addons
 #include "addons/Hook.h"

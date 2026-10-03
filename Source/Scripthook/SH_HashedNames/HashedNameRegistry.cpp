@@ -1,7 +1,7 @@
 #include "HashedNameRegistry.h"
 
 // SDK
-#include "SDK/ears_common/include/ears_common/commontypes.h"
+#include "ears_common/commontypes.h"
 
 SH::HashedNameRegistry& SH::HashedNameRegistry::GetInstance()
 {

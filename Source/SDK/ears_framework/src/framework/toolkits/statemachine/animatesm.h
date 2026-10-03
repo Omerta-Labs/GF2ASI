@@ -1,8 +1,8 @@
 #pragma once
 
 // CPP
-#include "SDK/ears_common/include/ears_common/safeptr.h"
-#include "SDK/ears_framework/src/framework/toolkits/statemachine/interruptablesm.h"
+#include "ears_common/safeptr.h"
+#include "framework/toolkits/statemachine/interruptablesm.h"
 
 namespace EARS
 {

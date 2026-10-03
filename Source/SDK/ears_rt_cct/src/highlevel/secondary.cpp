@@ -1,6 +1,6 @@
-#include "SDK/ears_rt_cct/include/ears_rt_cct/highlevel/secondary.h"
+#include "ears_rt_cct/highlevel/secondary.h"
 
-#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_animview.h"
+#include "ears_rt_cct/chrcntl_animview.h"
 
 // C++
 #include <assert.h>

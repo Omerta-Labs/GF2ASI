@@ -1,8 +1,8 @@
 #pragma once
 
 // GF2
-#include <SDK/ears_common/include/ears_common/bitflags.h>
-#include <SDK/ears_common/include/ears_common/safeptr.h>
+#include <ears_common/bitflags.h>
+#include <ears_common/safeptr.h>
 
 namespace EARS
 {

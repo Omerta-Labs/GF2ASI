@@ -1,10 +1,10 @@
-#include "SDK/ears_statemachine/include/ears_statemachine/statemachine.h"
+#include "ears_statemachine/statemachine.h"
 
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/allocator/include/allocator/iallocator.h"
-#include "SDK/ears_statemachine/include/ears_statemachine/statemachinemanager.h"
+#include "allocator/iallocator.h"
+#include "ears_statemachine/statemachinemanager.h"
 
 // C++
 #include <assert.h>

@@ -1,9 +1,9 @@
 #include "mademan.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/families/family.h"
-#include "SDK/ears_godfather/src/modules/sentient/sentient_constants.h"
-#include "SDK/ears_godfather/src/modules/npcscheduling/simnpc.h"
+#include "modules/families/family.h"
+#include "modules/sentient/sentient_constants.h"
+#include "modules/npcscheduling/simnpc.h"
 
 // CPP
 #include "Addons/Hook.h"

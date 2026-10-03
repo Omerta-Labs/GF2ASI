@@ -1,11 +1,11 @@
 #pragma once
 
 // SDK (Common)
-#include "SDK/ears_common/include/ears_common/string.h"
-#include "SDK/ears_common/include/ears_common/rwtypes.h"
+#include "ears_common/string.h"
+#include "ears_common/rwtypes.h"
 
 // SDK (Framework)
-#include "SDK/ears_framework/src/framework/core/base/base.h"
+#include "framework/core/base/base.h"
 
 namespace EARS
 {

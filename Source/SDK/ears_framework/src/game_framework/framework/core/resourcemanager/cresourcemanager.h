@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/eventhandler/ceventhandler.h"
 
 namespace RWS
 {

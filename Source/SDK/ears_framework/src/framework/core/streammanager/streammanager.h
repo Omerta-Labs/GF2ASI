@@ -1,17 +1,17 @@
 #pragma once
 
 // SDK (Common)
-#include "SDK/ears_common/include/ears_common/array.h"
-#include "SDK/ears_common/include/ears_common/doubleinternallinkedlist.h"
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/hashtable.h"
-#include "SDK/ears_common/include/ears_common/singleton.h"
-#include "SDK/ears_common/include/ears_common/staticarray.h"
-#include "SDK/ears_common/include/ears_common/string.h"
+#include "ears_common/array.h"
+#include "ears_common/doubleinternallinkedlist.h"
+#include "ears_common/guid.h"
+#include "ears_common/hashtable.h"
+#include "ears_common/singleton.h"
+#include "ears_common/staticarray.h"
+#include "ears_common/string.h"
 
 // SDK (Framework)
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
-#include "SDK/ears_framework/src/framework/core/streammanager/streammanagertypes.h"
+#include "framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/streammanager/streammanagertypes.h"
 
 namespace EARS
 {

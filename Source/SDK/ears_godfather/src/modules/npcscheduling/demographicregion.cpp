@@ -1,7 +1,7 @@
 #include "demographicregion.h"
 
 // GF2
-#include "SDK/ears_framework/src/framework/core/simmanager/simmanager.h"
+#include "framework/core/simmanager/simmanager.h"
 
 // HOOK
 #include <polyhook2/Detour/x86Detour.hpp>

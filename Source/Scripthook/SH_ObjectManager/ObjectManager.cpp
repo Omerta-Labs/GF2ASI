@@ -4,17 +4,17 @@
 #include <Addons/Hook.h>
 
 // SDK (Framework)
-#include "SDK/ears_framework/src/game_framework/framework/core/attributehandler/cattributehandler.h"
-#include "SDK/ears_framework/src/framework/core/entity/entity.h"
-#include "SDK/ears_framework/src/framework/core/simmanager/simmanager.h"
-#include "SDK/ears_framework/src/framework/core/streammanager/streammanager.h"
+#include "framework/core/attributehandler/cattributehandler.h"
+#include "framework/core/entity/entity.h"
+#include "framework/core/simmanager/simmanager.h"
+#include "framework/core/streammanager/streammanager.h"
 
 // SDK (Godfather)
-#include "SDK/ears_godfather/src/modules/npcscheduling/simnpc.h"
-#include "SDK/ears_godfather/src/modules/player/player.h"
-#include "SDK/ears_godfather/src/modules/item/inventory.h"
-#include "SDK/ears_godfather/src/modules/item/inventorymanager.h"
-#include "SDK/ears_godfather/src/modules/item/item.h"
+#include "modules/npcscheduling/simnpc.h"
+#include "modules/player/player.h"
+#include "modules/item/inventory.h"
+#include "modules/item/inventorymanager.h"
+#include "modules/item/item.h"
 
 namespace DefinedEvents
 {

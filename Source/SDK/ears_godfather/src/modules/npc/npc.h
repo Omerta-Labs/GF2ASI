@@ -1,10 +1,10 @@
 #pragma once
 
-#include "SDK/ears_godfather/src/modules/sentient/sentient.h"
+#include "modules/sentient/sentient.h"
 
 // SDK
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "ears_common/guid.h"
+#include "framework/core/eventhandler/ceventhandler.h"
 
 // CPP
 #include <cstdint>

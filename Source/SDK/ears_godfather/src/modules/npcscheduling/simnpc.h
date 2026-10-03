@@ -1,18 +1,18 @@
 #pragma once
 
 // SDK Common
-#include "SDK/ears_common/include/ears_common/array.h"
-#include "SDK/ears_common/include/ears_common/bitflags.h"
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/safeptr.h"
-#include "SDK/ears_common/include/ears_common/string.h"
-#include "SDK/ears_common/include/ears_common/rwtypes.h"
+#include "ears_common/array.h"
+#include "ears_common/bitflags.h"
+#include "ears_common/guid.h"
+#include "ears_common/safeptr.h"
+#include "ears_common/string.h"
+#include "ears_common/rwtypes.h"
 
 // SDK Framework
-#include "SDK/ears_framework/src/framework/core/base/base.h"
+#include "framework/core/base/base.h"
 
 // SDK Godfather
-#include "SDK/ears_godfather/src/modules/sentient/sentient_constants.h"
+#include "modules/sentient/sentient_constants.h"
 
 namespace EARS
 {

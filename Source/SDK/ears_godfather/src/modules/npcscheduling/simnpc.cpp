@@ -4,7 +4,7 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/component/npcupgradecomponent.h"
+#include "modules/component/npcupgradecomponent.h"
 
 String* EARS::Modules::SimNPC::GetName()
 {

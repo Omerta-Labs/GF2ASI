@@ -1,10 +1,10 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/bitflags.h"
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/safeptr.h"
-#include "SDK/ears_godfather/src/modules/sentient/sentient_constants.h"
+#include "ears_common/bitflags.h"
+#include "ears_common/guid.h"
+#include "ears_common/safeptr.h"
+#include "modules/sentient/sentient_constants.h"
 
 // CPP
 #include <functional>

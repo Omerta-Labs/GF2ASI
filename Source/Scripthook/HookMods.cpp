@@ -11,23 +11,23 @@
 #include "Scripthook/SH_ModManager/ModManager.h"
 
 #include "Scripthook/SH_HashedNames/HashedNameRegistry.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/eventhandler/ceventhandler.h"
 
 // SDK
-#include "SDK/ears_framework/src/framework/toolkits/statemachine/smbuilder.h"
-#include "SDK/ears_godfather/src/modules/player/playermastersm.h"
-#include "SDK/ears_godfather/src/modules/player/playerdebug.h"
-#include "SDK/ears_godfather/src/modules/ui/ui_popup.h"
-#include "SDK/ears_godfather/src/modules/ui/ui_frontend.h"
-#include "SDK/ears_godfather/src/modules/vehicles/statemachines/vehicleentrysm.h"
+#include "framework/toolkits/statemachine/smbuilder.h"
+#include "modules/player/playermastersm.h"
+#include "modules/player/playerdebug.h"
+#include "modules/ui/ui_popup.h"
+#include "modules/ui/ui_frontend.h"
+#include "modules/vehicles/statemachines/vehicleentrysm.h"
 
-#include "SDK/ears_godfather/src/modules/missions/checkpoint.h"
-#include "SDK/ears_godfather/src/modules/missions/checkpointmanager.h"
+#include "modules/missions/checkpoint.h"
+#include "modules/missions/checkpointmanager.h"
 
-#include "SDK/ears_godfather/src/modules/debug/demopackagemanager.h"
-#include "SDK/ears_godfather/src/modules/debug/demopackage.h"
+#include "modules/debug/demopackagemanager.h"
+#include "modules/debug/demopackage.h"
 
-#include "SDK/rwfilesystem/include/rw/core/filesys/manager.h"
+#include "rw/core/filesys/manager.h"
 
 // Pl2
 #include <polyhook2/Detour/x86Detour.hpp>

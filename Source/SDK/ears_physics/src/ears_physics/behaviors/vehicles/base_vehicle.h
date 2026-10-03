@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/animated/animated.h"
+#include "framework/core/animated/animated.h"
 
 namespace EARS::Vehicles
 {

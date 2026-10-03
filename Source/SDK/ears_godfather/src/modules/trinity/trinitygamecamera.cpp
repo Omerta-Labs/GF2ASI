@@ -3,10 +3,10 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/ears_common/include/ears_common/rwtypes.h"
-#include "SDK/ears_framework/src/framework/core/camera/camera.h"
-#include "SDK/ears_framework/src/framework/core/camera/cameramanager.h"
-#include "SDK/ears_framework/src/framework/modules/camera/customcamera.h"
+#include "ears_common/rwtypes.h"
+#include "framework/core/camera/camera.h"
+#include "framework/core/camera/cameramanager.h"
+#include "framework/modules/camera/customcamera.h"
 
 // C++
 #include <cmath>

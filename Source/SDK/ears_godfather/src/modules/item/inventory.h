@@ -1,8 +1,8 @@
 #pragma once
 
 // Common
-#include "SDK/ears_common/include/ears_common/array.h"
-#include "SDK/ears_common/include/ears_common/safeptr.h"
+#include "ears_common/array.h"
+#include "ears_common/safeptr.h"
 
 // CPP
 #include <stdint.h>

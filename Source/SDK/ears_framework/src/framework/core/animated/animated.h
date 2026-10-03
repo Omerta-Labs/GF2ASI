@@ -1,7 +1,7 @@
 #pragma once
 // SDK
-#include "SDK/ears_common/include/ears_common/array.h"
-#include "SDK/ears_framework/src/framework/core/entity/entity.h"
+#include "ears_common/array.h"
+#include "framework/core/entity/entity.h"
 
 // forward declares
 namespace EA

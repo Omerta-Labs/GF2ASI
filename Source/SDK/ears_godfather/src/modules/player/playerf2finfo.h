@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_framework/src/framework/modules/behaviorinfo/behaviorinfo.h"
+#include "framework/modules/behaviorinfo/behaviorinfo.h"
 
 namespace EARS
 {

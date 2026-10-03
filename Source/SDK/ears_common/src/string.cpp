@@ -1,4 +1,4 @@
-#include "SDK/ears_common/include/ears_common/string.h"
+#include "ears_common/string.h"
 
 // SH
 #include "addons/Hook.h"

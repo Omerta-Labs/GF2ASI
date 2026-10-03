@@ -1,7 +1,7 @@
 #pragma once
 
 // Renderware
-#include <SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h>
+#include <framework/core/eventhandler/ceventhandler.h>
 
 // TODO: When we get a manager we can probably move a lot of the achievement/trophy related stuff into said folder
 

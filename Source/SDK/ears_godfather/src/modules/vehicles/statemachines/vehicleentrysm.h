@@ -1,10 +1,10 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/bitflags.h"
-#include "SDK/ears_common/include/ears_common/safeptr.h"
-#include "SDK/ears_framework/src/framework/toolkits/statemachine/animatesm.h"
-#include "SDK/ears_physics/src/ears_physics/behaviors/vehicles/base_vehicle.h"
+#include "ears_common/bitflags.h"
+#include "ears_common/safeptr.h"
+#include "framework/toolkits/statemachine/animatesm.h"
+#include "ears_physics/behaviors/vehicles/base_vehicle.h"
 
 namespace EARS::Modules
 {

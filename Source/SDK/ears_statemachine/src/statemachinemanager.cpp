@@ -1,8 +1,8 @@
-#include "SDK/ears_statemachine/include/ears_statemachine/statemachinemanager.h"
+#include "ears_statemachine/statemachinemanager.h"
 
 #include "Addons/Hook.h"
 
-#include "SDK/ears_statemachine/include/ears_statemachine/statemachine.h"
+#include "ears_statemachine/statemachine.h"
 
 // C++
 #include <assert.h>

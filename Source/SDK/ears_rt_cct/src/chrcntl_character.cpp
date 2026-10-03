@@ -1,4 +1,4 @@
-#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_character.h"
+#include "ears_rt_cct/chrcntl_character.h"
 
 namespace EA
 {

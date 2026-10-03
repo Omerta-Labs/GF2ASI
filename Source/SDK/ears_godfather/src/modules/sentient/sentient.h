@@ -1,14 +1,14 @@
 #pragma once
 
-#include "SDK/ears_godfather/src/modules/partedanimated/partedanimated.h"
+#include "modules/partedanimated/partedanimated.h"
 
 // SDK
-#include "SDK/ears_common/include/ears_common/safeptr.h"
-#include "SDK/ears_godfather/src/modules/generic/scriptactor.h"
-#include "SDK/ears_godfather/src/modules/npc/scriptedsequence.h"
-#include "SDK/ears_godfather/src/modules/utils/weaputils.h"
-#include "SDK/ears_physics/src/ears_physics/characters/characterproxy.h"
-#include "SDK/ears_statemachine/include/ears_statemachine/statemachine.h"
+#include "ears_common/safeptr.h"
+#include "modules/generic/scriptactor.h"
+#include "modules/npc/scriptedsequence.h"
+#include "modules/utils/weaputils.h"
+#include "ears_physics/characters/characterproxy.h"
+#include "ears_statemachine/statemachine.h"
 
 namespace EARS
 {

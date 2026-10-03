@@ -1,10 +1,10 @@
 #include "player.h"
 
 // Framework
-#include "SDK/ears_common/include/ears_common/bitvector.h"
-#include "SDK/ears_framework/src/framework/core/player/playermanager.h"
-#include "SDK/ears_godfather/src/modules/component/playerupgradecomponent.h"
-#include "SDK/ears_godfather/src/modules/player/playermastersm.h"
+#include "ears_common/bitvector.h"
+#include "framework/core/player/playermanager.h"
+#include "modules/component/playerupgradecomponent.h"
+#include "modules/player/playermastersm.h"
 
 // Hook
 #include <Addons/Hook.h>

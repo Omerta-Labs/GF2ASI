@@ -1,14 +1,14 @@
 #pragma once
 
 // SDK (Common)
-#include "SDK/ears_common/include/ears_common/array.h"
-#include "SDK/ears_common/include/ears_common/bitflags.h"
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/string.h"
+#include "ears_common/array.h"
+#include "ears_common/bitflags.h"
+#include "ears_common/guid.h"
+#include "ears_common/string.h"
 
 // SDK (Framework)
-#include "SDK/ears_framework/src/framework/core/base/base.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/base/base.h"
+#include "framework/core/eventhandler/ceventhandler.h"
 
 // CPP
 #include <stdint.h>

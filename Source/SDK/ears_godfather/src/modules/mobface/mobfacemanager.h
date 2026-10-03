@@ -1,10 +1,10 @@
 #pragma once
 
 // EARS Godfather
-#include "SDK/ears_godfather/src/modules/familytree/playerfamilytree.h"
+#include "modules/familytree/playerfamilytree.h"
 
 // EARS Framework
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/eventhandler/ceventhandler.h"
 
 namespace EARS
 {

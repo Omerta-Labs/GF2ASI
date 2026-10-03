@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK/ears_godfather/src/modules/sentient/statemachines/sentientsm.h"
+#include "modules/sentient/statemachines/sentientsm.h"
 
 // Addons
 #include "Addons/Hook.h"

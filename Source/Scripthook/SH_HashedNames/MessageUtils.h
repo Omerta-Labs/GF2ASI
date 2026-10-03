@@ -5,8 +5,8 @@
 // to the mod layer (HashedNameRegistry).
 
 // SDK
-#include "SDK/ears_common/include/ears_common/commontypes.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "ears_common/commontypes.h"
+#include "framework/core/eventhandler/ceventhandler.h"
 
 // Scripthook
 #include "Scripthook/SH_HashedNames/HashedNameRegistry.h"

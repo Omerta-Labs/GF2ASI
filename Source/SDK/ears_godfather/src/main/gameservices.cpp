@@ -1,6 +1,6 @@
 #include "gameservices.h"
 
-#include "SDK/ears_godfather/src/modules/vehicles/statemachines/vehicleentrysm.h"
+#include "modules/vehicles/statemachines/vehicleentrysm.h"
 
 namespace EARS
 {

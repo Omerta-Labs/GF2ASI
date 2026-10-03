@@ -4,10 +4,10 @@
 #include "Addons/Hook.h"
 
 // Framework
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/eventhandler/ceventhandler.h"
 
 // Godfather
-#include "SDK/ears_godfather/src/modules/gun/gun.h"
+#include "modules/gun/gun.h"
 
 // CPP
 #include <algorithm>

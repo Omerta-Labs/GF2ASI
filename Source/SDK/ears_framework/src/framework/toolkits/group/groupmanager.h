@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK (Common)
-#include "SDK/ears_common/include/ears_common/list.h"
+#include "ears_common/list.h"
 
 namespace EARS
 {

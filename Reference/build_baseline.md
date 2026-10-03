@@ -47,8 +47,21 @@ vendors/lua/include
 vendors/sol
 ```
 
-`Source/` as a single include root is what keeps Phase 3's target split free of
-include rewrites. Phase 2e replaces it with per-package roots.
+Phase 2e added the 17 per-package SDK roots on top of these, so an SDK include
+directive reads as it did in the original. The repo root and `Source/` stay, for
+`Addons/`, `Scripthook/`, `Utils/` and `framework.h`; no SDK include depends on
+them any more.
+
+## Translation unit count over the restructure
+
+| | TUs |
+|---|---|
+| Phase 0 baseline | 269 |
+| after 2d-ii (12 merged away, 3 new) | 260 |
+| after 2d-iii (3 inlined into headers, 1 merged) | 257 |
+
+A drop is expected at each merge and is the point of it; an *increase* would
+mean a file was duplicated rather than moved.
 
 ## Link libraries
 

@@ -1,7 +1,7 @@
 #include "demopackagemanager.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/debug/demopackage.h"
+#include "modules/debug/demopackage.h"
 
 // c++
 #include <assert.h>

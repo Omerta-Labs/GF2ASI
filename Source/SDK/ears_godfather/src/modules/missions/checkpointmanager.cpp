@@ -4,7 +4,7 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/missions/checkpoint.h"
+#include "modules/missions/checkpoint.h"
 
 namespace EARS::Modules
 {

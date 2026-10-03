@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/camera/camera.h"
+#include "framework/core/camera/camera.h"
 
 // C++
 #include <type_traits>

@@ -1,11 +1,11 @@
 #pragma once
 
 // SDK (Common)
-#include "SDK/ears_common/include/ears_common/singleton.h"
+#include "ears_common/singleton.h"
 
 // SDK (Framework)
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/resourcemanager/cresourcehandler.h"
+#include "framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/resourcemanager/cresourcehandler.h"
 
 namespace EARS::Modules
 {

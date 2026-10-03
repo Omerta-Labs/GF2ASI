@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK/ears_framework/src/framework/core/entity/entity.h"
+#include "framework/core/entity/entity.h"
 
 namespace EARS::Modules
 {

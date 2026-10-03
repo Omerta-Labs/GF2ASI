@@ -3,7 +3,7 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/ears_common/include/ears_common/bitflags.h"
+#include "ears_common/bitflags.h"
 
 namespace EARS::Apt
 {

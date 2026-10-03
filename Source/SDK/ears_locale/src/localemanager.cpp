@@ -1,4 +1,4 @@
-#include "SDK/ears_locale/include/ears_locale/localemanager.h"
+#include "ears_locale/localemanager.h"
 
 // Hooks
 #include "Addons/Hook.h"

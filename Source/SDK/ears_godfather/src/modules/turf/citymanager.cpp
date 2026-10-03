@@ -1,7 +1,7 @@
 #include "citymanager.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/turf/city.h"
+#include "modules/turf/city.h"
 
 int32_t EARS::Modules::CityManager::FindCityIndex(const uint32_t InCityID) const
 {

@@ -31,10 +31,32 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 
-# Mirrors target_include_directories() in CMakeLists.txt.
+# Mirrors target_include_directories() in CMakeLists.txt. Keep the two in step;
+# CMake errors out if one of the SDK roots below stops existing.
+SDK_ROOTS = [
+    "allocator/include",
+    "ears_common/include",
+    "ears_common/src",
+    "ears_framework/src",
+    "ears_framework/src/game_framework",
+    "ears_godfather/src",
+    "ears_locale/include",
+    "ears_physics/src",
+    "ears_rt_cct/include",
+    "ears_rt_cct/src",
+    "ears_rt_llrender/include",
+    "ears_rt_llrender/src",
+    "ears_statemachine/include",
+    "ears_trinity/include",
+    "ears_trinity/src",
+    "rwcontroller/include",
+    "rwfilesystem/include",
+]
+
 INCLUDE_ROOTS = [
     REPO,
     REPO / "Source",
+    *[REPO / "Source" / "SDK" / r for r in SDK_ROOTS],
     REPO / "Vendors/d3d9/include",
     REPO / "Vendors/detours",
     REPO / "Vendors/polyhook/include",

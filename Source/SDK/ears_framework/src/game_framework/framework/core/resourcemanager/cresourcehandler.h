@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/guid.h"
+#include "ears_common/guid.h"
 
 // C++
 #include <stdint.h>

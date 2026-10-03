@@ -3,7 +3,7 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/camera/camerablender.h"
+#include "framework/core/camera/camerablender.h"
 
 // C++
 #include "assert.h"

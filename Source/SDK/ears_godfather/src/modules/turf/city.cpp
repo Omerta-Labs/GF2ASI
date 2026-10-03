@@ -1,8 +1,8 @@
 #include "city.h"
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/simmanager/simmanager.h"
-#include "SDK/ears_framework/src/framework/core/streammanager/streammanager.h"
+#include "framework/core/simmanager/simmanager.h"
+#include "framework/core/streammanager/streammanager.h"
 
 // Hook
 #include "Addons/Hook.h"

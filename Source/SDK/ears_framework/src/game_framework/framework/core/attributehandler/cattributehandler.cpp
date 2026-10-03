@@ -4,8 +4,8 @@
 #include <Addons/Hook.h>
 
 // Framework
-#include "SDK/ears_framework/src/framework/core/component/component.h"
-#include "SDK/ears_framework/src/framework/core/simmanager/simmanager.h"
+#include "framework/core/component/component.h"
+#include "framework/core/simmanager/simmanager.h"
 
 // CPP
 #include <assert.h>

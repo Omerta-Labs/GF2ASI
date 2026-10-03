@@ -1,7 +1,7 @@
 #pragma once
 
 // TODO: Should be private/excluded from public API
-#include "SDK/ears_trinity/src/trinitytransformbase.h"
+#include "trinitytransformbase.h"
 
 namespace EA::Trinity
 {

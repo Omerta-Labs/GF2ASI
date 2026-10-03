@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK/ears_godfather/src/modules/component/damage/standarddamagecomponent.h"
+#include "modules/component/damage/standarddamagecomponent.h"
 
 namespace EARS
 {

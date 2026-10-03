@@ -4,9 +4,9 @@
 #include "addons/tConsole.h"
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/camera/cameramanager.h"
-#include "SDK/ears_framework/src/framework/core/input/input.h"
-#include "SDK/ears_godfather/src/modules/player/player.h"
+#include "framework/core/camera/cameramanager.h"
+#include "framework/core/input/input.h"
+#include "modules/player/player.h"
 
 // Scripthook
 #include "Scripthook/SH_ImGui/ImGuiManager.h"

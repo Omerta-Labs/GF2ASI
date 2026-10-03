@@ -1,6 +1,6 @@
-#include "SDK/ears_rt_cct/include/ears_rt_cct/highlevel/chrcntl_extensions.h"
+#include "ears_rt_cct/highlevel/chrcntl_extensions.h"
 
-#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_animview.h"
+#include "ears_rt_cct/chrcntl_animview.h"
 
 /* static */
 bool ChrCntl_Extensions_AnimEnd(EA::CCT::AnimView* pAnimViewInfo)

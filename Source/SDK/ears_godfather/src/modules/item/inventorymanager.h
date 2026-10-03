@@ -1,13 +1,13 @@
 #pragma once
 
 // Common
-#include "SDK/ears_common/include/ears_common/array.h"
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/safeptr.h"
+#include "ears_common/array.h"
+#include "ears_common/guid.h"
+#include "ears_common/safeptr.h"
 
 // Framework
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
-#include "SDK/ears_framework/src/framework/core/persistence/PersistenceRegistry.h"
+#include "framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/persistence/PersistenceRegistry.h"
 
 // CPP
 #include <stdint.h>

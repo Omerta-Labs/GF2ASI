@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK/ears_trinity/src/interpolator.h"
+#include "interpolator.h"
 
 namespace EA::Trinity
 {

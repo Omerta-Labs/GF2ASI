@@ -1,9 +1,9 @@
 #pragma once
 
 // SDK.h
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/string.h"
-#include "SDK/ears_framework/src/framework/core/base/base.h"
+#include "ears_common/guid.h"
+#include "ears_common/string.h"
+#include "framework/core/base/base.h"
 
 namespace EARS
 {

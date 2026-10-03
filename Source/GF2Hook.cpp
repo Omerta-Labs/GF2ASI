@@ -22,18 +22,18 @@
 #include "Scripthook/SH_ModManager/ModManager.h"
 #include "Scripthook/HookMods.h"
 
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_framework/src/framework/core/simmanager/simmanager.h"
-#include "SDK/ears_framework/src/framework/core/streammanager/streammanager.h"
-#include "SDK/ears_godfather/src/modules/partedanimated/partedanimated.h"
-#include "SDK/ears_godfather/src/modules/families/corleone_data.h"
-#include "SDK/ears_godfather/src/modules/npcscheduling/demographicregion.h"
-#include "SDK/ears_godfather/src/modules/scoring/scorekeeper.h"
-#include "SDK/ears_godfather/src/modules/mobface/mobfacemanager.h"
-#include "SDK/ears_godfather/src/modules/npc/npc.h"
-#include "SDK/ears_godfather/src/modules/trinity/trinitygamecamera.h"
-#include "SDK/ears_godfather/src/modules/turf/city.h"
-#include <SDK/ears_rt_llrender/include/ears_rt_llrender/shadermanager.h>
+#include "ears_common/guid.h"
+#include "framework/core/simmanager/simmanager.h"
+#include "framework/core/streammanager/streammanager.h"
+#include "modules/partedanimated/partedanimated.h"
+#include "modules/families/corleone_data.h"
+#include "modules/npcscheduling/demographicregion.h"
+#include "modules/scoring/scorekeeper.h"
+#include "modules/mobface/mobfacemanager.h"
+#include "modules/npc/npc.h"
+#include "modules/trinity/trinitygamecamera.h"
+#include "modules/turf/city.h"
+#include <ears_rt_llrender/shadermanager.h>
 
 #include <sol.hpp>
 #include <thread>

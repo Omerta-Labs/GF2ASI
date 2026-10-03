@@ -1,8 +1,8 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/safeptr.h"
-#include "SDK/ears_framework/src/framework/core/camera/camera.h"
+#include "ears_common/safeptr.h"
+#include "framework/core/camera/camera.h"
 
 namespace EARS::Modules
 {

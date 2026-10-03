@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/memory/allocator.h"
+#include "framework/core/memory/allocator.h"
 
 // C++
 #include <stdint.h>

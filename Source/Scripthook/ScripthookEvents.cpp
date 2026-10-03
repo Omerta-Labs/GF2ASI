@@ -7,7 +7,7 @@
 #include "Scripthook/ScripthookEvents.h"
 
 // GF2
-#include <SDK/ears_godfather/src/modules/scoring/scoreevent.h>
+#include <modules/scoring/scoreevent.h>
 
 namespace Mod
 {

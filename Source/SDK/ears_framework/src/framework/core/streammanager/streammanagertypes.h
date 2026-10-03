@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK (Framework)
-#include "SDK/ears_framework/src/framework/core/eventscheduler/imsgdata.h"
+#include "framework/core/eventscheduler/imsgdata.h"
 
 // C++
 #include <stdint.h>

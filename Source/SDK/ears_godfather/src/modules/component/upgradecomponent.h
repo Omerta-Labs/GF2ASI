@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/component/component.h"
+#include "framework/core/component/component.h"
 
 // CPP
 #include <stdint.h>

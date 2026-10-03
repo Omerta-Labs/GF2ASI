@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK Framework
-#include "SDK/ears_framework/src/framework/modules/lights/directionalshadowparams.h"
+#include "framework/modules/lights/directionalshadowparams.h"
 
 // C++
 #include <stdint.h>

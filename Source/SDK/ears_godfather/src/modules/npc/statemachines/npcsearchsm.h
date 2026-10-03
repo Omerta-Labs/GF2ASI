@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SDK/ears_godfather/src/modules/sentient/statemachines/sentientsm.h"
+#include "modules/sentient/statemachines/sentientsm.h"
 #include "Addons/Hook.h"
-#include "SDK/ears_framework/src/framework/toolkits/statemachine/animatesm.h"
+#include "framework/toolkits/statemachine/animatesm.h"
 
 namespace EARS::Modules
 {

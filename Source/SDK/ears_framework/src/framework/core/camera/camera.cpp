@@ -3,7 +3,7 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/memory/globalheapallocator.h"
+#include "framework/core/memory/globalheapallocator.h"
 
 namespace EARS::Framework
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 // CPP
-#include "SDK/ears_godfather/src/modules/sentient/statemachines/sentientsm.h"
+#include "modules/sentient/statemachines/sentientsm.h"
 
 namespace EARS
 {

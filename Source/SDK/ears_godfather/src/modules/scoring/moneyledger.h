@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK (Common)
-#include "SDK/ears_common/include/ears_common/staticarray.h"
+#include "ears_common/staticarray.h"
 
 // CPP
 #include <stdint.h>

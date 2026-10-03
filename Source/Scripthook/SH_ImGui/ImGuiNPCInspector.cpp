@@ -6,17 +6,17 @@
 #include "Scripthook/SH_PlayerMasterSM/PlayerDebugOptions_Modded.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/npc/npc.h"
-#include "SDK/ears_godfather/src/modules/npcscheduling/simnpc.h"
-#include "SDK/ears_godfather/src/modules/player/player.h"
-#include "SDK/ears_godfather/src/modules/component/npcupgradecomponent.h"
-#include "SDK/ears_godfather/src/modules/component/playerupgradecomponent.h"
-#include "SDK/ears_godfather/src/modules/mobface/mobfacemanager.h"
-#include "SDK/ears_godfather/src/modules/partedmodel/partedmodelmgr.h"
-#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_animview.h"
-#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_character.h"
+#include "modules/npc/npc.h"
+#include "modules/npcscheduling/simnpc.h"
+#include "modules/player/player.h"
+#include "modules/component/npcupgradecomponent.h"
+#include "modules/component/playerupgradecomponent.h"
+#include "modules/mobface/mobfacemanager.h"
+#include "modules/partedmodel/partedmodelmgr.h"
+#include "ears_rt_cct/chrcntl_animview.h"
+#include "ears_rt_cct/chrcntl_character.h"
 
-#include "SDK/ears_godfather/src/modules/player/playermastersm.h"
+#include "modules/player/playermastersm.h"
 
 namespace Private
 {

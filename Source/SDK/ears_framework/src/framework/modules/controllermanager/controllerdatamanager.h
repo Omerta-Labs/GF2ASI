@@ -1,9 +1,9 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/singleton.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/resourcemanager/cresourcehandler.h"
-#include "SDK/ears_framework/src/framework/modules/controllermanager/controllereventconfig.h"
+#include "ears_common/singleton.h"
+#include "framework/core/resourcemanager/cresourcehandler.h"
+#include "framework/modules/controllermanager/controllereventconfig.h"
 
 // C++
 #include <stdint.h>

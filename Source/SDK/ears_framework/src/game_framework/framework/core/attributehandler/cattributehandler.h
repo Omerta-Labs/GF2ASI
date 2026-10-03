@@ -1,13 +1,13 @@
 #pragma once
 
 // SDK Common
-#include "SDK/ears_common/include/ears_common/BitArray.h"
-#include "SDK/ears_common/include/ears_common/commontypes.h"
-#include "SDK/ears_common/include/ears_common/doubleinternallinkedlist2.h"
-#include "SDK/ears_common/include/ears_common/guid.h"
+#include "ears_common/BitArray.h"
+#include "ears_common/commontypes.h"
+#include "ears_common/doubleinternallinkedlist2.h"
+#include "ears_common/guid.h"
 
 // SDK Framework
-#include "SDK/ears_framework/src/game_framework/framework/core/attributehandler/cclassfactory.h"
+#include "framework/core/attributehandler/cclassfactory.h"
 
 // Forward declare
 namespace EARS

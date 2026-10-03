@@ -1,7 +1,7 @@
 #include "controllereventconfig.h"
 
 // SDK
-#include "SDK/ears_common/include/ears_common/commontypes.h"
+#include "ears_common/commontypes.h"
 
 // C++
 #include <string.h>

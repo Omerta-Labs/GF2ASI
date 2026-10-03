@@ -2,7 +2,7 @@
 
 #include "Addons/Hook.h"
 
-#include "SDK/ears_common/include/ears_common/hashtable.h"
+#include "ears_common/hashtable.h"
 
 #include <assert.h>
 

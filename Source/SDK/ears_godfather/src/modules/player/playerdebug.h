@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SDK/ears_common/include/ears_common/bitflags.h"
-#include "SDK/ears_common/include/ears_common/singleton.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
-#include "SDK/ears_godfather/src/modules/player/playersm.h"
+#include "ears_common/bitflags.h"
+#include "ears_common/singleton.h"
+#include "framework/core/eventhandler/ceventhandler.h"
+#include "modules/player/playersm.h"
 
 namespace EARS::Modules
 {

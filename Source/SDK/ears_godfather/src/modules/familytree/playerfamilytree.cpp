@@ -4,9 +4,9 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/npc/npc.h"
-#include "SDK/ears_godfather/src/modules/npcscheduling/simnpc.h"
-#include "SDK/ears_godfather/src/modules/ui/ui_hud.h"
+#include "modules/npc/npc.h"
+#include "modules/npcscheduling/simnpc.h"
+#include "modules/ui/ui_hud.h"
 
 // CPP
 #include <bitset>

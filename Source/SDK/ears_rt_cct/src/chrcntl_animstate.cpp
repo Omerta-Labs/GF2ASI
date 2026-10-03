@@ -1,4 +1,4 @@
-#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_animstate.h"
+#include "ears_rt_cct/chrcntl_animstate.h"
 
 namespace EA
 {

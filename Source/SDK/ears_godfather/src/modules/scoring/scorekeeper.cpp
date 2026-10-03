@@ -1,10 +1,10 @@
 #include "scorekeeper.h"
 
 // GF2
-#include "SDK/ears_godfather/src/modules/scoring/scoreevent.h"
+#include "modules/scoring/scoreevent.h"
 
 // Renderware
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/eventhandler/ceventhandler.h"
 
 // Addons
 #include "Addons/Hook.h"

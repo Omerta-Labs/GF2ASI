@@ -1,8 +1,8 @@
 #pragma once
 
 // SDK (Common)
-#include "SDK/ears_common/include/ears_common/array.h"
-#include "SDK/ears_common/include/ears_common/singleton.h"
+#include "ears_common/array.h"
+#include "ears_common/singleton.h"
 
 namespace EARS
 {

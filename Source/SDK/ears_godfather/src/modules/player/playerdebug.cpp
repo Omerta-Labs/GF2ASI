@@ -1,11 +1,11 @@
 #include "playerdebug.h"
 
 #include "playerdebug.h"
-#include "SDK/ears_framework/src/framework/core/camera/cameramanager.h"
-#include "SDK/ears_framework/src/framework/core/input/input.h"
-#include "SDK/ears_framework/src/framework/toolkits/statemachine/smbuilder.h"
-#include "SDK/ears_godfather/src/modules/player/player.h"
-#include "SDK/ears_godfather/src/modules/player/playerdebug.h"
+#include "framework/core/camera/cameramanager.h"
+#include "framework/core/input/input.h"
+#include "framework/toolkits/statemachine/smbuilder.h"
+#include "modules/player/player.h"
+#include "modules/player/playerdebug.h"
 #include "Addons/Hook.h"
 #include <cmath>
 

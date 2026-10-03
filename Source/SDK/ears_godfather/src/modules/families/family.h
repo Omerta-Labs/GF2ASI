@@ -1,18 +1,18 @@
 #pragma once
 
 // SDK Framework
-#include "SDK/ears_framework/src/framework/core/base/base.h"
+#include "framework/core/base/base.h"
 
 // SDK Common
-#include "SDK/ears_common/include/ears_common/array.h"
-#include "SDK/ears_common/include/ears_common/bitflags.h"
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/string.h"
+#include "ears_common/array.h"
+#include "ears_common/bitflags.h"
+#include "ears_common/guid.h"
+#include "ears_common/string.h"
 
 // SDK Godfather
-#include "SDK/ears_godfather/src/modules/families/mademan.h"
-#include "SDK/ears_godfather/src/modules/npcscheduling/simnpc.h"
-#include "SDK/ears_godfather/src/modules/scoring/moneyledger.h"
+#include "modules/families/mademan.h"
+#include "modules/npcscheduling/simnpc.h"
+#include "modules/scoring/moneyledger.h"
 
 // C++
 #include <functional>

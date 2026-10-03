@@ -144,6 +144,45 @@ target_include_directories(GF2ASI PRIVATE
     "${CMAKE_SOURCE_DIR}/Source"
 )
 
+# Each SDK package's own source root, so an include directive reads exactly as
+# it did in the original: "modules/families/family.h", not
+# "SDK/ears_godfather/src/modules/families/family.h". Code transcribed out of
+# the original build compiles as written, which is the point.
+#
+# Keep this list in step with INCLUDE_ROOTS in Tools/check_includes.py.
+#
+# ears_framework needs both its roots: src/framework/ and
+# src/game_framework/framework/ hold disjoint files that share the framework/...
+# prefix. A handful of headers sit in src/ for packages that otherwise use
+# include/ (ears_trinity, ears_rt_cct, ears_rt_llrender), so those are listed
+# too.
+foreach(_root
+    allocator/include
+    ears_common/include
+    ears_common/src
+    ears_framework/src
+    ears_framework/src/game_framework
+    ears_godfather/src
+    ears_locale/include
+    ears_physics/src
+    ears_rt_cct/include
+    ears_rt_cct/src
+    ears_rt_llrender/include
+    ears_rt_llrender/src
+    ears_statemachine/include
+    ears_trinity/include
+    ears_trinity/src
+    rwcontroller/include
+    rwfilesystem/include
+)
+    if(NOT IS_DIRECTORY "${CMAKE_SOURCE_DIR}/Source/SDK/${_root}")
+        message(FATAL_ERROR
+            "SDK include root Source/SDK/${_root} does not exist. The package "
+            "layout and this list have drifted apart.")
+    endif()
+    target_include_directories(GF2ASI PRIVATE "${CMAKE_SOURCE_DIR}/Source/SDK/${_root}")
+endforeach()
+
 target_include_directories(GF2ASI SYSTEM PRIVATE
     "${CMAKE_SOURCE_DIR}/Vendors/d3d9/include"
     "${CMAKE_SOURCE_DIR}/Vendors/detours"
@@ -206,4 +245,4 @@ set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT GF2ASI)
 list(LENGTH GF2ASI_SOURCES GF2ASI_TU_COUNT)
 math(EXPR GF2ASI_TU_COUNT "${GF2ASI_TU_COUNT} + 1")   # dllmain.cpp
 message(STATUS "GF2ASI: ${GF2ASI_TU_COUNT} translation units "
-               "(baseline is 269 -- see Reference/build_baseline.md)")
+               "(257 after the Phase 2 merges -- see Reference/build_baseline.md)")

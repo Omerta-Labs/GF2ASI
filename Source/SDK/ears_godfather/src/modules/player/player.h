@@ -1,22 +1,22 @@
 #pragma once
 
 // SDK Common
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/staticarray.h"
+#include "ears_common/guid.h"
+#include "ears_common/staticarray.h"
 
 // SDK Framework
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
-#include "SDK/ears_framework/src/framework/core/player/baseplayer.h"
+#include "framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/player/baseplayer.h"
 
 // SDK Modules
-#include "SDK/ears_godfather/src/modules/player/playeractionable.h"
-#include "SDK/ears_godfather/src/modules/player/playercamera.h"
-#include "SDK/ears_godfather/src/modules/player/PlayerDefines.h"
-#include "SDK/ears_godfather/src/modules/player/playerf2finfo.h"
-#include "SDK/ears_godfather/src/modules/player/playerlogical.h"
-#include "SDK/ears_godfather/src/modules/player/playerlowerbody.h"
-#include "SDK/ears_godfather/src/modules/player/playerupperbody.h"
-#include "SDK/ears_godfather/src/modules/sentient/sentient.h"
+#include "modules/player/playeractionable.h"
+#include "modules/player/playercamera.h"
+#include "modules/player/PlayerDefines.h"
+#include "modules/player/playerf2finfo.h"
+#include "modules/player/playerlogical.h"
+#include "modules/player/playerlowerbody.h"
+#include "modules/player/playerupperbody.h"
+#include "modules/sentient/sentient.h"
 
 // CPP
 #include <cstdint>

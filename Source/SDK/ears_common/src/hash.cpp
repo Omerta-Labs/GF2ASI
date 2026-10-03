@@ -1,4 +1,4 @@
-#include "SDK/ears_common/include/ears_common/commontypes.h"
+#include "ears_common/commontypes.h"
 
 uint32_t EARS::Common::HashMem_SDBM(const void* pVoidData, uint32_t dataLen)
 {

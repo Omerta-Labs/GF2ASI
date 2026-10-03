@@ -1,7 +1,7 @@
 #include "vehicleentrysm.h"
 
-#include "SDK/ears_godfather/src/modules/sentient/sentient.h"
-#include "SDK/ears_godfather/src/modules/vehicles/behaviors/whitebox_car/whitebox_car.h"
+#include "modules/sentient/sentient.h"
+#include "modules/vehicles/behaviors/whitebox_car/whitebox_car.h"
 
 #include "addons/Hook.h"
 

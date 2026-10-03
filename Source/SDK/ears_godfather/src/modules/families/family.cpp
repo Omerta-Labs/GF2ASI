@@ -4,9 +4,9 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/buildings/building_manager.h"
-#include "SDK/ears_godfather/src/modules/buildings/building_store.h"
-#include "SDK/ears_godfather/src/modules/families/mademan.h"
+#include "modules/buildings/building_manager.h"
+#include "modules/buildings/building_store.h"
+#include "modules/families/mademan.h"
 
 // C++
 #include <assert.h>

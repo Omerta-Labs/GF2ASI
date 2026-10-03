@@ -1,11 +1,11 @@
 #pragma once
 
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/eventhandler/ceventhandler.h"
 
 // Framework
-#include "SDK/ears_common/include/ears_common/bitflags.h"
-#include "SDK/ears_common/include/ears_common/rwtypes.h"
-#include "SDK/ears_common/include/ears_common/string.h"
+#include "ears_common/bitflags.h"
+#include "ears_common/rwtypes.h"
+#include "ears_common/string.h"
 
 namespace EARS
 {

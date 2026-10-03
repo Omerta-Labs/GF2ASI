@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SDK/ears_common/include/ears_common/rwtypes.h"
-#include "SDK/ears_common/include/ears_common/safeptr.h"
-#include "SDK/ears_framework/src/framework/core/base/base.h"
+#include "ears_common/rwtypes.h"
+#include "ears_common/safeptr.h"
+#include "framework/core/base/base.h"
 
 // TODO: Move this elsewhere eventually
 namespace RWS

@@ -1,7 +1,7 @@
 #include "playersm.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/player/player.h"
+#include "modules/player/player.h"
 
 // Addons
 #include "Addons/Hook.h"

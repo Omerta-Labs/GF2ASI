@@ -1,4 +1,4 @@
-#include "SDK/ears_common/include/ears_common/safeptr.h"
+#include "ears_common/safeptr.h"
 
 SafeObj::~SafeObj()
 {

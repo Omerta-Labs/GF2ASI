@@ -4,10 +4,10 @@
 #include "Scripthook/SH_ImGui/ImGuiPropertyGrid.h"
 
 // SDK
-#include "SDK/ears_framework/src/framework/toolkits/group/groupmanager.h"
-#include "SDK/ears_godfather/src/modules/npc/npc.h"
-#include "SDK/ears_godfather/src/modules/ui/ui_hud.h"
-#include "SDK/ears_locale/include/ears_locale/localemanager.h"
+#include "framework/toolkits/group/groupmanager.h"
+#include "modules/npc/npc.h"
+#include "modules/ui/ui_hud.h"
+#include "ears_locale/localemanager.h"
 
 // CPP
 #include <string>

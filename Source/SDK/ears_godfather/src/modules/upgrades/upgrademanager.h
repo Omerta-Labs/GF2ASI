@@ -1,9 +1,9 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/array.h"
-#include "SDK/ears_common/include/ears_common/singleton.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/attributehandler/cattributehandler.h"
+#include "ears_common/array.h"
+#include "ears_common/singleton.h"
+#include "framework/core/attributehandler/cattributehandler.h"
 
 namespace EARS
 {

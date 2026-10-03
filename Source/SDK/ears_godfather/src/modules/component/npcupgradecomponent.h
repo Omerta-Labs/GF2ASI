@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_godfather/src/modules/component/upgradecomponent.h"
+#include "modules/component/upgradecomponent.h"
 
 namespace EARS
 {

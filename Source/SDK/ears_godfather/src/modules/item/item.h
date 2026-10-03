@@ -1,11 +1,11 @@
 #pragma once
 
 // Common
-#include "SDK/ears_common/include/ears_common/bitflags.h"
-#include "SDK/ears_common/include/ears_common/string.h"
+#include "ears_common/bitflags.h"
+#include "ears_common/string.h"
 
 // Framework
-#include "SDK/ears_framework/src/framework/core/entity/entity.h"
+#include "framework/core/entity/entity.h"
 
 // CPP
 #include <stdint.h>

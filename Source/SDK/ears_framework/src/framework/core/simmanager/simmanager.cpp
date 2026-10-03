@@ -5,8 +5,8 @@
 #include <Addons/Hook.h>
 
 // SDK
-#include "SDK/ears_framework/src/game_framework/framework/core/attributehandler/cattributehandler.h"
-#include "SDK/ears_framework/src/framework/core/streammanager/streammanager.h"
+#include "framework/core/attributehandler/cattributehandler.h"
+#include "framework/core/streammanager/streammanager.h"
 
 // c++
 #include <filesystem>

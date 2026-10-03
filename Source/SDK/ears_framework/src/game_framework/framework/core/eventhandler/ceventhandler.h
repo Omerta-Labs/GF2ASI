@@ -1,10 +1,10 @@
 #pragma once
 
 // EARS_Common
-#include "SDK/ears_common/include/ears_common/commontypes.h"
-#include "SDK/ears_common/include/ears_common/doubleinternallinkedlist.h"
-#include "SDK/ears_common/include/ears_common/doubleinternallinkedlist2.h"
-#include "SDK/ears_common/include/ears_common/singleinternallinkedlist.h"
+#include "ears_common/commontypes.h"
+#include "ears_common/doubleinternallinkedlist.h"
+#include "ears_common/doubleinternallinkedlist2.h"
+#include "ears_common/singleinternallinkedlist.h"
 
 // CPP
 #include <cstdint>

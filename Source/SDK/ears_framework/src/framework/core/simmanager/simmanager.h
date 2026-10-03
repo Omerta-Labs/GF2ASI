@@ -1,13 +1,13 @@
 #pragma once
 
 // RenderWare Framework
-#include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/hashtable.h"
-#include "SDK/ears_common/include/ears_common/doubleinternallinkedlist.h"
-#include "SDK/ears_common/include/ears_common/managedarray.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/attributehandler/cattributehandler.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/resourcemanager/cresourcehandler.h"
+#include "ears_common/guid.h"
+#include "ears_common/hashtable.h"
+#include "ears_common/doubleinternallinkedlist.h"
+#include "ears_common/managedarray.h"
+#include "framework/core/attributehandler/cattributehandler.h"
+#include "framework/core/eventhandler/ceventhandler.h"
+#include "framework/core/resourcemanager/cresourcehandler.h"
 
 // C++
 #include <functional>

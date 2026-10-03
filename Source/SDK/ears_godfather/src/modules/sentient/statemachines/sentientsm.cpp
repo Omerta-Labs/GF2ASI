@@ -1,7 +1,7 @@
 #include "sentientsm.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/sentient/sentient.h"
+#include "modules/sentient/sentient.h"
 
 #include "Addons/Hook.h"
 

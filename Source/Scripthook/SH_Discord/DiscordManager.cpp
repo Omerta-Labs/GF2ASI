@@ -5,8 +5,8 @@
 #include "Addons/tLog.h"
 
 // Godfather
-#include "SDK/ears_godfather/src/modules/turf/city.h"
-#include "SDK/ears_godfather/src/modules/turf/citymanager.h"
+#include "modules/turf/city.h"
+#include "modules/turf/citymanager.h"
 
 // CPP
 #include <format>

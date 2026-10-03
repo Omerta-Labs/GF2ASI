@@ -1,10 +1,10 @@
 #pragma once
 
 // Common
-#include "SDK/ears_common/include/ears_common/bitflags.h"
+#include "ears_common/bitflags.h"
 
 // Godfather
-#include "SDK/ears_godfather/src/modules/component/damage/damagecomponent.h"
+#include "modules/component/damage/damagecomponent.h"
 
 namespace EARS
 {

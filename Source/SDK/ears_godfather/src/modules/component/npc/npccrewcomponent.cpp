@@ -1,9 +1,9 @@
 #include "npccrewcomponent.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/families/family.h"
-#include "SDK/ears_godfather/src/modules/npc/npc.h"
-#include "SDK/ears_godfather/src/modules/ui/ui_hud.h"
+#include "modules/families/family.h"
+#include "modules/npc/npc.h"
+#include "modules/ui/ui_hud.h"
 
 // Addons
 #include "Addons/Hook.h"

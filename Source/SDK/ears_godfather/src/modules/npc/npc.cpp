@@ -1,8 +1,8 @@
 #include "npc.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/component/npc/npccrewcomponent.h"
-#include "SDK/ears_godfather/src/modules/npcscheduling/simnpc.h"
+#include "modules/component/npc/npccrewcomponent.h"
+#include "modules/npcscheduling/simnpc.h"
 
 // Hook
 #include <Addons/Hook.h>

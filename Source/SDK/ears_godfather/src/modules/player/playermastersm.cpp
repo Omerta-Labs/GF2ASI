@@ -1,8 +1,8 @@
 #include "playermastersm.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/player/player.h"
-#include "SDK/ears_godfather/src/modules/player/playerdebug.h"
+#include "modules/player/player.h"
+#include "modules/player/playerdebug.h"
 
 EARS::Modules::PlayerMasterSM::PlayerMasterSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams)
 	: EARS::Modules::PlayerSM::PlayerSM(TableID, SMParams)

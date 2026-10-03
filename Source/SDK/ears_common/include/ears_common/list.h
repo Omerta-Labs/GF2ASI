@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/tvpcontainer.h"
+#include "ears_common/tvpcontainer.h"
 
 // CPP
 #include <stdint.h>

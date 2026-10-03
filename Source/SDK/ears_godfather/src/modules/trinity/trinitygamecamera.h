@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK/ears_trinity/include/trinitycamera.h"
+#include "trinitycamera.h"
 
 namespace EARS::Modules
 {

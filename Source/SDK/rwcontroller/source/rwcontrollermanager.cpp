@@ -1,4 +1,4 @@
-#include "SDK/rwcontroller/include/rw/core/controller/manager.h"
+#include "rw/core/controller/manager.h"
 
 namespace rw
 {
