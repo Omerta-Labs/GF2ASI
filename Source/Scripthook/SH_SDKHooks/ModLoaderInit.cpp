@@ -5,16 +5,51 @@
 #include "framework/core/attributehandler/cattributehandler.h"
 #include "framework/core/streammanager/streammanager.h"
 
+#include "ears_common/recoverptr.h"
+
 #include "Platform/Diagnostics.h"
 #include "Platform/MemUtils.h"
+#include "Platform/ModPoints.h"
 
 #include <filesystem>
 #include <fstream>
 #include <map>
+#include <vector>
 
 // Moved out of ears_framework/src/framework/core/simmanager/simmanager.cpp.
 // It scans simgroup_mods and mounts behaviour overrides, which is the mod
 // loader, not the engine -- the name said so all along.
+//
+// The override state lives here too. It used to sit in an anonymous namespace
+// inside simmanager.cpp, which the SDK's LoadResource read directly; that was
+// the one data coupling left pointing the wrong way. SimManager now asks
+// EARS::ModPoints::ResolveAttributePacket instead, and this answers it.
+namespace
+{
+	// Parsed .sgp files, owned here and freed at exit.
+	std::vector<EARS::Framework::SimGroupTOC*> g_LoadedOverrideFiles;
+
+	// Packet guid -> replacement, pointing into one of the TOCs above.
+	std::map<EARS::Common::guid128_t, RWS::CAttributePacket*> g_RegisteredPackets;
+
+	RWS::CAttributePacket* ResolveOverridePacket(const EARS::Common::guid128_t& PacketId)
+	{
+		const auto Found = g_RegisteredPackets.find(PacketId);
+		return Found != g_RegisteredPackets.end() ? Found->second : nullptr;
+	}
+
+	void DestroyTOC()
+	{
+		for (EARS::Framework::SimGroupTOC* SimGroup : g_LoadedOverrideFiles)
+		{
+			delete SimGroup;
+		}
+
+		g_LoadedOverrideFiles.clear();
+		g_RegisteredPackets.clear();
+	}
+}
+
 void Mod::SDKHooks::InitialiseModLoader()
 {
 	static const std::filesystem::path MODS_FOLDER_NAME = "simgroup_mods";
@@ -54,23 +89,28 @@ void Mod::SDKHooks::InitialiseModLoader()
 			memcpy(SimGroupBytes, Bytes.data(), Bytes.size());
 
 			EARS::Framework::SimGroupTOC* SimGroupTOC = reinterpret_cast<EARS::Framework::SimGroupTOC*>(SimGroupBytes);
-			PrivateUtils::LoadedOverrideFiles.push_back(SimGroupTOC);
+			g_LoadedOverrideFiles.push_back(SimGroupTOC);
 
-			PrivateUtils::RecoverPtr<RWS::CAttributePacket*>(SimGroupTOC->m_EntPackets, (uint8_t*)SimGroupTOC);
+			RecoverPtr<RWS::CAttributePacket*>(SimGroupTOC->m_EntPackets, (uint8_t*)SimGroupTOC);
 			for (uint32_t idx = 0; idx < SimGroupTOC->m_NumEnts; idx++)
 			{
-				PrivateUtils::RecoverPtr<RWS::CAttributePacket>(SimGroupTOC->m_EntPackets[idx], (uint8_t*)SimGroupTOC);
+				RecoverPtr<RWS::CAttributePacket>(SimGroupTOC->m_EntPackets[idx], (uint8_t*)SimGroupTOC);
 				RWS::CAttributePacket* Pckt = SimGroupTOC->m_EntPackets[idx];
 
 				const EARS::Common::guid128_t PcktID = Pckt->GetInstanceID();
 				EARS::Diag::Printf("Loaded behaviour [0x%X-0x%X-0x%X-0x%X] from SimGroupOverride file [%s]", PcktID[0], PcktID[1], PcktID[2], PcktID[3], AsPath.c_str());
 
-				PrivateUtils::RegisteredPackets.insert({ PcktID, Pckt });
+				g_RegisteredPackets.insert({ PcktID, Pckt });
 			}
 
 			EARS::Diag::Printf("Finished SimGroupOverride file [%s], with a total of %u behaviours mounted.", AsPath.c_str(), SimGroupTOC->m_NumEnts);
 		}
 	}
 
-	atexit(PrivateUtils::DestroyTOC);
+	atexit(DestroyTOC);
+
+	// Only now that the table is populated. SimManager calls this once per
+	// packet during sim-group load; before this point it resolves to nullptr
+	// and every packet is left alone.
+	EARS::ModPoints::SetResolveAttributePacket(&ResolveOverridePacket);
 }

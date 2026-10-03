@@ -1,45 +1,14 @@
 #include "simmanager.h"
 
-// Addons
+// Platform
 #include "Platform/Diagnostics.h"
+#include "Platform/ModPoints.h"
 #include <Platform/MemUtils.h>
 
 // SDK
+#include "ears_common/recoverptr.h"
 #include "framework/core/attributehandler/cattributehandler.h"
 #include "framework/core/streammanager/streammanager.h"
-
-// c++
-#include <filesystem>
-#include <fstream>
-#include <map>
-
-namespace PrivateUtils
-{
-	template<typename TClass>
-	void RecoverPtr(TClass*& PtrToFixUp, const uint8_t* PtrBase)
-	{
-		if (PtrToFixUp != nullptr)
-		{
-			uintptr_t offset = reinterpret_cast<uintptr_t>(PtrToFixUp);
-			uintptr_t base = reinterpret_cast<uintptr_t>(PtrBase);
-			PtrToFixUp = reinterpret_cast<TClass*>(offset + base);
-		}
-	}
-
-	std::vector<EARS::Framework::SimGroupTOC*> LoadedOverrideFiles;
-	std::map<EARS::Common::guid128_t, RWS::CAttributePacket*> RegisteredPackets;
-
-	void DestroyTOC()
-	{
-		for (EARS::Framework::SimGroupTOC* SimGroup : LoadedOverrideFiles)
-		{
-			delete SimGroup;
-		}
-
-		LoadedOverrideFiles.clear();
-		RegisteredPackets.clear();
-	}
-}
 
 RWS::CAttributePacket* EARS::Framework::SimManager::GetAttributePacket(const EARS::Common::guid128_t* InGuid, int bMaskStream)
 {
@@ -131,18 +100,19 @@ void EARS::Framework::SimManager::LoadResource(RWS::CResourceHandler::CResourceL
 	EARS::Diag::Printf("SimManager::LoadResource: [%s]", StreamName);
 
 	// Recover pointers
-	PrivateUtils::RecoverPtr<RWS::CAttributePacket*>(SimGroupTOC->m_EntPackets, (uint8_t*)SimGroupTOC);
+	RecoverPtr<RWS::CAttributePacket*>(SimGroupTOC->m_EntPackets, (uint8_t*)SimGroupTOC);
 	for (uint32_t idx = 0; idx < SimGroupTOC->m_NumEnts; idx++)
 	{
-		PrivateUtils::RecoverPtr<RWS::CAttributePacket>(SimGroupTOC->m_EntPackets[idx], (uint8_t*)SimGroupTOC);
+		RecoverPtr<RWS::CAttributePacket>(SimGroupTOC->m_EntPackets[idx], (uint8_t*)SimGroupTOC);
 
 		RWS::CAttributePacket* Pckt = SimGroupTOC->m_EntPackets[idx];
 
-		// NB: If exists, directly hot patch
-		const EARS::Common::guid128_t PcktID = Pckt->GetInstanceID();
-		if (PrivateUtils::RegisteredPackets.contains(PcktID))
+		// Let the modding layer substitute this packet. Nothing is installed
+		// by default, in which case the original packet is kept.
+		if (RWS::CAttributePacket* Replacement =
+			EARS::ModPoints::ResolveAttributePacket(Pckt->GetInstanceID()))
 		{
-			SimGroupTOC->m_EntPackets[idx] = PrivateUtils::RegisteredPackets.at(PcktID);
+			SimGroupTOC->m_EntPackets[idx] = Replacement;
 		}
 	}
 
