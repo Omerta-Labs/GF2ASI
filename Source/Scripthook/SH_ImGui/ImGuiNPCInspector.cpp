@@ -124,7 +124,6 @@ void ImGuiNPCInspector::DrawTab_Animation()
 			ImGui::Text("State Name: %s", ActiveObject->GetCharacterStateName());
 			ImGui::Text("Frames: %f/%f", SentientAnimView->GetFrameNum(), SentientAnimView->GetNumFrames());
 
-#if DEBUG
 			if (bIsPlayer)
 			{
 				SH::PlayerDebugOptions_Modded& DebugOptions = *SH::PlayerDebugOptions_Modded::GetInstance();
@@ -156,7 +155,6 @@ void ImGuiNPCInspector::DrawTab_Animation()
 					}
 				}
 			}
-#endif // DEBUG
 		}
 
 		ImGui::EndTabItem();
