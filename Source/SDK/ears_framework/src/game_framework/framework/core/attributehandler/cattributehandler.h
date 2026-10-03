@@ -197,8 +197,7 @@ namespace RWS
 	{
 	public:
 
-		// NB: Virtual order must match the engine vtable exactly:
-		// ~dtor, HandleAttributes, HandleAttributesFromProxy, DisableMessages
+		// NB: The release version does not have GetClassID nor does RWS_GetClassName!
 		virtual ~CAttributeHandler() = 0;
 		virtual void HandleAttributes(const RWS::CAttributePacket& InPacket) = 0;
 		virtual void HandleAttributesFromProxy(const RWS::CAttributePacket& InPacket);
@@ -207,9 +206,7 @@ namespace RWS
 		void EnableMessagesToComponents();
 		void DisableMessagesToComponents();
 
-		/**
-		 * Fetch the Instance ID of this Attribute Handler.
-		 */
+		/** Fetch the Instance ID of this Attribute Handler. */
 		EARS::Common::guid128_t InqInstanceID() const { return m_InstanceId; }
 
 		bool HasAttributeHandlerFlag(const uint32_t InFlag) const;
