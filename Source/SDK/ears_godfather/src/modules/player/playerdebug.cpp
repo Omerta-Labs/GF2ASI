@@ -1,6 +1,5 @@
 #include "playerdebug.h"
 
-#include "playerdebug.h"
 #include "ears_statemachine/statemachine.h"
 #include "framework/core/camera/cameramanager.h"
 #include "framework/core/input/input.h"

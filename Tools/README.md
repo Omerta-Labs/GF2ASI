@@ -237,6 +237,40 @@ Three things to know before trusting a figure:
 The CSV is not committed. It is ~41k rows and regenerating it would produce a
 large diff every time, which would bury the signal rather than track it.
 
+## check_sources.py
+
+Brace balance and duplicate includes, per file.
+
+```bash
+python Tools/check_sources.py
+python Tools/check_sources.py --path Source/SDK/ears_rt_cct
+```
+
+This exists because the 2d-ii merges shipped code that would not compile, and
+the verification at the time could not see it. That check compared every
+meaningful line of each source against the merged result and reported "all
+source lines accounted for" — while skipping `{` and `}` lines as noise. The
+merge had stripped the closing brace off the last function in five of six files,
+which is exactly a `}` line.
+
+Run against the commit before the fixes it names all seven broken files, so it
+is checked against a real failure rather than only against a clean tree:
+
+```
+npccoversm.cpp: 2 unclosed {        npcguncombatsm.cpp: 3 unclosed {
+npcsearchsm.cpp: 3 unclosed {       npcshootsm.cpp: 3 unclosed {
+playerdebug.cpp: 4 unclosed {       playerswitchitemsm.cpp: 2 unclosed {
+chrcntl_character.cpp: 2 extra }
+```
+
+Braces are counted outside comments and string and character literals, so a `{`
+in a comment or a `"}"` in a string does not register. Exits non-zero when any
+file is unbalanced.
+
+It also notes how many closing braces carry a trailing comment (`} // CCT`),
+because a merge tool that matches on a bare `}` will miss those and append
+outside the namespace — which is how CCTNameNode ended up outside `EA::CCT`.
+
 ## Reference data these read
 
 | File | Purpose |

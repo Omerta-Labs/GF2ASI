@@ -1,6 +1,5 @@
 #include "npcsearchsm.h"
 
-#include "npcsearchsm.h"
 
 namespace EARS::Modules
 {

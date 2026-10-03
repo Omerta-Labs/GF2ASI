@@ -1,6 +1,5 @@
 #include "playerswitchitemsm.h"
 
-#include "playerswitchitemsm.h"
 
 namespace EARS::Modules
 {
