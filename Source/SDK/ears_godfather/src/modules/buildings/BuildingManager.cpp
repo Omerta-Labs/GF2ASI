@@ -1,7 +1,7 @@
 #include "BuildingManager.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/buildings/Building.h"
+#include "SDK/ears_godfather/src/modules/buildings/building.h"
 #include "SDK/ears_godfather/src/modules/buildings/BuildingStore.h"
 
 namespace EARS::Modules

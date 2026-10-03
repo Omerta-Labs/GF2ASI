@@ -1,7 +1,7 @@
 #pragma once
 
 // CPP
-#include "SDK/ears_common/include/ears_common/SafePtr.h"
+#include "SDK/ears_common/include/ears_common/safeptr.h"
 #include "SDK/ears_framework/src/framework/toolkits/statemachine/InterruptableStateMachine.h"
 
 namespace EARS

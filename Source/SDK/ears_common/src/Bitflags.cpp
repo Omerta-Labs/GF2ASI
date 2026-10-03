@@ -1,4 +1,4 @@
-#include "SDK/ears_common/include/ears_common/Bitflags.h"
+#include "SDK/ears_common/include/ears_common/bitflags.h"
 
 Flags16::Flags16()
 	: m_Flags(0)

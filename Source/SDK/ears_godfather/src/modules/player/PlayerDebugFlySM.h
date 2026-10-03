@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_godfather/src/modules/player/PlayerSM.h"
+#include "SDK/ears_godfather/src/modules/player/playersm.h"
 
 namespace EARS
 {

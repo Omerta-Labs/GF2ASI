@@ -1,7 +1,7 @@
 #include "GodfatherShadows.h"
 
 // SDK Framework
-#include "SDK/ears_framework/src/framework/core/graphics/ShadowHelper.h"
+#include "SDK/ears_framework/src/framework/core/graphics/shadowhelper.h"
 
 namespace
 {

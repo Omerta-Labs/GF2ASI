@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/String.h"
+#include "SDK/ears_common/include/ears_common/string.h"
 #include "SDK/ears_physics/src/ears_physics/behaviors/vehicles/BaseVehicle.h"
 
 namespace EARS

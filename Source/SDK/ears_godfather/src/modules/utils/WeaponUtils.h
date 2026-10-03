@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/SingleLinkedListNodeMixin.h"
+#include "SDK/ears_common/include/ears_common/singlelinkedlistnodemixin.h"
 
 namespace EARS
 {

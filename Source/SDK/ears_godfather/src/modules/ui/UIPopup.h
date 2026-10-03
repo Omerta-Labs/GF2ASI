@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SDK/ears_common/include/ears_common/Bitflags.h"
-#include "SDK/ears_common/include/ears_common/String.h"
+#include "SDK/ears_common/include/ears_common/bitflags.h"
+#include "SDK/ears_common/include/ears_common/string.h"
 
 namespace EARS::Apt
 {

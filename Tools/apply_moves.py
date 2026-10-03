@@ -34,6 +34,7 @@ import argparse
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -47,11 +48,34 @@ BARE_INCLUDE_RE = re.compile(r'(^[ \t]*#[ \t]*include[ \t]*")([^"/]+\.(?:h|hpp|i
                              re.MULTILINE)
 
 
+def write_retry(path: Path, text: str, attempts: int = 5) -> None:
+    """Write, retrying briefly on a transient Windows lock.
+
+    An editor, a file watcher or antivirus can hold a handle for a moment and
+    the open fails with EINVAL. Sweeping hundreds of files makes that likely
+    enough to be worth handling rather than losing the run halfway.
+    """
+    for attempt in range(attempts):
+        try:
+            path.write_text(text, encoding="utf-8", errors="surrogateescape",
+                            newline="")
+            return
+        except OSError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(0.3 * (attempt + 1))
+
+
 def git(*args: str, check: bool = True) -> str:
-    done = subprocess.run(("git",) + args, cwd=REPO, capture_output=True, text=True)
+    # Decode as UTF-8 with surrogateescape, never the locale codec. text=True
+    # decodes with cp1252 here, and one stray byte in a source file
+    # (ImGuiManager.cpp carries a 0x9d) kills subprocess's reader thread and
+    # hands back None instead of the content -- a silent, confusing failure.
+    done = subprocess.run(("git",) + args, cwd=REPO, capture_output=True,
+                          encoding="utf-8", errors="surrogateescape")
     if check and done.returncode != 0:
-        raise RuntimeError(f"git {' '.join(args)}\n{done.stderr.strip()}")
-    return done.stdout
+        raise RuntimeError(f"git {' '.join(args)}\n{(done.stderr or '').strip()}")
+    return done.stdout or ""
 
 
 def load_moves(tsv: Path) -> list[tuple[str, str]]:
@@ -92,9 +116,13 @@ def rewrite(text: str, path_rel: str, mv: dict[str, str],
             sibling_new = by_dir.get((my_old_dir, target.lower()))
             if sibling_new is None:
                 return match.group(0)
-            sib_dir = sibling_new.rsplit("/", 1)[0] if "/" in sibling_new else ""
+            sib_dir, sib_name = (sibling_new.rsplit("/", 1) if "/" in sibling_new
+                                 else ("", sibling_new))
             if sib_dir == my_new_dir:
-                return match.group(0)        # still siblings, leave it
+                # Still a sibling, so the include stays bare -- but the basename
+                # may have changed case, and "NPC.h" pointing at npc.h compiles
+                # here and nowhere else.
+                return f"{match.group(1)}{sib_name}{match.group(3)}"
             return f"{match.group(1)}SDK/{sibling_new}{match.group(3)}"
 
         text = BARE_INCLUDE_RE.sub(fix_bare, text)
@@ -139,7 +167,7 @@ def main() -> int:
         touched += 1
         if args.dry_run:
             continue
-        path.write_text(updated, encoding="utf-8", errors="surrogateescape", newline="")
+        write_retry(path, updated)
         if rel in dirty:
             plan_index.append((rel, rel))
     print(f"includes rewritten in {touched} files")
@@ -166,23 +194,26 @@ def main() -> int:
         except OSError:
             pass
 
-    # Move the staged packages up. If the original package directory survived --
-    # which happens when some of its files were already correctly placed and so
-    # were never moved -- then moving the directory would nest it inside, giving
-    # SDK/rwfilesystem/rwfilesystem/. Move the contents in that case.
-    for pkg in sorted(p.name for p in STAGE.iterdir() if p.is_dir()):
-        src, dst = f"{SDK_REL}/__restructure/{pkg}", f"{SDK_REL}/{pkg}"
-        if (SDK / pkg).exists():
-            for entry in sorted(p.name for p in (STAGE / pkg).iterdir()):
-                if (SDK / pkg / entry).exists():
-                    raise RuntimeError(
-                        f"{dst}/{entry} already exists; move list and tree disagree")
-                git("mv", "-f", f"{src}/{entry}", f"{dst}/{entry}")
-            (STAGE / pkg).rmdir()
-        else:
-            git("mv", "-f", src, dst)
+    # Move each staged file to its destination individually. Moving whole
+    # directories instead would nest them wherever the destination already
+    # exists -- that is how 2b produced SDK/rwfilesystem/rwfilesystem/ -- and
+    # the deeper the shared prefix, the more often that happens. Per-file is
+    # also what makes a same-directory case-only rename work at all: the
+    # original is already in staging, so nothing is left to collide with.
+    staged = sorted(p for p in STAGE.rglob("*") if p.is_file())
+    for src in staged:
+        rel = src.relative_to(STAGE).as_posix()
+        dest = SDK / rel
+        if dest.exists() and dest.resolve() != src.resolve():
+            raise RuntimeError(f"{rel} already exists; move list and tree disagree")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        git("mv", "-f", f"{SDK_REL}/__restructure/{rel}", f"{SDK_REL}/{rel}")
+
+    for d in sorted((p for p in STAGE.rglob("*") if p.is_dir()),
+                    key=lambda p: len(p.parts), reverse=True):
+        d.rmdir()
     STAGE.rmdir()
-    print(f"moved {len(list(SDK.iterdir()))} package directories into place")
+    print(f"{len(staged)} files moved into place")
 
     # --- index repair for uncommitted work -------------------------------
     for rel, _ in plan_index:
@@ -193,7 +224,7 @@ def main() -> int:
         head = git("show", f"HEAD:{rel}")
         fixed = rewrite(head, rel, mv, by_dir)
         tmp = REPO / ".git" / "gf2asi_index_blob"
-        tmp.write_text(fixed, encoding="utf-8", errors="surrogateescape", newline="")
+        write_retry(tmp, fixed)
         blob = git("hash-object", "-w", str(tmp)).strip()
         tmp.unlink()
         git("update-index", "--cacheinfo", f"100644,{blob},{new_rel}")

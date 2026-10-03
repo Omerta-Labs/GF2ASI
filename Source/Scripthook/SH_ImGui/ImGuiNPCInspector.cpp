@@ -6,17 +6,17 @@
 #include "Scripthook/SH_PlayerMasterSM/PlayerDebugOptions_Modded.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/npc/NPC.h"
-#include "SDK/ears_godfather/src/modules/npcscheduling/SimNPC.h"
-#include "SDK/ears_godfather/src/modules/player/Player.h"
-#include "SDK/ears_godfather/src/modules/component/NPCUpgradeComponent.h"
-#include "SDK/ears_godfather/src/modules/component/PlayerUpgradeComponent.h"
-#include "SDK/ears_godfather/src/modules/mobface/MobfaceManager.h"
-#include "SDK/ears_godfather/src/modules/partedmodel/PartedModelMgr.h"
+#include "SDK/ears_godfather/src/modules/npc/npc.h"
+#include "SDK/ears_godfather/src/modules/npcscheduling/simnpc.h"
+#include "SDK/ears_godfather/src/modules/player/player.h"
+#include "SDK/ears_godfather/src/modules/component/npcupgradecomponent.h"
+#include "SDK/ears_godfather/src/modules/component/playerupgradecomponent.h"
+#include "SDK/ears_godfather/src/modules/mobface/mobfacemanager.h"
+#include "SDK/ears_godfather/src/modules/partedmodel/partedmodelmgr.h"
 #include "SDK/ears_rt_cct/include/ears_rt_cct/ChrCntrl_AnimView.h"
 #include "SDK/ears_rt_cct/include/ears_rt_cct/ChrCntrl_Character.h"
 
-#include "SDK/ears_godfather/src/modules/player/PlayerMasterSM.h"
+#include "SDK/ears_godfather/src/modules/player/playermastersm.h"
 
 namespace Private
 {

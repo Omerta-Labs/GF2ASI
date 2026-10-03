@@ -1,7 +1,7 @@
 #include "FamilyManager.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/families/Family.h"
+#include "SDK/ears_godfather/src/modules/families/family.h"
 
 const EARS::Modules::Family* EARS::Modules::FamilyManager::GetFamily(const uint32_t FamilyID) const
 {

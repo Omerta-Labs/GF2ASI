@@ -10,11 +10,11 @@
 #include "Scripthook/SH_ImGui/ImGuiPropertyGrid.h"
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/camera/CameraManager.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/CEventHandler.h"
-#include "SDK/ears_framework/src/game_framework/framework/mainloop/Logic.h"
-#include "SDK/ears_framework/src/framework/modules/screenfx/ScreenFX.h"
-#include "SDK/ears_godfather/src/modules/debug/MarketingDebug.h"
+#include "SDK/ears_framework/src/framework/core/camera/cameramanager.h"
+#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "SDK/ears_framework/src/game_framework/framework/mainloop/logic.h"
+#include "SDK/ears_framework/src/framework/modules/screenfx/screenfx.h"
+#include "SDK/ears_godfather/src/modules/debug/marketingdebug.h"
 
 // C++
 #include <cfloat>

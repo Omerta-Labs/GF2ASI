@@ -1,13 +1,13 @@
 #pragma once
 
 // ObjectManager base class
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/CEventHandler.h"
+#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
 
 // Addons
 #include <Addons/imgui/imgui.h>
 
 // RenderWare Framework
-#include "SDK/ears_common/include/ears_common/Guid.h"
+#include "SDK/ears_common/include/ears_common/guid.h"
 #include "SDK/ears_common/include/ears_common/RwMaths.h"
 
 // Scripthook

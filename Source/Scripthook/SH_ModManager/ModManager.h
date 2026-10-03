@@ -6,7 +6,7 @@
 #include <vector>
 
 // SDK
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/CEventHandler.h"
+#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
 
 // forward declares
 namespace EARS

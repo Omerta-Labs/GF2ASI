@@ -1,12 +1,12 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/Array.h"
-#include "SDK/ears_common/include/ears_common/RegArr.h"
-#include "SDK/ears_common/include/ears_common/Singleton.h"
-#include "SDK/ears_common/include/ears_common/String.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/CEventHandler.h"
-#include "SDK/ears_framework/src/game_framework/framework/core/resourcemanager/CResourceHandler.h"
+#include "SDK/ears_common/include/ears_common/array.h"
+#include "SDK/ears_common/include/ears_common/regarr.h"
+#include "SDK/ears_common/include/ears_common/singleton.h"
+#include "SDK/ears_common/include/ears_common/string.h"
+#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
+#include "SDK/ears_framework/src/game_framework/framework/core/resourcemanager/cresourcehandler.h"
 #include "SDK/ears_framework/src/framework/core/persistence/PersistenceRegistry.h"
 
 // C++

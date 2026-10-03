@@ -156,9 +156,21 @@ Two traps it handles, both found the hard way:
   `SDK/rwfilesystem/rwfilesystem/`. The contents are moved individually in that
   case.
 
+A third rewrite matters for 2c, where files keep their directory: a bare
+`#include "NPC.h"` stays bare, but the basename itself changes case, and
+`"NPC.h"` pointing at `npc.h` compiles here and nowhere else.
+
 It also preserves uncommitted work: for a file with unstaged changes the index
 entry is rebuilt as HEAD plus the mechanical rewrite, so a commit carries the
 rename and the include fix and leaves everything else in the working tree.
+
+Two Windows details worth knowing if this ever misbehaves. Writes retry briefly,
+because an editor or antivirus holding a handle for a moment makes `open` fail
+with EINVAL and that is likely enough across hundreds of files to lose a run
+halfway. And `git()` decodes with UTF-8 and surrogateescape rather than
+`text=True`: the locale codec here is cp1252, and one stray byte in a source
+file (`ImGuiManager.cpp` carries a `0x9d`) kills subprocess's reader thread and
+returns None instead of the content.
 
 ## check_includes.py
 

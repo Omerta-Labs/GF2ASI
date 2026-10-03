@@ -3,7 +3,7 @@
 #include "tConsole.h"
 
 // SDK
-#include "SDK/ears_godfather/src/modules/debug/MarketingDebug.h"
+#include "SDK/ears_godfather/src/modules/debug/marketingdebug.h"
 
 // C++
 #include <algorithm>

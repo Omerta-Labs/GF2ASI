@@ -1,8 +1,8 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/HashTable.h"
-#include "SDK/ears_rt_cct/include/ears_rt_cct/CCTNameNode.h"
+#include "SDK/ears_common/include/ears_common/hashtable.h"
+#include "SDK/ears_rt_cct/include/ears_rt_cct/cctnamenode.h"
 
 // CPP
 #include <stdint.h>

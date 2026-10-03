@@ -1,7 +1,7 @@
 #pragma once
 
 // CPP
-#include "SDK/ears_statemachine/include/ears_statemachine/StateMachine.h"
+#include "SDK/ears_statemachine/include/ears_statemachine/statemachine.h"
 
 namespace EARS
 {

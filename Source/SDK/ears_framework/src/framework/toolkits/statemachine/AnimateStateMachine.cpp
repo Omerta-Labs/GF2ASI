@@ -3,9 +3,9 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/animated/Animated.h"
+#include "SDK/ears_framework/src/framework/core/animated/animated.h"
 #include "SDK/ears_rt_cct/include/ears_rt_cct/ChrCntrl_AnimView.h"
-#include "SDK/ears_statemachine/include/ears_statemachine/StateMachineManager.h"
+#include "SDK/ears_statemachine/include/ears_statemachine/statemachinemanager.h"
 
 // ============================================================
 // AnimateStateMachine

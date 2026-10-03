@@ -20,7 +20,10 @@ Phases:
       Otherwise the per-package rule below applies, and 2d corrects any that
       land in the wrong directory.
 
-  2c  File basenames to exact original lowercase.
+  2c  File basenames to exact original lowercase, for every file that matches
+      the manifest. Directories are already lowercase after 2b, so these are
+      same-directory, case-only renames. Files with no manifest match are left
+      for 2d, which has the linker map to go on.
 
 Usage:
     python plan_moves.py --phase 2b
@@ -114,16 +117,48 @@ def plan_2b(sdk: Path, manifest: Path) -> list[tuple[str, str]]:
     return moves
 
 
+def plan_2c(sdk: Path, manifest: Path) -> list[tuple[str, str]]:
+    """Basenames to the manifest's exact spelling, which is always lowercase."""
+    packages = load_manifest(manifest)
+    by_name: dict[str, dict[str, list[str]]] = {}
+    for pkg, paths in packages.items():
+        idx: dict[str, list[str]] = collections.defaultdict(list)
+        for intra in paths:
+            idx[intra.rsplit("/", 1)[-1]].append(intra)
+        by_name[pkg] = idx
+
+    moves: list[tuple[str, str]] = []
+    for path in sorted(sdk.rglob("*")):
+        if not path.is_file() or path.suffix.lower() not in SOURCE_EXT:
+            continue
+        rel = path.relative_to(sdk).as_posix()
+        pkg = PACKAGE_DIRS.get(rel.split("/")[0])
+        if pkg is None:
+            continue
+        within = rel.split("/", 1)[1] if "/" in rel else path.name
+        hit = next((intra for intra in by_name[pkg].get(path.name.lower(), [])
+                    if matches(within.lower(), intra)), None)
+        if hit is None:
+            continue                      # no manifest match; 2d deals with it
+        original_name = hit.rsplit("/", 1)[-1]
+        if original_name == path.name:
+            continue                      # already correct
+        new = f"{rel.rsplit('/', 1)[0]}/{original_name}" if "/" in rel else original_name
+        moves.append((rel, new))
+    return moves
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--phase", required=True, choices=("2b",))
+    parser.add_argument("--phase", required=True, choices=("2b", "2c"))
     parser.add_argument("--sdk", type=Path, default=DEFAULT_SDK)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--out", type=Path, help="write TSV here instead of stdout")
     args = parser.parse_args()
 
-    moves = plan_2b(args.sdk, args.manifest)
+    planner = {"2b": plan_2b, "2c": plan_2c}[args.phase]
+    moves = planner(args.sdk, args.manifest)
     rows = "".join(f"{old}\t{new}\n" for old, new in moves)
     if args.out:
         args.out.write_text(rows, encoding="utf-8", newline="\n")

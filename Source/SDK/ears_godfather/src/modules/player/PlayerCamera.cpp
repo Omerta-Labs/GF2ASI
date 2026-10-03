@@ -1,4 +1,4 @@
-#include "PlayerCamera.h"
+#include "playercamera.h"
 
 namespace EARS
 {

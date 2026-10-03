@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/Array.h"
+#include "SDK/ears_common/include/ears_common/array.h"
 
 // CPP
 #include <functional>

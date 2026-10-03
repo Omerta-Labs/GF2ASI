@@ -1,11 +1,11 @@
 #include "PlayerDebugFlySM.h"
 
 // SDK
-#include "SDK/ears_framework/src/framework/core/camera/CameraManager.h"
-#include "SDK/ears_framework/src/framework/core/input/Input.h"
-#include "SDK/ears_framework/src/framework/toolkits/statemachine/SMBuilder.h"
-#include "SDK/ears_godfather/src/modules/player/Player.h"
-#include "SDK/ears_godfather/src/modules/player/PlayerDebug.h"
+#include "SDK/ears_framework/src/framework/core/camera/cameramanager.h"
+#include "SDK/ears_framework/src/framework/core/input/input.h"
+#include "SDK/ears_framework/src/framework/toolkits/statemachine/smbuilder.h"
+#include "SDK/ears_godfather/src/modules/player/player.h"
+#include "SDK/ears_godfather/src/modules/player/playerdebug.h"
 
 // Addons
 #include "Addons/Hook.h"
