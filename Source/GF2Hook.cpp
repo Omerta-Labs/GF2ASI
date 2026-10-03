@@ -513,19 +513,14 @@ void __fastcall HOOK_TrinityGameCamera_BeginUpdate(EARS::Modules::TrinityGameCam
 	ActualPtr->EARS::Modules::TrinityGameCamera::BeginUpdate();
 }
 
-// The SDK declares EARS::Diag and leaves it unimplemented so that GF2SDK does
-// not depend on the layer above it. These are the implementations, installed
-// during start-up; see Source/Platform/Diagnostics.h.
 namespace
 {
 	// EARS::Host: the SDK asks whether something else has the input. Only
 	// marketingdebug's free camera needs it so far, to stand down while the
 	// menu overlay has the mouse.
-	// GetChecked, never Get: SH::Singleton::Get constructs on demand, so
-	// querying it from here would build the ImGuiManager the first time the SDK
-	// asked -- early, on the SIM thread, and before Open() had run. These sinks
-	// are installed after Open(), so the instance exists by the time anything
-	// calls them, and the null test covers shutdown.
+	// GetChecked, never Get: SH::Singleton::Get constructs on demand, which
+	// would build the ImGuiManager on the SIM thread the first time the SDK
+	// asked, before Open() had run.
 	bool Host_OwnsCursor()
 	{
 		const ImGuiManager* ImGuiMgr = ImGuiManager::GetChecked();
@@ -540,9 +535,8 @@ namespace
 
 	void Diag_Printf(const char* Format, va_list Args)
 	{
-		// Same buffer size and the same fWriteLine tail as tConsole::fPrintf,
-		// which is what the SDK called before the inversion, so the output is
-		// unchanged.
+		// 4096 matches tConsole::fPrintf; vsprintf_s truncates rather than
+		// overflowing, so an over-long line is clipped and not lost.
 		char Buffer[4096]{};
 		vsprintf_s(Buffer, Format, Args);
 		tConsole::fWriteLine(Buffer);
@@ -558,9 +552,8 @@ void GF2Hook::Init_Logging()
 
 	tConsole::RouteToLogger(true);
 
-	// Only Printf is wired up. The draw entry points stay null, which makes
-	// them no-ops rather than crashes -- there is no 3D debug renderer in the
-	// modding layer yet, and the SDK can already call them.
+	// The draw entry points stay null until there is a debug renderer to back
+	// them; SDK calls to them are no-ops meanwhile.
 	EARS::Diag::Sinks DiagSinks;
 	DiagSinks.Printf = &Diag_Printf;
 	EARS::Diag::InstallSinks(DiagSinks);
@@ -694,8 +687,7 @@ void GF2Hook::Init_GameSystems()
 	ImGuiManager* OurImGuiManager = ImGuiManager::Get();
 	OurImGuiManager->Open();
 
-	// Installed here rather than in Init_Logging: the sinks read the
-	// ImGuiManager, so they must not be reachable before it exists.
+	// After Open(): the sinks dereference the ImGuiManager.
 	EARS::Host::Sinks HostSinks;
 	HostSinks.OwnsCursor = &Host_OwnsCursor;
 	HostSinks.OwnsKeyboard = &Host_OwnsKeyboard;

@@ -11,10 +11,6 @@
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
 
-// Moved out of ears_godfather/src/modules/scoring/scorekeeper.cpp, which held
-// nothing else: the detour calls Mod::DispatchPlatformAgnosticUnlockEvent, so
-// the whole file was modding-layer code living under Source/SDK. The .cpp is
-// gone; scorekeeper.h keeps the reconstructed ScoreKeeper class.
 // HOOKING AND SCRIPTHOOK RELATED
 namespace EARS
 {

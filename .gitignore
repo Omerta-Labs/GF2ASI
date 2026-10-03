@@ -1,5 +1,6 @@
-# agent stuff
-/.claude
+# agent stuff -- skills are project conventions, so they are tracked
+/.claude/*
+!/.claude/skills/
 /agents
 
 # Prerequisites

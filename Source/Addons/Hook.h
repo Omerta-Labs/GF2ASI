@@ -1,8 +1,8 @@
 #pragma once
 
-// Hook installation. The memory and call primitives moved to
-// Platform/MemUtils.h, which the SDK depends on; nothing below this layer needs
-// to install a hook, so these stayed here.
+// Writes a relative jump over a function's prologue. Crude next to a polyhook
+// detour -- there is no trampoline, so the original becomes unreachable -- and
+// kept for the sites that only need the original suppressed.
 #include "Platform/MemUtils.h"
 
 const std::uint32_t JUMP_OPCODE = 0xE9;

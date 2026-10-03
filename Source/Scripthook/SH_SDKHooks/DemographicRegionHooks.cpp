@@ -7,9 +7,6 @@
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
 
-// Moved out of ears_godfather/src/modules/npcscheduling/demographicregion.cpp.
-// ApplyUserSettings stayed there, being reconstructed SDK code; these are the
-// traffic and NPC instance-limit detours, which are ours.
 #define DISABLE_NPC_SPAWN_LIMIT 0
 
 #if DISABLE_NPC_SPAWN_LIMIT

@@ -107,8 +107,6 @@ void EARS::Framework::SimManager::LoadResource(RWS::CResourceHandler::CResourceL
 
 		RWS::CAttributePacket* Pckt = SimGroupTOC->m_EntPackets[idx];
 
-		// Let the modding layer substitute this packet. Nothing is installed
-		// by default, in which case the original packet is kept.
 		if (RWS::CAttributePacket* Replacement =
 			EARS::ModPoints::ResolveAttributePacket(Pckt->GetInstanceID()))
 		{

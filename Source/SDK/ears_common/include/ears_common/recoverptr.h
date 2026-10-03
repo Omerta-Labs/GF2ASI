@@ -9,11 +9,8 @@
  * contains them, so every pointer field has to be fixed up once the chunk has
  * been placed in memory. A null offset stays null.
  *
- * Signature taken from the original's mangled names, which give
- * `void RecoverPtr<T>(T*&, const void*)` in the global namespace -- for
- * instance ??$RecoverPtr@D@@YAXAAPADPBX@Z for T = char. The project had a copy
- * of this in an anonymous namespace inside simmanager.cpp, which left the mod
- * loader unable to reach it once it moved out of the SDK.
+ * Global namespace and this exact signature are the original's, from mangled
+ * names such as ??$RecoverPtr@D@@YAXAAPADPBX@Z for T = char.
  */
 template <typename TType>
 void RecoverPtr(TType*& PtrToFixUp, const void* PtrBase)

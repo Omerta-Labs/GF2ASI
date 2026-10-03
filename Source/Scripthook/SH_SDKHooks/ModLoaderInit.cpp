@@ -16,14 +16,6 @@
 #include <map>
 #include <vector>
 
-// Moved out of ears_framework/src/framework/core/simmanager/simmanager.cpp.
-// It scans simgroup_mods and mounts behaviour overrides, which is the mod
-// loader, not the engine -- the name said so all along.
-//
-// The override state lives here too. It used to sit in an anonymous namespace
-// inside simmanager.cpp, which the SDK's LoadResource read directly; that was
-// the one data coupling left pointing the wrong way. SimManager now asks
-// EARS::ModPoints::ResolveAttributePacket instead, and this answers it.
 namespace
 {
 	// Parsed .sgp files, owned here and freed at exit.
@@ -109,8 +101,7 @@ void Mod::SDKHooks::InitialiseModLoader()
 
 	atexit(DestroyTOC);
 
-	// Only now that the table is populated. SimManager calls this once per
-	// packet during sim-group load; before this point it resolves to nullptr
-	// and every packet is left alone.
+	// Installed last: SimManager starts consulting it the moment it is set, and
+	// the table has to be complete by then.
 	EARS::ModPoints::SetResolveAttributePacket(&ResolveOverridePacket);
 }

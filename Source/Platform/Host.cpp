@@ -4,8 +4,8 @@ namespace EARS::Host
 {
 	namespace
 	{
-		// Zero-initialised: with no sinks installed, nothing owns the input,
-		// which is how the game behaves with no overlay present.
+		// Written once during start-up; see Diagnostics.cpp for the threading
+		// caveat.
 		Sinks g_Sinks;
 	}
 

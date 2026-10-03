@@ -1,31 +1,25 @@
 #pragma once
 
 //=============================================================================
-// Hooks and start-up that act on SDK systems but belong to the modding layer.
+// Detours and start-up that act on SDK systems.
 //
-// These lived inside the SDK files they target, which made Source/SDK depend on
-// polyhook and on Scripthook/ScripthookEvents.h -- the bottom layer reaching up
-// into the one above it. The detour bodies came with them, since a detour that
-// dispatches a Scripthook event is not engine code by any reading.
-//
-// Each of these was a static member on an SDK class
-// (ScoreKeeper::StaticApplyHooks, DemographicRegion::StaticApplyHooks) or a free
-// function in an SDK namespace (EARS::Framework::InitialiseScripthookModLoader).
-// They are free functions here, and the declarations are gone from the SDK
-// headers.
+// All of these run from GF2Hook during start-up. Order matters where noted;
+// otherwise they are independent.
 //=============================================================================
 
 namespace Mod::SDKHooks
 {
 	/**
-	 * Detours ScoreKeeper::ExecuteOperation so unlock events reach
-	 * Mod::DispatchPlatformAgnosticUnlockEvent.
+	 * Detours ScoreKeeper::ExecuteOperation so score operations that unlock
+	 * something are forwarded to the Scripthook's platform-agnostic unlock
+	 * path. Only operations the original accepted are forwarded.
 	 */
 	void ApplyScoreKeeperHooks();
 
 	/**
-	 * Detours the traffic and NPC instance limits. Compiled out unless
-	 * DISABLE_NPC_SPAWN_LIMIT is set, in which case this does nothing.
+	 * Detours the parked-car, pedestrian and vehicle traffic managers' instance
+	 * limits so they always report headroom. Compiled out unless
+	 * DISABLE_NPC_SPAWN_LIMIT is set.
 	 */
 	void ApplyDemographicRegionHooks();
 

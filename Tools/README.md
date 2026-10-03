@@ -271,6 +271,36 @@ It also notes how many closing braces carry a trailing comment (`} // CCT`),
 because a merge tool that matches on a bare `}` will miss those and append
 outside the namespace — which is how CCTNameNode ended up outside `EA::CCT`.
 
+## check_layers.py
+
+Checks that `Source/SDK` does not depend on the layers above it.
+
+```bash
+python Tools/check_layers.py
+```
+
+Include-level coupling is the easy half, and `grep` finds it. The half that got
+through was a **data** coupling: `SimManager::LoadResource` read
+`PrivateUtils::RegisteredPackets`, a namespace-scope map defined in
+`simmanager.cpp`, and the code that filled it moved to the modding layer.
+Neither file included the other, so nothing flagged it — it failed at compile
+time, after the move was committed.
+
+So it reports two things: forbidden includes, and any identifier **defined at
+namespace scope in an SDK `.cpp`, declared in no header, and referenced from the
+modding layer**.
+
+`static`, `constexpr` and `inline` definitions are excluded, because internal
+linkage cannot couple two translation units. Without that exclusion the check
+reports five hits that are not couplings at all — `RunningTickEvent` and friends,
+where the SDK and the menu each hold their own `static` copy pointing at the same
+address. Functions are excluded too: a missing declaration fails loudly at the
+first call, whereas a stray variable links by accident.
+
+Validated both ways rather than only against a clean tree: it reports nothing on
+the current tree, and on the commit that broke the build it names
+`RegisteredPackets` and `LoadedOverrideFiles` and nothing else.
+
 ## Reference data these read
 
 | File | Purpose |

@@ -1,21 +1,17 @@
 #pragma once
 
 //=============================================================================
-// Questions the SDK needs to ask of whatever is hosting it.
+// Questions the SDK asks of whatever is hosting it.
 //
-// The only one so far is input ownership. marketingdebug.cpp drives a free
-// camera from the mouse and keyboard, and has to stand down while the menu
-// overlay has them -- otherwise moving the mouse over the menu flies the
-// camera. It asked ImGuiManager directly, which made an SDK file include from
-// the modding layer.
+// Input ownership is the only one so far: a host that draws an overlay takes
+// the mouse and keyboard, and game cameras must stand down while it does, or
+// moving the pointer over the overlay also drives the camera.
 //
-// Same shape as Platform/Diagnostics.h: the SDK declares, GF2Mod installs, and
-// the default answer is "nobody owns the input", which is how the game behaves
+// With no sinks installed nothing owns the input, which is how the game behaves
 // with no overlay present.
 //
-// This is deliberately not a general "call the host" escape hatch. Anything
-// added here should be a question about the environment the SDK is running in,
-// not a way to reach a particular mod feature.
+// Keep this to questions about the environment the SDK runs in, not a general
+// route from the SDK to a particular host feature.
 //=============================================================================
 
 namespace EARS::Host

@@ -1,17 +1,13 @@
 //=============================================================================
-// Platform primitives for the reconstructed SDK.
+// Calling into the game image, and reading its globals.
 //
-// This is not mod infrastructure, which is why it sits below the modding layer
-// rather than in it: the SDK's whole job is to call into a specific
-// godfather2.exe at fixed addresses, and 141 of its files call
-// MemUtils::CallClassMethod to do it. Moving this into GF2Mod would make
-// GF2SDK depend on the layer above it.
-//
-// Split out of Addons/Hook.h, which keeps the pieces that install hooks --
-// SHook, HookInstall and the jump opcodes. Nothing in the SDK uses those.
+// Reconstructed SDK classes are thin shells over a specific godfather2.exe:
+// their members forward to the original code at fixed addresses, and their
+// globals are read through hook::Type.
 //
 // MSVC x86 only. CallEaxVoidMethod is inline __asm because no calling
-// convention passes the first argument in EAX.
+// convention passes the first argument in EAX, which the game's __usercall
+// functions require.
 //=============================================================================
 
 #pragma once

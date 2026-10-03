@@ -4,9 +4,9 @@ namespace EARS::Diag
 {
 	namespace
 	{
-		// Zero-initialised, so every call is a no-op until GF2Mod installs its
-		// implementations. That is what lets GF2SDK link without the layer
-		// above it.
+		// Written once during start-up and read from the sim and presentation
+		// threads thereafter, so the unsynchronised access is safe only as long
+		// as nothing installs sinks late.
 		Sinks g_Sinks;
 	}
 
