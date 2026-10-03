@@ -1,4 +1,4 @@
-#include "KeybindManager.h"
+#include "Addons/KeybindManager.h"
 
 // Addons
 #include "Addons/tConsole.h"

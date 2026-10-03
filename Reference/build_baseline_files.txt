@@ -1,3 +1,5 @@
+Source/Addons/ImGuiRuntime.cpp
+Source/Addons/KeybindManager.cpp
 Source/Addons/Settings.cpp
 Source/Addons/discord/achievement_manager.cpp
 Source/Addons/discord/activity_manager.cpp
@@ -248,7 +250,6 @@ Source/Scripthook/SH_ImGui/ImGuiNPCInspector.cpp
 Source/Scripthook/SH_ImGui/ImGuiPanels.cpp
 Source/Scripthook/SH_ImGui/ImGuiPhotoModeSystem.cpp
 Source/Scripthook/SH_ImGui/ImGuiUISystem.cpp
-Source/Scripthook/SH_ImGui/KeybindManager.cpp
 Source/Scripthook/SH_ModManager/ModManager.cpp
 Source/Scripthook/SH_MugShotFix/MugShotFix.cpp
 Source/Scripthook/SH_ObjectManager/ObjectManager.cpp

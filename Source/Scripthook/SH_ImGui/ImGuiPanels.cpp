@@ -4,7 +4,7 @@
 #include "Addons/Settings.h"
 #include "Addons/imgui/imgui.h"
 #include "Scripthook/SH_ImGui/GameEventIds.h"
-#include "Scripthook/SH_ImGui/KeybindManager.h"
+#include "Addons/KeybindManager.h"
 #include "Scripthook/SH_ObjectManager/ObjectManager.h"
 
 // SDK

@@ -14,6 +14,7 @@
 #include "Addons/imgui/backends/imgui_impl_dx9.h"
 
 #include "Scripthook/ScripthookEvents.h"
+#include "Addons/ImGuiRuntime.h"
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
 #include "Scripthook/SH_Discord/DiscordManager.h"
 #include "Scripthook/SH_ObjectManager/ObjectManager.h"
@@ -289,9 +290,8 @@ void __cdecl HOOK_Displ_BeginScene()
 uint64_t Displ_EndScene_Old;
 void __cdecl HOOK_Displ_EndScene()
 {
-	if (ImGuiManager* ImGuiMgr = ImGuiManager::Get())
 	{
-		ImGuiMgr->OnEndScene();
+		Mod::ImGuiRuntime::Present();
 	}
 
 	// Keep the EdgeAA pass armed for the next frame's post-FX chain
@@ -311,9 +311,8 @@ void __cdecl HOOK_Displ_EndScene()
 uint64_t Displ_ResetDevice_Old;
 bool __cdecl HOOK_Displ_ResetDevice(int a1)
 {
-	if (ImGuiManager* ImGuiMgr = ImGuiManager::Get())
 	{
-		ImGuiMgr->OnDeviceLost();
+		Mod::ImGuiRuntime::OnDeviceLost();
 	}
 
 	Mod::GammaFix::OnDeviceReset();
@@ -322,9 +321,8 @@ bool __cdecl HOOK_Displ_ResetDevice(int a1)
 
 	if (bResult)
 	{
-		if (ImGuiManager* ImGuiMgr = ImGuiManager::Get())
 		{
-			ImGuiMgr->OnDeviceRestored();
+			Mod::ImGuiRuntime::OnDeviceRestored();
 		}
 	}
 
@@ -338,9 +336,8 @@ uint64_t WinProc_GF2_Old;
 int __stdcall WndProc_GF2(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	// Let ImGui add inputs
-	if (ImGuiManager* ImGuiMgr = ImGuiManager::Get())
 	{
-		if (ImGuiMgr->WndProc(hWnd, Msg, wParam, lParam))
+		if (Mod::ImGuiRuntime::WndProc(hWnd, Msg, wParam, lParam))
 		{
 			return true;
 		}
@@ -355,15 +352,14 @@ int __stdcall WndProc_GF2(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 uint64_t SetCursorPos_old;
 void HOOK_SetCursorPos(int x, int y)
 {
-	if (ImGuiManager* ImGuiMgr = ImGuiManager::Get())
 	{
-		if (ImGuiMgr->HasCursorControl())
+		if (Mod::ImGuiRuntime::IsInputOwned())
 		{
 			// avoid the game from forcing the mouse to the centre.
 			// Remember where it wanted the pointer: the game measures mouse movement as
 			// an offset from that position, so it has to be put back when we hand input
 			// over again, or its first delta is the width of the screen.
-			ImGuiMgr->NotifySuppressedCursorPos(x, y);
+			Mod::ImGuiRuntime::NotifySuppressedCursorPos(x, y);
 			return;
 		}
 	}
@@ -523,8 +519,7 @@ namespace
 	// asked, before Open() had run.
 	bool Host_OwnsCursor()
 	{
-		const ImGuiManager* ImGuiMgr = ImGuiManager::GetChecked();
-		return ImGuiMgr != nullptr && ImGuiMgr->HasCursorControl();
+		return Mod::ImGuiRuntime::IsInputOwned();
 	}
 
 	bool Host_OwnsKeyboard()

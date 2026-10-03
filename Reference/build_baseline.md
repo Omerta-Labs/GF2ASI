@@ -66,6 +66,7 @@ them any more.
 | after 2d-iii (3 inlined into headers, 1 merged) | 257 |
 | after 3a/3b (Platform, SH_SDKHooks; scorekeeper.cpp removed) | 262 |
 | after 4a (ImGuiPanels.cpp) | 263 |
+| after 4b (Addons/ImGuiRuntime.cpp) | 264 |
 
 Split across targets: 214 GF2SDK, 35 GF2Mod, 13 GF2ASI.
 

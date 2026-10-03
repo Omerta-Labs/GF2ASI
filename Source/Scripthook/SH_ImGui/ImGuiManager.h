@@ -19,7 +19,6 @@
 
 // CPP
 #include <windows.h>
-#include <mutex>
 #include <string>
 #include <optional>
 
@@ -59,45 +58,12 @@ public:
 	void Open();
 
 	/**
-	 * Called when the rendering is completed.
-	 * Runs on the PRESENTATION thread - only renders the draw data snapshot,
-	 * never the live ImGui context (the SIM thread may be rebuilding it).
-	 */
-	void OnEndScene();
-
-	/**
-	 * Called on the presentation thread before the D3D9 device is reset.
-	 * Releases ImGui device objects and drops the draw data snapshot, which
-	 * may reference textures that are about to be destroyed.
-	 */
-	void OnDeviceLost();
-
-	/**
-	 * Called on the presentation thread after a successful D3D9 device reset.
-	 */
-	void OnDeviceRestored();
-
-	/**
-	 * Does ImGui currently have cursor control
-	 * @return bool - Whether or not it has cursor control
-	 */
-	bool HasCursorControl() const;
-
-	/**
 	 * Whether the menu takes input while it is on screen. Turning this off leaves the
 	 * menu visible but hands the mouse and keyboard back to the game, so the player
 	 * keeps their camera controls.
 	 */
 	bool IsMenuInteractive() const { return bImGuiInteractive; }
 	void SetMenuInteractive(bool bInteractive) { bImGuiInteractive = bInteractive; }
-
-	/**
-	 * Records where the game last tried to warp the cursor while we were suppressing
-	 * its recentring, so the pointer can be put back when control returns.
-	 *
-	 * Called from the SetCursorPos detour on the SIM thread, the same thread as OnTick.
-	 */
-	void NotifySuppressedCursorPos(int InX, int InY);
 
 	/**
 	 * Update manager when level services become active
@@ -116,12 +82,6 @@ public:
 	static SH::ImGuiCheckpointDebug& StaticGetCheckpointDebug();
 	static SH::ImGuiUISystem& StaticGetUISystemDebug();
 
-	/**
-	 * API for ImGui to listen for Windows messages
-	 * Do not call outside of a WndProc function handler!
-	 */
-	LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 private:
 
 	struct BuildingTeleportPayload
@@ -129,8 +89,11 @@ private:
 		RwV3d TeleportLocation;
 	};
 
-	/** Put the pointer back where the game last wanted it, if we withheld a warp. */
-	void RestoreGameCursorPos();
+	// Registered with Mod::ImGuiRuntime; forwards to DrawMenu on the instance.
+	static void DrawMenuPanel();
+
+	// Draws the menu window and the inspector. Runs inside the runtime's frame.
+	void DrawMenu();
 
 	void DrawTab_PlayerSettings();
 
@@ -179,16 +142,6 @@ private:
 	// Called when iMsgRunningTick event is detected
 	void OnTick();
 
-	// Deep-copy the just-rendered frame's draw data into SnapshotDrawData.
-	// Expects ImGuiContextLock to be held.
-	void CaptureDrawDataSnapshot();
-
-	// Free the cloned draw lists owned by SnapshotDrawData and mark it invalid.
-	// Expects ImGuiContextLock to be held.
-	void ClearDrawDataSnapshot();
-
-	void AddFont(const char* name);
-
 	// Inspector for the current object
 	// (Either Player or NPC)
 	ImGuiNPCInspector CurrentInspector;
@@ -216,13 +169,6 @@ private:
 	// In this state, we disable Player inputs, and get ImGui to visualise a cursor.
 	bool bTakeoverCursor = false;
 
-	// Last position the game asked for while its recentring was suppressed.
-	// Restored when the takeover ends so the game's next mouse delta is measured
-	// from where it expects the pointer to be, instead of kicking the camera.
-	bool bHasSuppressedCursorPos = false;
-	int SuppressedCursorPosX = 0;
-	int SuppressedCursorPosY = 0;
-
 	bool bPlayerGodModeActive = false;
 
 	bool bPlayerVehicleGodModeActive = false;
@@ -234,23 +180,5 @@ private:
 
 	// TODO: Does this need SafePtr? WeakPtr?
 	EARS::Modules::Family* TargetFamily = nullptr;
-
-	// Serialises all ImGui context access between the SIM thread (frame build
-	// in OnTick), the PRESENTATION thread (OnEndScene / device reset) and the
-	// window thread (WndProc input events).
-	// Recursive because the Win32 backend re-enters WndProc on the same thread:
-	// its handler calls ReleaseCapture(), which synchronously dispatches
-	// WM_CAPTURECHANGED back into the window proc while the lock is held.
-	std::recursive_mutex ImGuiContextLock;
-
-	// Deep copy of the last completed frame's draw data, owned by us (the
-	// ImDrawLists are clones). The presentation thread renders this instead of
-	// the live context, so it always sees a complete frame regardless of how
-	// many presents happen per SIM tick.
-	ImDrawData SnapshotDrawData;
-
-	// Stored Fonts
-	struct ImFont* CustomFont = nullptr;
-	struct ImFont* DefaultFont = nullptr;
 
 };
