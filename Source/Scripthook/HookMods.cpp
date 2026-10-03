@@ -16,7 +16,7 @@
 // SDK
 #include "SDK/ears_framework/src/framework/toolkits/statemachine/smbuilder.h"
 #include "SDK/ears_godfather/src/modules/player/playermastersm.h"
-#include "SDK/ears_godfather/src/modules/player/PlayerDebugFlySM.h"
+#include "SDK/ears_godfather/src/modules/player/playerdebug.h"
 #include "SDK/ears_godfather/src/modules/ui/ui_popup.h"
 #include "SDK/ears_godfather/src/modules/ui/ui_frontend.h"
 #include "SDK/ears_godfather/src/modules/vehicles/statemachines/vehicleentrysm.h"

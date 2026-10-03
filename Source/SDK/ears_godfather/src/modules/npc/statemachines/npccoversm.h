@@ -1,9 +1,8 @@
 #pragma once
 
 #include "SDK/ears_framework/src/framework/toolkits/statemachine/animatesm.h"
-
-// Addons
 #include "Addons/Hook.h"
+#include "SDK/ears_godfather/src/modules/sentient/statemachines/sentientsm.h"
 
 namespace EARS::Modules
 {
@@ -28,4 +27,22 @@ namespace EARS::Modules
 		char m_Padding[0x38];
 	};
 	static_assert(sizeof(CoverDashSM) == 0x88);
+
+	class CoverPeekSM : public EARS::Modules::SentientSM
+	{
+	public:
+
+		CoverPeekSM() = delete;
+		CoverPeekSM(uint32_t TableID, EARS::StateMachineSys::StateMachineParams* SMParams);
+		virtual ~CoverPeekSM();
+
+		//~ Begin SentientSM Interface
+		virtual uint32_t GetStateMachineID() const override { return 0x0A4AC966C; }
+		virtual bool HandleStateMessage(uint32_t SimTime, float FrameTime, uint32_t CurFlags, uint32_t MessageID, EARS::StateMachineSys::State::StateMessageData* MsgData) override;
+		virtual bool CheckTransition(uint32_t SimTime, float FrameTime, uint32_t TransID, EARS::StateMachineSys::Transition::TransitionData* TransData) override;
+		virtual void InitialiseChild(EARS::StateMachineSys::StateMachine& ChildMachine) override;
+		//~ End SentientSM Interface
+
+		static EARS::StateMachineSys::StateMachine* S_CoverPeekSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
+	};
 }
