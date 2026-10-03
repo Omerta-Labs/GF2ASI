@@ -22,18 +22,18 @@
 #include "Scripthook/SH_ModManager/ModManager.h"
 #include "Scripthook/HookMods.h"
 
-#include "SDK/EARS_Common/Guid.h"
-#include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
-#include "SDK/EARS_Framework/Core/StreamManager/StreamManager.h"
-#include "SDK/EARS_Godfather/Modules/PartedAnimated/PartedAnimated.h"
-#include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
-#include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
-#include "SDK/EARS_Godfather/Modules/Scoring/ScoreKeeper.h"
-#include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
-#include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
-#include "SDK/EARS_Godfather/Modules/Trinity/TrinityGameCamera.h"
-#include "SDK/EARS_Godfather/Modules/Turf/City.h"
-#include <SDK/EARS_RT_LLRender/include/ShaderManager.h>
+#include "SDK/ears_common/include/ears_common/Guid.h"
+#include "SDK/ears_framework/src/framework/core/simmanager/SimManager.h"
+#include "SDK/ears_framework/src/framework/core/streammanager/StreamManager.h"
+#include "SDK/ears_godfather/src/modules/partedanimated/PartedAnimated.h"
+#include "SDK/ears_godfather/src/modules/families/CorleoneData.h"
+#include "SDK/ears_godfather/src/modules/npcscheduling/DemographicRegion.h"
+#include "SDK/ears_godfather/src/modules/scoring/ScoreKeeper.h"
+#include "SDK/ears_godfather/src/modules/mobface/MobfaceManager.h"
+#include "SDK/ears_godfather/src/modules/npc/NPC.h"
+#include "SDK/ears_godfather/src/modules/trinity/TrinityGameCamera.h"
+#include "SDK/ears_godfather/src/modules/turf/City.h"
+#include <SDK/ears_rt_llrender/include/ears_rt_llrender/ShaderManager.h>
 
 #include <sol.hpp>
 #include <thread>

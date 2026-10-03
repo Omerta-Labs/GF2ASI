@@ -3,8 +3,8 @@
 // Scripthook
 #include "Scripthook/SH_PlayerMasterSM/PlayerDebugOptions_Modded.h"
 // SDK
-#include <SDK/EARS_Common/CommonTypes.h>
-#include <SDK/EARS_Framework/Toolkits/StateMachine/SMBuilder.h>
+#include <SDK/ears_common/include/ears_common/CommonTypes.h>
+#include <SDK/ears_framework/src/framework/toolkits/statemachine/SMBuilder.h>
 
 // Addons
 #include "Addons/Hook.h"

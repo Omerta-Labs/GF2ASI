@@ -4,8 +4,8 @@
 #include "addons/imgui/imgui.h"
 
 // Godfather
-#include "SDK/EARS_Godfather/Modules/Missions/CheckpointManager.h"
-#include "SDK/EARS_Godfather/Modules/Missions/Checkpoint.h"
+#include "SDK/ears_godfather/src/modules/missions/CheckpointManager.h"
+#include "SDK/ears_godfather/src/modules/missions/Checkpoint.h"
 
 // C++
 #include <algorithm>

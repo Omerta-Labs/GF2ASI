@@ -8,11 +8,11 @@
 #include "Utils/Singleton.h"
 
 // RenderWare Framework
-#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/CEventHandler.h"
 
 // Common
-#include "SDK/EARS_Common/Guid.h"
-#include "SDK/EARS_Common/RwMaths.h"
+#include "SDK/ears_common/include/ears_common/Guid.h"
+#include "SDK/ears_common/include/ears_common/RwMaths.h"
 
 // ImGui
 #include "Addons/imgui/imgui.h"

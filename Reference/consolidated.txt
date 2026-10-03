@@ -11,22 +11,22 @@
 
 # --- ears_common. The original kept these header-only, so there is a .h in the
 #     manifest but no .cpp, and our split files need folding back in.
-EARS_Common/Bitflags.cpp	Flags16 (9), Flags32 (41) -> include/ears_common/bitflags.h, header-only
-EARS_Common/CommonTypes.cpp	-> include/ears_common/commontypes.h, header-only
-EARS_Common/RwMaths.cpp	RwV3d (896), RwMatrixTag (129) -> include/ears_common/rwtypes.h, header-only
-EARS_Common/SafePtr.inl	SafePtr (1403) -> include/ears_common/safeptr.h
-EARS_Common/BitArray.h	BitArray<0x10000,unsigned int> (18), StaticBitArray (bare, never instantiated out of line). Global namespace, and no bitarray.h in ANY package -- home file not yet identified.
+ears_common/src/Bitflags.cpp	Flags16 (9), Flags32 (41) -> include/ears_common/bitflags.h, header-only
+ears_common/src/CommonTypes.cpp	-> include/ears_common/commontypes.h, header-only
+ears_common/src/RwMaths.cpp	RwV3d (896), RwMatrixTag (129) -> include/ears_common/rwtypes.h, header-only
+ears_common/include/ears_common/SafePtr.inl	SafePtr (1403) -> include/ears_common/safeptr.h
+ears_common/include/ears_common/BitArray.h	BitArray<0x10000,unsigned int> (18), StaticBitArray (bare, never instantiated out of line). Global namespace, and no bitarray.h in ANY package -- home file not yet identified.
 
 # --- ears_framework
-EARS_Framework/Core/Component/Component.cpp	Component (1450, too generic to attribute on its own)
-EARS_Framework/Core/Persistence/PersistenceRegistry.h	IPersistable (39) -> src/framework/core/persistence/, defining file inlined
-EARS_Framework/Modules/BehaviorInfo/BehaviorInfo.cpp	BehaviorInfo (8) -> modules/player/player.h (5x) or modules/npc/npc.h (1x)
+ears_framework/src/framework/core/component/Component.cpp	Component (1450, too generic to attribute on its own)
+ears_framework/src/framework/core/persistence/PersistenceRegistry.h	IPersistable (39) -> src/framework/core/persistence/, defining file inlined
+ears_framework/src/framework/modules/behaviorinfo/BehaviorInfo.cpp	BehaviorInfo (8) -> modules/player/player.h (5x) or modules/npc/npc.h (1x)
 
 # --- ears_godfather. PDB has the types but the map has no out-of-line
 #     definition, so the defining file is a header.
-EARS_Godfather/Modules/Player/PlayerCamera.cpp	PlayerCamera (33), no map attribution
-EARS_Godfather/Modules/Player/PlayerDefines.h	no types; check against modules/player/ headers in Phase 2d
-EARS_Godfather/Modules/Scoring/ScoreEvent.cpp	ScoreEvent (40), no map attribution
+ears_godfather/src/modules/player/PlayerCamera.cpp	PlayerCamera (33), no map attribution
+ears_godfather/src/modules/player/PlayerDefines.h	no types; check against modules/player/ headers in Phase 2d
+ears_godfather/src/modules/scoring/ScoreEvent.cpp	ScoreEvent (40), no map attribution
 
 # --- ears_rt_cct
-EARS_RT_CCT/src/CCTNameNode.cpp	CCTNameNode (41) -> src/chrcntl_character.cpp (3x); cctnamenode.h exists for the header
+ears_rt_cct/src/CCTNameNode.cpp	CCTNameNode (41) -> src/chrcntl_character.cpp (3x); cctnamenode.h exists for the header

@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/EARS_Godfather/Modules/FamilyTree/PlayerFamilyTree.h"
+#include "SDK/ears_godfather/src/modules/familytree/PlayerFamilyTree.h"
 
 // forward declaring
 namespace EARS

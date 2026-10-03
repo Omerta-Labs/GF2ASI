@@ -1,0 +1,77 @@
+#include "SDK/ears_common/include/ears_common/SafePtr.h"
+
+SafeObj::~SafeObj()
+{
+	// On destruction, invalidate every SafePtr still referencing this object so
+	// they safely read back as null rather than dangling.
+	while (m_SafePtrList)
+	{
+		SafePtrBase* const Current = m_SafePtrList;
+		m_SafePtrList = Current->m_Next;
+
+		Current->m_Obj = nullptr;
+		Current->m_Next = nullptr;
+	}
+}
+
+SafePtrBase::~SafePtrBase()
+{
+	if (m_Obj)
+	{
+		m_Obj->RemoveSafePtr(this);
+	}
+}
+
+void SafePtrBase::ClearSafePtr()
+{
+	if (m_Obj)
+	{
+		m_Obj->RemoveSafePtr(this);
+		m_Obj = nullptr;
+	}
+}
+
+void SafePtrBase::InitSafePtr(SafeObj* NewObj)
+{
+	if (m_Obj != NewObj)
+	{
+		if (m_Obj)
+		{
+			m_Obj->RemoveSafePtr(this);
+		}
+
+		m_Obj = NewObj;
+
+		if (m_Obj)
+		{
+			m_Obj->AddSafePtr(this);
+		}
+	}
+}
+
+void SafeObj::AddSafePtr(SafePtrBase* InBase)
+{
+	InBase->m_Next = m_SafePtrList;
+	m_SafePtrList = InBase;
+}
+
+void SafeObj::RemoveSafePtr(SafePtrBase* InBase)
+{
+	assert(m_SafePtrList);
+	assert(InBase);
+
+	if (m_SafePtrList == InBase)
+	{
+		m_SafePtrList = InBase->m_Next;
+	}
+	else
+	{
+		SafePtrBase* i = m_SafePtrList;
+		for (; i->m_Next != InBase; i = i->m_Next)
+		{
+			assert(i->m_Next);
+		}
+
+		i->m_Next = InBase->m_Next;
+	}
+}

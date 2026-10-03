@@ -1,7 +1,7 @@
 #pragma once
 
 // RenderWare Framework
-#include "SDK/EARS_Framework/Core/EventHandler/CEventHandler.h"
+#include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/CEventHandler.h"
 
 // Addons
 #include "Addons/discord/discord.h"

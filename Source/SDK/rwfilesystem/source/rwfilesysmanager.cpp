@@ -1,4 +1,4 @@
-#include "SDK/rwfilesystem/include/rwfilesysmanager.h"
+#include "SDK/rwfilesystem/include/rw/core/filesys/rwfilesysmanager.h"
 
 // Scripthook
 #include "addons/hook.h"

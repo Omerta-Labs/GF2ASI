@@ -12,9 +12,9 @@
 # --- RenderWare: unity builds, so the map resolves only to bb_runtime objects.
 #     Both packages put their public header at include/rw/core/<area>/manager.h
 #     and prefix the implementation file, which no name transform predicts.
-rwfilesystem/include/rwfilesysmanager.h	rwfilesystem/include/rw/core/filesys/manager.h
-rwcontroller/rwcontroller.h	rwcontroller/include/rw/core/controller/manager.h
-rwcontroller/rwcontroller.cpp	rwcontroller/source/rwcontrollermanager.cpp
+rwfilesystem/include/rw/core/filesys/rwfilesysmanager.h	rwfilesystem/include/rw/core/filesys/manager.h
+rwcontroller/include/rw/core/controller/rwcontroller.h	rwcontroller/include/rw/core/controller/manager.h
+rwcontroller/source/rwcontroller.cpp	rwcontroller/source/rwcontrollermanager.cpp
 
 # --- Cross-package files used to need rows here. Phase 2a moved them into the
 #     right package, so a plain same-package lookup now finds them:
@@ -25,16 +25,16 @@ rwcontroller/rwcontroller.cpp	rwcontroller/source/rwcontrollermanager.cpp
 # --- CCT highlevel: these sit under a highlevel/ subdirectory and two of them
 #     drop the ChrCntl_ prefix altogether, so the ChrCntrl_ alias misses them.
 #     chrcntl_extensions is C, not C++ -- the extension changes too.
-EARS_RT_CCT/include/ChrCntrl_Secondary.h	ears_rt_cct/include/ears_rt_cct/highlevel/secondary.h
-EARS_RT_CCT/src/ChrCntrl_Secondary.cpp	ears_rt_cct/src/highlevel/secondary.cpp
-EARS_RT_CCT/include/ChrCntrl_Extensions.h	ears_rt_cct/include/ears_rt_cct/highlevel/chrcntl_extensions.h
-EARS_RT_CCT/src/ChrCntrl_Extensions.cpp	ears_rt_cct/src/highlevel/chrcntl_extensions.c
+ears_rt_cct/include/ears_rt_cct/ChrCntrl_Secondary.h	ears_rt_cct/include/ears_rt_cct/highlevel/secondary.h
+ears_rt_cct/src/ChrCntrl_Secondary.cpp	ears_rt_cct/src/highlevel/secondary.cpp
+ears_rt_cct/include/ears_rt_cct/ChrCntrl_Extensions.h	ears_rt_cct/include/ears_rt_cct/highlevel/chrcntl_extensions.h
+ears_rt_cct/src/ChrCntrl_Extensions.cpp	ears_rt_cct/src/highlevel/chrcntl_extensions.c
 
 # --- Confirmed original files whose types are templates or fully inlined, so
 #     the linker map alone could not find them. Tools/pdb_find_type.py shows the
 #     types in the PDB; the manifest then names the file.
 #     SMBuilder is an original EARS::Framework class, not ours as first assumed.
-EARS_Framework/Toolkits/StateMachine/SMBuilder.cpp	ears_framework/src/framework/toolkits/statemachine/smbuilder.cpp
-EARS_Framework/Toolkits/StateMachine/SMBuilder.h	ears_framework/src/framework/toolkits/statemachine/smbuilder.h
-EARS_Common/RwMaths.h	ears_common/include/ears_common/rwtypes.h
-EARS_Common/SingleInternalLinkedListLightweight.h	ears_common/include/ears_common/singleinternallinkedlist.h
+ears_framework/src/framework/toolkits/statemachine/SMBuilder.cpp	ears_framework/src/framework/toolkits/statemachine/smbuilder.cpp
+ears_framework/src/framework/toolkits/statemachine/SMBuilder.h	ears_framework/src/framework/toolkits/statemachine/smbuilder.h
+ears_common/include/ears_common/RwMaths.h	ears_common/include/ears_common/rwtypes.h
+ears_common/include/ears_common/SingleInternalLinkedListLightweight.h	ears_common/include/ears_common/singleinternallinkedlist.h

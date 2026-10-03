@@ -10,38 +10,38 @@
 #include "Scripthook/SH_ImGui/KeybindManager.h"
 
 // Godfather
-#include "SDK/EARS_Framework/Core/Camera/CameraManager.h"
-#include "SDK/EARS_Framework/Core/Graphics/MaterialHash.h"
-#include "SDK/EARS_Framework/Core/Graphics/MaterialManager.h"
-#include "SDK/EARS_Framework/Core/SimManager/SimManager.h"
-#include "SDK/EARS_Framework/Core/StreamManager/StreamManager.h"
-#include "SDK/EARS_Framework/MainLoop/Logic.h"
-#include "SDK/EARS_Framework/Toolkits/Group/GroupManager.h"
-#include "SDK/EARS_Godfather/Modules/Buildings/Building.h"
-#include "SDK/EARS_Godfather/Modules/Buildings/BuildingStore.h"
-#include "SDK/EARS_Godfather/Modules/Buildings/BuildingManager.h"
-#include "SDK/EARS_Godfather/Modules/Families/Family.h"
-#include "SDK/EARS_Godfather/Modules/Families/FamilyManager.h"
-#include "SDK/EARS_Godfather/Modules/Families/CorleoneData.h"
-#include "SDK/EARS_Godfather/Modules/Families/MadeMan.h"
-#include "SDK/EARS_Godfather/Modules/Item/InventoryManager.h"
-#include "SDK/EARS_Godfather/Modules/Player/Player.h"
-#include "SDK/EARS_Godfather/Modules/Player/PlayerDebug.h"
-#include "SDK/EARS_Godfather/Modules/Mobface/MobfaceManager.h"
-#include "SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.h"
-#include "SDK/EARS_Godfather/Modules/Turf/City.h"
-#include "SDK/EARS_Godfather/Modules/Turf/CityManager.h"
-#include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
-#include "SDK/EARS_Godfather/Modules/NPC/Crime/CrimeManager.h"
-#include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegion.h"
-#include "SDK/EARS_Godfather/Modules/NPCScheduling/DemographicRegionManager.h"
-#include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
-#include "SDK/EARS_Godfather/Modules/Vehicles/Behaviors/WhiteboxCar/WhiteboxCar.h"
-#include "SDK/EARS_Godfather/Modules/Vehicles/VehicleDamageComponent.h"
-#include "SDK/EARS_Physics/Characters/CharacterProxy.h"
-#include "SDK/EARS_Physics/Vehicles/ground/wheeled/HavokWheeledVehicle.h"
+#include "SDK/ears_framework/src/framework/core/camera/CameraManager.h"
+#include "SDK/ears_framework/src/framework/core/graphics/MaterialHash.h"
+#include "SDK/ears_framework/src/framework/core/graphics/MaterialManager.h"
+#include "SDK/ears_framework/src/framework/core/simmanager/SimManager.h"
+#include "SDK/ears_framework/src/framework/core/streammanager/StreamManager.h"
+#include "SDK/ears_framework/src/game_framework/framework/mainloop/Logic.h"
+#include "SDK/ears_framework/src/framework/toolkits/group/GroupManager.h"
+#include "SDK/ears_godfather/src/modules/buildings/Building.h"
+#include "SDK/ears_godfather/src/modules/buildings/BuildingStore.h"
+#include "SDK/ears_godfather/src/modules/buildings/BuildingManager.h"
+#include "SDK/ears_godfather/src/modules/families/Family.h"
+#include "SDK/ears_godfather/src/modules/families/FamilyManager.h"
+#include "SDK/ears_godfather/src/modules/families/CorleoneData.h"
+#include "SDK/ears_godfather/src/modules/families/MadeMan.h"
+#include "SDK/ears_godfather/src/modules/item/InventoryManager.h"
+#include "SDK/ears_godfather/src/modules/player/Player.h"
+#include "SDK/ears_godfather/src/modules/player/PlayerDebug.h"
+#include "SDK/ears_godfather/src/modules/mobface/MobfaceManager.h"
+#include "SDK/ears_godfather/src/modules/timeofday/TimeOfDayManager.h"
+#include "SDK/ears_godfather/src/modules/turf/City.h"
+#include "SDK/ears_godfather/src/modules/turf/CityManager.h"
+#include "SDK/ears_godfather/src/modules/npc/NPC.h"
+#include "SDK/ears_godfather/src/modules/npc/crime/CrimeManager.h"
+#include "SDK/ears_godfather/src/modules/npcscheduling/DemographicRegion.h"
+#include "SDK/ears_godfather/src/modules/npcscheduling/DemographicRegionManager.h"
+#include "SDK/ears_godfather/src/modules/npcscheduling/SimNPC.h"
+#include "SDK/ears_godfather/src/modules/vehicles/behaviors/whiteboxcar/WhiteboxCar.h"
+#include "SDK/ears_godfather/src/modules/vehicles/VehicleDamageComponent.h"
+#include "SDK/ears_physics/src/ears_physics/characters/CharacterProxy.h"
+#include "SDK/ears_physics/src/ears_physics/vehicles/ground/wheeled/HavokWheeledVehicle.h"
 
-#include "SDK/EARS_RT_LLRender/include/ShaderManager.h"
+#include "SDK/ears_rt_llrender/include/ears_rt_llrender/ShaderManager.h"
 
 // CPP
 #include <filesystem>
@@ -441,8 +441,8 @@ void ImGuiManager::AddFont(const char* name)
 	static const ImWchar Generic_ranges_most_needed[] =
 	{
 		0x0020, 0x00FF, // Basic Latin + Latin Supplement
-		0x0100, 0x017F,	//0100 — 017F  	Latin Extended-A
-		0x0180, 0x024F,	//0180 — 024F  	Latin Extended-B
+		0x0100, 0x017F,	//0100 â€” 017F  	Latin Extended-A
+		0x0180, 0x024F,	//0180 â€” 024F  	Latin Extended-B
 		0,
 	};
 

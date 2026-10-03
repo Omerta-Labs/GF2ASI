@@ -148,6 +148,13 @@ renaming), and premake/CMake globs the file list — so this is a rename + inclu
 | `EARS_Common/IAllocator.h` | package `allocator`, `include/allocator/iallocator.h` |
 | `EARS_Godfather/System/Memory/GlobalHeapAllocator.h` | `ears_framework/.../core/memory/` |
 
+Careful with that last one: only the **header** moves. The manifest has
+`ears_framework/src/framework/core/memory/globalheapallocator.h` but
+`ears_godfather/src/system/memory/globalheapallocator.cpp` — the framework
+declares the allocator and godfather implements it, so the pair genuinely
+straddles two packages. `ears_godfather/src/system/` is real (27 files) and must
+not be removed.
+
 You currently have **both** `Modules/Vehicles/Behaviors/` and `.../Behaviours/`. Original is `behaviors`.
 
 **2b. Adopt the original package roots.** Drop the version level (`dev`, `release`, `2.0`) — it is a

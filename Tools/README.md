@@ -118,6 +118,48 @@ the file declares — not its stem, which is not a type name.
 Output gives each distinct mangled name, so you also get the namespace and, for
 a template, the arguments it was instantiated with.
 
+## plan_moves.py / apply_moves.py
+
+The restructure move machinery. Planning is separate from applying so a plan can
+be read and argued with before anything moves.
+
+```bash
+python Tools/plan_moves.py --phase 2b --out moves_2b.tsv
+python Tools/apply_moves.py moves_2b.tsv --dry-run
+python Tools/apply_moves.py moves_2b.tsv
+```
+
+`plan_moves.py` emits `old<TAB>new` rows relative to `Source/SDK`. Where a file
+matches the manifest its target comes straight from there, which is the only way
+to get the cases a rule cannot predict — the `ears_common` include/src split,
+the 11 `ears_framework` files under `src/game_framework/framework/`, and
+`ears_trinity`, whose headers sit directly in `include/` with no package
+subdirectory. A per-package rule covers the rest. It reports collisions, which
+are always a planning bug.
+
+`apply_moves.py` does three things that have to happen together or the tree
+stops building: rewrites `SDK/<old>` include directives to `SDK/<new>`
+(case-insensitively, so an already-miscased directive gets corrected rather than
+missed), rewrites bare sibling includes that the move separates, and performs
+the moves with git recording renames.
+
+Two traps it handles, both found the hard way:
+
+- **Case-only renames.** Git on Windows defaults to `core.ignorecase=true`, and
+  `EARS_Common` and `ears_common` are the same directory to the filesystem.
+  Files go through `Source/SDK/__restructure/` and the emptied originals are
+  removed before the staged tree moves up. Never rename a package directory in
+  place.
+- **A surviving original directory.** If some of a package's files were already
+  correctly placed they are not in the move list, so the old directory is not
+  empty, and moving the staged directory would nest it inside — giving
+  `SDK/rwfilesystem/rwfilesystem/`. The contents are moved individually in that
+  case.
+
+It also preserves uncommitted work: for a file with unstaged changes the index
+entry is rebuilt as HEAD plus the mechanical rewrite, so a commit carries the
+rename and the include fix and leaves everything else in the working tree.
+
 ## check_includes.py
 
 Resolves every `#include` in the project and reports the ones that do not exist.

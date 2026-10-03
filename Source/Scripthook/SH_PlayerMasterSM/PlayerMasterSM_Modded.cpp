@@ -6,7 +6,7 @@
 #include "Scripthook/SH_PlayerMasterSM/PlayerDebugOptions_Modded.h"
 
 // SDK
-#include "SDK/EARS_Godfather/Modules/Player/Player.h"
+#include "SDK/ears_godfather/src/modules/player/Player.h"
 
 #include <Windows.h>
 

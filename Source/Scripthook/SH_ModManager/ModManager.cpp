@@ -4,9 +4,9 @@
 #include "Addons/tConsole.h"
 
 // SDK
-#include "SDK/EARS_Common/Guid.h"
-#include "SDK/EARS_Common/String.h"
-#include "SDK/EARS_Framework/Core/StreamManager/StreamManager.h"
+#include "SDK/ears_common/include/ears_common/Guid.h"
+#include "SDK/ears_common/include/ears_common/String.h"
+#include "SDK/ears_framework/src/framework/core/streammanager/StreamManager.h"
 
 // C++
 #include <stdio.h>
