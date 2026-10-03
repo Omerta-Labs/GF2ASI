@@ -46,3 +46,4 @@ premake5.lua
 /build
 /out
 CMakeUserPresets.json
+/_build
