@@ -118,6 +118,34 @@ the file declares — not its stem, which is not a type name.
 Output gives each distinct mangled name, so you also get the namespace and, for
 a template, the arguments it was instantiated with.
 
+## check_includes.py
+
+Resolves every `#include` in the project and reports the ones that do not exist.
+
+```bash
+python Tools/check_includes.py
+python Tools/check_includes.py --quiet         # summary only
+python Tools/check_includes.py --ignore-case   # skip the casing warnings
+```
+
+Stands in for a compile when checking a large rename, which is what Phase 2 is:
+~500 files moved and ~550 include directives rewritten, where a single stale
+directive is the whole risk. Exits non-zero if anything is unresolved, so it
+works in a hook.
+
+Search order matches MSVC, and the `-I` roots mirror `CMakeLists.txt` — keep the
+two in step.
+
+It also reports includes whose **casing** differs from the file on disk. Those
+build here and nowhere else, and they matter more than usual now: the original
+tree is entirely lowercase, so Phase 2c depends on getting case right. Casing is
+checked per path component against the real directory listing, because
+`Path.resolve()` does not reliably correct case on Windows.
+
+Vendored imgui and the Discord SDK are skipped. They are compiled, but their
+platform-conditional includes (Carbon, emscripten, optional stb and freetype
+backends) are `#ifdef`'d out on Windows and only produce noise.
+
 ## Reference data these read
 
 | File | Purpose |

@@ -1,16 +1,16 @@
 #pragma once
 
 // SDK
-#include "SDK/EARS_Godfather/Modules/Components/UpgradeComponent.h"
+#include "SDK/EARS_Godfather/Modules/Component/UpgradeComponent.h"
 
 namespace EARS
 {
 	namespace Modules
 	{
 		/**
-		 * An Upgrade component primarily used by the Player class
+		 *  An Upgrade component primarily used by the NPC class
 		 */
-		class PlayerUpgradeComponent : public EARS::Modules::UpgradeComponent
+		class NPCUpgradeComponent : public EARS::Modules::UpgradeComponent
 		{
 		public:
 

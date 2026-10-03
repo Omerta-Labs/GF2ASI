@@ -4,7 +4,7 @@
 #include "SDK/EARS_Common/BitFlags.h"
 #include "SDK/EARS_Common/SafePtr.h"
 #include "SDK/EARS_Framework/Toolkits/StateMachine/AnimateStateMachine.h"
-#include "SDK/EARS_Physics/Behaviours/Vehicles/BaseVehicle.h"
+#include "SDK/EARS_Physics/Behaviors/Vehicles/BaseVehicle.h"
 
 namespace EARS::Modules
 {

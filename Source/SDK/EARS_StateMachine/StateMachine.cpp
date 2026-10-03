@@ -3,7 +3,7 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/EARS_Common/IAllocator.h"
+#include "SDK/allocator/IAllocator.h"
 #include "SDK/EARS_StateMachine/StateMachineManager.h"
 
 // C++

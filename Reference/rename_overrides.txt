@@ -16,11 +16,11 @@ rwfilesystem/include/rwfilesysmanager.h	rwfilesystem/include/rw/core/filesys/man
 rwcontroller/rwcontroller.h	rwcontroller/include/rw/core/controller/manager.h
 rwcontroller/rwcontroller.cpp	rwcontroller/source/rwcontrollermanager.cpp
 
-# --- Cross-package: these live in a different package than the directory they
-#     were reconstructed into, so a same-package lookup can never find them.
-EARS_Godfather/System/Memory/GlobalHeapAllocator.h	ears_framework/src/framework/core/memory/globalheapallocator.h
-EARS_Godfather/System/Memory/GlobalHeapAllocator.cpp	ears_framework/src/framework/core/memory/globalheapallocator.cpp
-EARS_Common/IAllocator.h	allocator/include/allocator/iallocator.h
+# --- Cross-package files used to need rows here. Phase 2a moved them into the
+#     right package, so a plain same-package lookup now finds them:
+#       EARS_Common/IAllocator.h                      -> allocator/
+#       EARS_Godfather/System/Memory/GlobalHeapAllocator.{cpp,h}
+#                                                     -> EARS_Framework/Core/Memory/
 
 # --- CCT highlevel: these sit under a highlevel/ subdirectory and two of them
 #     drop the ChrCntl_ prefix altogether, so the ChrCntrl_ alias misses them.

@@ -4,7 +4,7 @@
 #include "Scripthook/SH_ImGui/ImGuiPropertyGrid.h"
 
 // SDK
-#include "SDK/EARS_Framework/Toolkits/GroupManager/GroupManager.h"
+#include "SDK/EARS_Framework/Toolkits/Group/GroupManager.h"
 #include "SDK/EARS_Godfather/Modules/NPC/NPC.h"
 #include "SDK/EARS_Godfather/Modules/UI/UIHud.h"
 #include "SDK/EARS_Locale/LocaleManager.h"

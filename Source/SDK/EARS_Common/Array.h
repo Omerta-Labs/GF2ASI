@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/EARS_Godfather/System/Memory/GlobalHeapAllocator.h"
+#include "SDK/EARS_Framework/Core/Memory/GlobalHeapAllocator.h"
 
 // C++
 #include <stdint.h>

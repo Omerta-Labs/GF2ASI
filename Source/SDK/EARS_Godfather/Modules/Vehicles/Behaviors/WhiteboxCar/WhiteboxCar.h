@@ -2,7 +2,7 @@
 
 // SDK
 #include "SDK/EARS_Common/String.h"
-#include "SDK/EARS_Physics/Behaviours/Vehicles/BaseVehicle.h"
+#include "SDK/EARS_Physics/Behaviors/Vehicles/BaseVehicle.h"
 
 namespace EARS
 {

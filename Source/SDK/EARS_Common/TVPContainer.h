@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/EARS_Common/IAllocator.h"
+#include "SDK/allocator/IAllocator.h"
 
 namespace EARS::Common
 {

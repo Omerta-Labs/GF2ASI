@@ -3,7 +3,7 @@
 #include "Addons/Hook.h"
 
 // SDK
-#include "SDK/EARS_Godfather/System/Memory/GlobalHeapAllocator.h"
+#include "SDK/EARS_Framework/Core/Memory/GlobalHeapAllocator.h"
 
 namespace EARS::Framework
 {

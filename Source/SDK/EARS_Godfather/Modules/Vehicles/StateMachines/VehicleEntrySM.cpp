@@ -1,7 +1,7 @@
 #include "VehicleEntrySM.h"
 
 #include "SDK/EARS_Godfather/Modules/Sentient/Sentient.h"
-#include "SDK/EARS_Godfather/Modules/Vehicles/Behaviours/WhiteboxCar/WhiteboxCar.h"
+#include "SDK/EARS_Godfather/Modules/Vehicles/Behaviors/WhiteboxCar/WhiteboxCar.h"
 
 #include "addons/Hook.h"
 

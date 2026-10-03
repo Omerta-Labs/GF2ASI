@@ -4,7 +4,7 @@
 #include "SDK/EARS_Common/Bitflags.h"
 
 // Godfather
-#include "SDK/EARS_Godfather/Modules/Components/Damage/DamageComponent.h"
+#include "SDK/EARS_Godfather/Modules/Component/Damage/DamageComponent.h"
 
 namespace EARS
 {

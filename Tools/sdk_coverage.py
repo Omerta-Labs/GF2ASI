@@ -39,6 +39,10 @@ SOURCE_EXT = (".cpp", ".hpp", ".inl", ".h", ".c")
 # Phase 2c renames these directories to the package name, after which every
 # entry is an identity mapping and this table can be deleted.
 PACKAGE_DIRS = {
+    # EA foundation package, reconstructed because SDK types reference
+    # EA::Allocator::IAllocator directly.
+    "allocator": "allocator",
+
     "ears_common": "ears_common",
     "ears_framework": "ears_framework",
     "ears_godfather": "ears_godfather",

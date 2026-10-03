@@ -1,7 +1,7 @@
 #include "NPC.h"
 
 // SDK
-#include "SDK/EARS_Godfather/Modules/Components/NPC/NPCCrewComponent.h"
+#include "SDK/EARS_Godfather/Modules/Component/NPC/NPCCrewComponent.h"
 #include "SDK/EARS_Godfather/Modules/NPCScheduling/SimNPC.h"
 
 // Hook

@@ -3,7 +3,7 @@
 // Framework
 #include "SDK/EARS_Common/BitVector.h"
 #include "SDK/EARS_Framework/Core/Player/PlayerManager.h"
-#include "SDK/EARS_Godfather/Modules/Components/PlayerUpgradeComponent.h"
+#include "SDK/EARS_Godfather/Modules/Component/PlayerUpgradeComponent.h"
 #include "SDK/EARS_Godfather/Modules/Player/PlayerMasterSM.h"
 
 // Hook
