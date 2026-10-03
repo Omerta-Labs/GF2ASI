@@ -4,6 +4,8 @@
 #include "Addons/tLog.h"
 #include "Addons/Settings.h"
 #include "Platform/Diagnostics.h"
+#include "Platform/Host.h"
+#include "Scripthook/SH_SDKHooks/SDKHooks.h"
 
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
@@ -516,6 +518,26 @@ void __fastcall HOOK_TrinityGameCamera_BeginUpdate(EARS::Modules::TrinityGameCam
 // during start-up; see Source/Platform/Diagnostics.h.
 namespace
 {
+	// EARS::Host: the SDK asks whether something else has the input. Only
+	// marketingdebug's free camera needs it so far, to stand down while the
+	// menu overlay has the mouse.
+	// GetChecked, never Get: SH::Singleton::Get constructs on demand, so
+	// querying it from here would build the ImGuiManager the first time the SDK
+	// asked -- early, on the SIM thread, and before Open() had run. These sinks
+	// are installed after Open(), so the instance exists by the time anything
+	// calls them, and the null test covers shutdown.
+	bool Host_OwnsCursor()
+	{
+		const ImGuiManager* ImGuiMgr = ImGuiManager::GetChecked();
+		return ImGuiMgr != nullptr && ImGuiMgr->HasCursorControl();
+	}
+
+	bool Host_OwnsKeyboard()
+	{
+		const ImGuiManager* ImGuiMgr = ImGuiManager::GetChecked();
+		return ImGuiMgr != nullptr && ImGuiMgr->IsMenuInteractive();
+	}
+
 	void Diag_Printf(const char* Format, va_list Args)
 	{
 		// Same buffer size and the same fWriteLine tail as tConsole::fPrintf,
@@ -542,6 +564,7 @@ void GF2Hook::Init_Logging()
 	EARS::Diag::Sinks DiagSinks;
 	DiagSinks.Printf = &Diag_Printf;
 	EARS::Diag::InstallSinks(DiagSinks);
+
 }
 
 void GF2Hook::Init_ModSystems()
@@ -549,7 +572,7 @@ void GF2Hook::Init_ModSystems()
 	Settings* SettingsMgr = Settings::Get();
 	SettingsMgr->Init();
 
-	EARS::Framework::InitialiseScripthookModLoader();
+	Mod::SDKHooks::InitialiseModLoader();
 }
 
 void GF2Hook::Init_AttachHooks()
@@ -651,8 +674,8 @@ void GF2Hook::Init_AttachHooks()
 	PLH::x86Detour detour1558((char*)0x0841460, (char*)&HOOK_TrinityGameCamera_BeginUpdate, &TrinityGameCamera_BeginUpdate_Old, dis);
 	detour1558.hook();
 
-	EARS::Modules::DemographicRegion::StaticApplyHooks();
-	EARS::Modules::ScoreKeeper::StaticApplyHooks();
+	Mod::SDKHooks::ApplyDemographicRegionHooks();
+	Mod::SDKHooks::ApplyScoreKeeperHooks();
 	Mod::GammaFix::StaticApplyHooks();
 	Mod::EdgeAA::StaticApplyHooks();
 
@@ -670,6 +693,13 @@ void GF2Hook::Init_GameSystems()
 {
 	ImGuiManager* OurImGuiManager = ImGuiManager::Get();
 	OurImGuiManager->Open();
+
+	// Installed here rather than in Init_Logging: the sinks read the
+	// ImGuiManager, so they must not be reachable before it exists.
+	EARS::Host::Sinks HostSinks;
+	HostSinks.OwnsCursor = &Host_OwnsCursor;
+	HostSinks.OwnsKeyboard = &Host_OwnsKeyboard;
+	EARS::Host::InstallSinks(HostSinks);
 
 	DiscordManager* OurDiscordManager = DiscordManager::Get();
 	OurDiscordManager->Open();

@@ -1,19 +1,20 @@
-#include "scorekeeper.h"
+#include "Scripthook/SH_SDKHooks/SDKHooks.h"
 
-// GF2
+// SDK
+#include "modules/scoring/scorekeeper.h"
 #include "modules/scoring/scoreevent.h"
-
-// Renderware
 #include "framework/core/eventhandler/ceventhandler.h"
 
-// Addons
 #include "Platform/MemUtils.h"
 #include "Scripthook/ScripthookEvents.h"
 
-// Polyhook
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
 
+// Moved out of ears_godfather/src/modules/scoring/scorekeeper.cpp, which held
+// nothing else: the detour calls Mod::DispatchPlatformAgnosticUnlockEvent, so
+// the whole file was modding-layer code living under Source/SDK. The .cpp is
+// gone; scorekeeper.h keeps the reconstructed ScoreKeeper class.
 // HOOKING AND SCRIPTHOOK RELATED
 namespace EARS
 {
@@ -35,7 +36,7 @@ namespace EARS
 	}
 }
 
-void EARS::Modules::ScoreKeeper::StaticApplyHooks()
+void Mod::SDKHooks::ApplyScoreKeeperHooks()
 {
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
 

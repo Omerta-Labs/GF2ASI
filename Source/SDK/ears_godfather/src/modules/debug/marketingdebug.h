@@ -59,7 +59,7 @@ namespace EARS::Modules
 		float m_SmoothedMouseVelocityY = 0.0f;
 
 		// When set, the next mouse delta is discarded instead of applied. Set on Init and while
-		// the ImGui menu owns the cursor, where the game's mouse delta tracking is unreliable.
+		// the host owns the cursor, where the game's mouse delta tracking is unreliable.
 		bool m_bSwallowMouseDelta = true;
 	};
 

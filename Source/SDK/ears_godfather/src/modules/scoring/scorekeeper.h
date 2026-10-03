@@ -12,7 +12,6 @@ namespace EARS
 		public:
 
 			/* apply hooks to manipulate original game functionality */
-			static void StaticApplyHooks();
 
 		private:
 		};

@@ -1,15 +1,15 @@
 #include "marketingdebug.h"
 
 #include "Platform/MemUtils.h"
-#include "addons/tConsole.h"
+#include "Platform/Diagnostics.h"
 
 // SDK
 #include "framework/core/camera/cameramanager.h"
 #include "framework/core/input/input.h"
 #include "modules/player/player.h"
 
-// Scripthook
-#include "Scripthook/SH_ImGui/ImGuiManager.h"
+// Platform
+#include "Platform/Host.h"
 
 // C++
 #include <algorithm>
@@ -31,7 +31,7 @@ namespace
 
 	// A single frame of real mouse movement is at most a few hundred counts, even during a
 	// hard flick. Anything larger is corrupted delta tracking (e.g. the game recentring the
-	// cursor across the whole screen after the ImGui menu suppressed SetCursorPos), so it
+	// cursor across the whole screen after the host suppressed SetCursorPos), so it
 	// gets discarded rather than applied.
 	constexpr float FREECAM_MOUSE_DELTA_MAX = 1000.0f;
 
@@ -163,10 +163,9 @@ namespace EARS::Modules
 
 		const uint16_t ControllerID = LclPlayer->GetControllerID();
 
-		// While the ImGui menu is open it owns the mouse and keyboard, so ignore all camera
+		// While the host owns the mouse and keyboard -- a menu overlay, say -- ignore all camera
 		// input - otherwise interacting with the menu also flies the camera around.
-		const ImGuiManager* ImGuiMgr = ImGuiManager::Get();
-		const bool bCursorCaptured = (ImGuiMgr != nullptr) && ImGuiMgr->HasCursorControl();
+		const bool bCursorCaptured = EARS::Host::OwnsCursor();
 
 		float LeftStickX = 0.0f;
 		float LeftStickY = 0.0f;
@@ -194,7 +193,7 @@ namespace EARS::Modules
 		float MouseDeltaY = 0.0f;
 		InputMgr->GetMouseDelta(MouseDeltaX, MouseDeltaY);
 
-		// While ImGui owns the cursor, the scripthook suppresses the game's SetCursorPos
+		// While the host owns the cursor it suppresses the game's SetCursorPos
 		// recentring, which corrupts the game's delta tracking (deltas become offsets from
 		// the screen centre). Ignore the mouse for those frames and for one update after
 		// control returns, so the garbage drains without kicking the camera. Deltas too

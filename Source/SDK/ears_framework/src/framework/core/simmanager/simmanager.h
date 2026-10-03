@@ -135,7 +135,6 @@ namespace EARS
 
 		static_assert(sizeof(SimManager) == 0x2D8); // actually much bigger
 
-		void InitialiseScripthookModLoader();
 	}
 }
 

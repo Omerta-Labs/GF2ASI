@@ -31,7 +31,6 @@ namespace EARS
 			 */
 			std::string GetDebugName() const;
 
-			static void StaticApplyHooks();
 
 		private:
 
