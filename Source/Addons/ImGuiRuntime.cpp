@@ -10,6 +10,13 @@
 #include <filesystem>
 #include <mutex>
 
+// Defined in imgui_impl_win32.cpp at global scope. imgui_impl_win32.h #if 0's
+// its own declaration and tells you to copy this line into your .cpp, so it has
+// to sit outside the namespace below -- inside it, this declares a different
+// symbol that nothing defines.
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
+	HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 namespace Mod::ImGuiRuntime
 {
 	namespace
@@ -17,8 +24,10 @@ namespace Mod::ImGuiRuntime
 		// The game's window and device, read from their fixed addresses rather
 		// than passed in: the detours that drive this runtime have no handle to
 		// either.
-		constexpr uintptr_t GAME_WINDOW_HANDLE_ADDRESS = 0x112A024;
-		constexpr uintptr_t GAME_D3D9_DEVICE_ADDRESS = 0x1205750;
+		// int, not uintptr_t: hook::Type's constructor takes int, and a wider
+		// type only buys a narrowing warning.
+		constexpr int GAME_WINDOW_HANDLE_ADDRESS = 0x112A024;
+		constexpr int GAME_D3D9_DEVICE_ADDRESS = 0x1205750;
 
 		constexpr int MAX_PANELS = 16;
 
@@ -369,9 +378,6 @@ namespace Mod::ImGuiRuntime
 	LRESULT WndProc(const HWND Window, const UINT Message,
 	                const WPARAM wParam, const LPARAM lParam)
 	{
-		extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
-			HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 		// The handler appends to the context's shared input queue, which must
 		// not overlap the SIM thread's frame build.
 		std::lock_guard<std::recursive_mutex> ContextLock(g_ContextLock);
