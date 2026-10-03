@@ -1,6 +1,6 @@
 #include "base.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 namespace EARS::Framework
 {

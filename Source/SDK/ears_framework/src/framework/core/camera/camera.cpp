@@ -1,6 +1,6 @@
 #include "camera.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // SDK
 #include "framework/core/memory/globalheapallocator.h"

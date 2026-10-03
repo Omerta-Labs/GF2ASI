@@ -1,6 +1,6 @@
 #include "framework/core/memory/globalheapallocator.h"
 
-#include "addons/hook.h"
+#include "Platform/MemUtils.h"
 
 namespace EARS::Allocator
 {

@@ -3,6 +3,7 @@
 #include "Addons/tConsole.h"
 #include "Addons/tLog.h"
 #include "Addons/Settings.h"
+#include "Platform/Diagnostics.h"
 
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
@@ -510,6 +511,22 @@ void __fastcall HOOK_TrinityGameCamera_BeginUpdate(EARS::Modules::TrinityGameCam
 	ActualPtr->EARS::Modules::TrinityGameCamera::BeginUpdate();
 }
 
+// The SDK declares EARS::Diag and leaves it unimplemented so that GF2SDK does
+// not depend on the layer above it. These are the implementations, installed
+// during start-up; see Source/Platform/Diagnostics.h.
+namespace
+{
+	void Diag_Printf(const char* Format, va_list Args)
+	{
+		// Same buffer size and the same fWriteLine tail as tConsole::fPrintf,
+		// which is what the SDK called before the inversion, so the output is
+		// unchanged.
+		char Buffer[4096]{};
+		vsprintf_s(Buffer, Format, Args);
+		tConsole::fWriteLine(Buffer);
+	}
+}
+
 void GF2Hook::Init_Logging()
 {
 	C_Logger::Create("GF2SE.txt");
@@ -518,6 +535,13 @@ void GF2Hook::Init_Logging()
 #endif // DEBUG
 
 	tConsole::RouteToLogger(true);
+
+	// Only Printf is wired up. The draw entry points stay null, which makes
+	// them no-ops rather than crashes -- there is no 3D debug renderer in the
+	// modding layer yet, and the SDK can already call them.
+	EARS::Diag::Sinks DiagSinks;
+	DiagSinks.Printf = &Diag_Printf;
+	EARS::Diag::InstallSinks(DiagSinks);
 }
 
 void GF2Hook::Init_ModSystems()

@@ -1,7 +1,7 @@
 #include "family.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // SDK
 #include "modules/buildings/building_manager.h"

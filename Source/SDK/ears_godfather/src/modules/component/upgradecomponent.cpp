@@ -1,7 +1,7 @@
 #include "upgradecomponent.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Modules::UpgradeComponent::ModifyAllUpgradeParts(bool bShowParts)
 {

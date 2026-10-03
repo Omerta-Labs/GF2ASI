@@ -6,7 +6,7 @@
 #include "framework/toolkits/statemachine/smbuilder.h"
 #include "modules/player/player.h"
 #include "modules/player/playerdebug.h"
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // C++
 #include <cmath>

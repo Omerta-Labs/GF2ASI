@@ -1,7 +1,7 @@
 #include "mobfacemanager.h"
 
 // addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 bool EARS::Modules::MobfaceManager::HasSavedData(const EARS::Modules::PlayerFamilyTree::FamilyTreeSlot SlotIndex) const
 {

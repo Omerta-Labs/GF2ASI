@@ -1,6 +1,6 @@
 #include "ui_frontend.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // SDK
 #include "ears_common/bitflags.h"

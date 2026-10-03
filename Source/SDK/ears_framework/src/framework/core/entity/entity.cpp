@@ -1,6 +1,6 @@
 #include "entity.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Framework::Entity::SetHeadingToPosition(const RwV3d& TargetPosition, const RwV3d* UpDirection)
 {

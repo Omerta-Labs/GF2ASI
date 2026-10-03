@@ -3,7 +3,7 @@
 #include "modules/sentient/sentient.h"
 #include "modules/vehicles/behaviors/whitebox_car/whitebox_car.h"
 
-#include "addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 namespace EARS::Modules
 {

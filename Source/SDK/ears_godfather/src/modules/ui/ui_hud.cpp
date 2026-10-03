@@ -1,7 +1,7 @@
 #include "ui_hud.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Apt::UIHUD::Suppress()
 {

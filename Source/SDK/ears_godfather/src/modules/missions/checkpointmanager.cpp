@@ -1,7 +1,7 @@
 #include "checkpointmanager.h"
 
 // addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // SDK
 #include "modules/missions/checkpoint.h"

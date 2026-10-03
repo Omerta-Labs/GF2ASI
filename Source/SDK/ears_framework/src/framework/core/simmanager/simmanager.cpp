@@ -1,8 +1,8 @@
 #include "simmanager.h"
 
 // Addons
-#include <Addons/tConsole.h>
-#include <Addons/Hook.h>
+#include "Platform/Diagnostics.h"
+#include <Platform/MemUtils.h>
 
 // SDK
 #include "framework/core/attributehandler/cattributehandler.h"
@@ -128,7 +128,7 @@ void EARS::Framework::SimManager::LoadResource(RWS::CResourceHandler::CResourceL
 	QueryPerformanceCounter(&PerformanceCount);
 	SimGroupTOC->m_VersionOrDispatchTime = (1000 * (PerformanceCount.QuadPart - m_MaxSpawnLatencyMSec) / some_value);
 
-	tConsole::fPrintf("SimManager::LoadResource: [%s]", StreamName);
+	EARS::Diag::Printf("SimManager::LoadResource: [%s]", StreamName);
 
 	// Recover pointers
 	PrivateUtils::RecoverPtr<RWS::CAttributePacket*>(SimGroupTOC->m_EntPackets, (uint8_t*)SimGroupTOC);
@@ -218,7 +218,7 @@ void EARS::Framework::InitialiseScripthookModLoader()
 	const std::filesystem::path CompletePath = (ExecutablePath.parent_path() / MODS_FOLDER_NAME);
 	if (!std::filesystem::exists(CompletePath))
 	{
-		tConsole::fPrintf("ERROR: SimGroupOverride path [%s] does not exist!", CompletePath.string().data());
+		EARS::Diag::Printf("ERROR: SimGroupOverride path [%s] does not exist!", CompletePath.string().data());
 		return;
 	}
 
@@ -232,7 +232,7 @@ void EARS::Framework::InitialiseScripthookModLoader()
 		const std::filesystem::path& AsPath = dirEntry.path();
 		if (AsPath.has_extension() && AsPath.extension() == ".sgp")
 		{
-			tConsole::fPrintf("Detected SimGroupOverride file [%s]", AsPath.c_str());
+			EARS::Diag::Printf("Detected SimGroupOverride file [%s]", AsPath.c_str());
 
 			std::ifstream input(AsPath.c_str(), std::ios::binary);
 			const std::vector<char> Bytes((std::istreambuf_iterator<char>(input)), (std::istreambuf_iterator<char>()));
@@ -251,12 +251,12 @@ void EARS::Framework::InitialiseScripthookModLoader()
 				RWS::CAttributePacket* Pckt = SimGroupTOC->m_EntPackets[idx];
 
 				const EARS::Common::guid128_t PcktID = Pckt->GetInstanceID();
-				tConsole::fPrintf("Loaded behaviour [0x%X-0x%X-0x%X-0x%X] from SimGroupOverride file [%s]", PcktID[0], PcktID[1], PcktID[2], PcktID[3], AsPath.c_str());
+				EARS::Diag::Printf("Loaded behaviour [0x%X-0x%X-0x%X-0x%X] from SimGroupOverride file [%s]", PcktID[0], PcktID[1], PcktID[2], PcktID[3], AsPath.c_str());
 
 				PrivateUtils::RegisteredPackets.insert({ PcktID, Pckt });
 			}
 
-			tConsole::fPrintf("Finished SimGroupOverride file [%s], with a total of %u behaviours mounted.", AsPath.c_str(), SimGroupTOC->m_NumEnts);
+			EARS::Diag::Printf("Finished SimGroupOverride file [%s], with a total of %u behaviours mounted.", AsPath.c_str(), SimGroupTOC->m_NumEnts);
 		}
 	}
 

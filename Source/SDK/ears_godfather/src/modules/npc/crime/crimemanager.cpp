@@ -1,7 +1,7 @@
 #include "crimemanager.h"
 
 // Hooks
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Modules::CrimeManager::CalmPoliceTowardsCorleones()
 {

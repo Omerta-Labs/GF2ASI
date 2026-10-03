@@ -1,7 +1,7 @@
 #include "gun.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Modules::Gun::SetInfiniteAmmo(const bool bInfinite)
 {

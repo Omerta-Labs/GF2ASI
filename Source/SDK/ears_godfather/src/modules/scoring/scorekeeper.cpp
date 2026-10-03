@@ -7,7 +7,7 @@
 #include "framework/core/eventhandler/ceventhandler.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 #include "Scripthook/ScripthookEvents.h"
 
 // Polyhook

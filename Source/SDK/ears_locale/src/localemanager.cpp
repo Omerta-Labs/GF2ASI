@@ -1,7 +1,7 @@
 #include "ears_locale/localemanager.h"
 
 // Hooks
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 const std::unordered_map<std::string, std::string> EARS::Locale::LocaleManager::languageMap = {
 	{"en", "English"},

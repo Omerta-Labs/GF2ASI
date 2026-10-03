@@ -7,7 +7,7 @@
 #include "modules/player/playermastersm.h"
 
 // Hook
-#include <Addons/Hook.h>
+#include <Platform/MemUtils.h>
 
 namespace EARS
 {

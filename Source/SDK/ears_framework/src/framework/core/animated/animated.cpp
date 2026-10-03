@@ -6,7 +6,7 @@
 #include "ears_rt_cct/highlevel/secondary.h"
 
 // addons
-#include "addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Framework::Animated::SetSecondaryAnimSlots(uint32_t NumSlots)
 {

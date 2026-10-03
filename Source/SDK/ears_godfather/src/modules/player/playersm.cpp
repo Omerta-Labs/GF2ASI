@@ -4,7 +4,7 @@
 #include "modules/player/player.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 namespace EARS
 {

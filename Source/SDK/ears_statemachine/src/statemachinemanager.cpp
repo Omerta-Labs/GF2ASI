@@ -1,6 +1,6 @@
 #include "ears_statemachine/statemachinemanager.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 #include "ears_statemachine/statemachine.h"
 

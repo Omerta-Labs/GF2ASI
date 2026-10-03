@@ -1,6 +1,6 @@
 #include "smbuilder.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Framework::SMBuilderState::AddChild(const char* ChildName, bool bEvalParentTrans)
 {

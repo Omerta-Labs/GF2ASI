@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework/toolkits/statemachine/animatesm.h"
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 #include "modules/sentient/statemachines/sentientsm.h"
 
 namespace EARS::Modules

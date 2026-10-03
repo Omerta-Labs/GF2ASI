@@ -1,7 +1,7 @@
 #include "checkpoint.h"
 
 // addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 namespace EARS::Modules
 {

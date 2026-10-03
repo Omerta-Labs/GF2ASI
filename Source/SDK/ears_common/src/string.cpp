@@ -1,7 +1,7 @@
 #include "ears_common/string.h"
 
 // SH
-#include "addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // CPP
 #include <cstring>

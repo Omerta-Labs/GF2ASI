@@ -1,7 +1,7 @@
 #include "inventorymanager.h"
 
 // Hooks
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // Framework
 #include "framework/core/eventhandler/ceventhandler.h"

@@ -1,6 +1,6 @@
 #include "logic.h"
 
-#include "addons/hook.h"
+#include "Platform/MemUtils.h"
 
 namespace RWS::MainLoop::Logic
 {

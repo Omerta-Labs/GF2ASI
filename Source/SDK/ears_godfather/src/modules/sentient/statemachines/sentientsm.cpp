@@ -3,7 +3,7 @@
 // SDK
 #include "modules/sentient/sentient.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 namespace EARS
 {

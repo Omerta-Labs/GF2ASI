@@ -1,7 +1,7 @@
 #include "standarddamagecomponent.h"
 
 // HOOK
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Modules::StandardDamageComponent::SetInvincible(const bool bIsInvincible)
 {

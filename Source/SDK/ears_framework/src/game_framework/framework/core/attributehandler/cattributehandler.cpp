@@ -1,7 +1,7 @@
 #include "cattributehandler.h"
 
 // Hooks
-#include <Addons/Hook.h>
+#include <Platform/MemUtils.h>
 
 // Framework
 #include "framework/core/component/component.h"

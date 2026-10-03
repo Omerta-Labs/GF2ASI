@@ -1,8 +1,7 @@
 #include "ears_rt_llrender/shadermanager.h"
 
-#include "Addons/Hook.h"
-#include "Addons/tConsole.h"
-
+#include "Platform/MemUtils.h"
+#include "Platform/Diagnostics.h"
 // C++
 #include <d3d9.h>
 #include <d3dx9shader.h>
@@ -141,8 +140,8 @@ void TestLSShader()
 			delete[] vtxdata;
 		}
 
-		tConsole::fPrintf("START_SHADER");
-		tConsole::fWriteLine(Name);
+		EARS::Diag::Printf("START_SHADER");
+		EARS::Diag::Printf("%s", Name);
 
 		if (ID3DXConstantTable* pConstantTable = VertexShader.constantTable)
 		{
@@ -159,7 +158,7 @@ void TestLSShader()
 				HRESULT hr = pConstantTable->GetConstantDesc(hConstant, &desc, &count);
 				if (SUCCEEDED(hr)) {
 					// Print constant info
-					tConsole::fPrintf("%s %d %u %u %d %d",
+					EARS::Diag::Printf("%s %d %u %u %d %d",
 						desc.Name,
 						desc.RegisterSet,
 						desc.RegisterIndex,
@@ -187,7 +186,7 @@ void TestLSShader()
 				HRESULT hr = pConstantTable->GetConstantDesc(hConstant, &desc, &count);
 				if (SUCCEEDED(hr)) {
 					// Print constant info
-					tConsole::fPrintf("%s %d %u %u %d %d",
+					EARS::Diag::Printf("%s %d %u %u %d %d",
 						desc.Name,
 						desc.RegisterSet,
 						desc.RegisterIndex,
@@ -199,7 +198,7 @@ void TestLSShader()
 			}
 		}
 
-		tConsole::fWriteLine("END_SHADER");
+		EARS::Diag::Printf("%s", "END_SHADER");
 	}
 #endif // DEBUG
 }

@@ -5,7 +5,7 @@
 #include "framework/core/streammanager/streammanager.h"
 
 // Hook
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 bool EARS::Modules::City::IsKnownToPlayer() const
 {

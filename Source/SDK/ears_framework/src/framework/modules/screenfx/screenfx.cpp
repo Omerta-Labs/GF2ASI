@@ -1,6 +1,6 @@
 #include "screenfx.h"
 
-#include "addons/hook.h"
+#include "Platform/MemUtils.h"
 
 namespace PrivateEvents
 {

@@ -1,6 +1,6 @@
 #include "trinitygamecamera.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // SDK
 #include "ears_common/rwtypes.h"

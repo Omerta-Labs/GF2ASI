@@ -1,6 +1,6 @@
 #include "cameramanager.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // SDK
 #include "framework/core/camera/camerablender.h"

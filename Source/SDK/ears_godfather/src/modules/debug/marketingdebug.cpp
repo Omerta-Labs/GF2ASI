@@ -1,6 +1,6 @@
 #include "marketingdebug.h"
 
-#include "addons/hook.h"
+#include "Platform/MemUtils.h"
 #include "addons/tConsole.h"
 
 // SDK

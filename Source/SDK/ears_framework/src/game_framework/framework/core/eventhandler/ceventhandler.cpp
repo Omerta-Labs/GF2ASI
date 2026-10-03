@@ -1,6 +1,6 @@
 #include "ceventhandler.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 #include "ears_common/hashtable.h"
 

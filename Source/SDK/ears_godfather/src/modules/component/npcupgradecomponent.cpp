@@ -1,7 +1,7 @@
 #include "npcupgradecomponent.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 uint32_t EARS::Modules::NPCUpgradeComponent::GetComponentIndex()
 {

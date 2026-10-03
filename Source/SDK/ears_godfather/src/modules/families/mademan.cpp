@@ -6,7 +6,7 @@
 #include "modules/npcscheduling/simnpc.h"
 
 // CPP
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 namespace EARS
 {

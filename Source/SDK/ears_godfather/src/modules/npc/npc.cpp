@@ -5,7 +5,7 @@
 #include "modules/npcscheduling/simnpc.h"
 
 // Hook
-#include <Addons/Hook.h>
+#include <Platform/MemUtils.h>
 
 void EARS::Modules::NPC::ActivateHUDIndicator(uint32_t NewIndicatorType, const char* InIndicatorVfxName)
 {

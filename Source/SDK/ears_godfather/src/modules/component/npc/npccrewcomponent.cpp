@@ -6,7 +6,7 @@
 #include "modules/ui/ui_hud.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 bool EARS::Modules::NPCCrewComponent::CanRecruit() const
 {

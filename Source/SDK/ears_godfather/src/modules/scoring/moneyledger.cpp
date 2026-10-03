@@ -1,7 +1,7 @@
 #include "moneyledger.h"
 
 // addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Modules::MoneyRecord::Reset()
 {

@@ -1,7 +1,7 @@
 #include "simnpc.h"
 
 // Hook
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // SDK
 #include "modules/component/npcupgradecomponent.h"

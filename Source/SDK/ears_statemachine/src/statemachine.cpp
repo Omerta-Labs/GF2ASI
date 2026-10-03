@@ -1,6 +1,6 @@
 #include "ears_statemachine/statemachine.h"
 
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // SDK
 #include "allocator/iallocator.h"

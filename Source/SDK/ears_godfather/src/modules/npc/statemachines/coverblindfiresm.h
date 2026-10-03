@@ -3,7 +3,7 @@
 #include "modules/sentient/statemachines/sentientsm.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 namespace EARS::Modules
 {

@@ -1,7 +1,7 @@
 #include "partedanimated.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // CPP
 #include <string>

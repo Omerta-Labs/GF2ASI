@@ -1,7 +1,7 @@
 #include "rw/core/filesys/manager.h"
 
 // Scripthook
-#include "addons/hook.h"
+#include "Platform/MemUtils.h"
 
 namespace rw::core::filesys
 {

@@ -1,7 +1,7 @@
 #include "playerfamilytree.h"
 
 // Hooks
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 // SDK
 #include "modules/npc/npc.h"

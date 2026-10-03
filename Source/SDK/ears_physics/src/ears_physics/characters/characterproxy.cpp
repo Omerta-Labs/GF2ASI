@@ -1,7 +1,7 @@
 #include "characterproxy.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 void EARS::Havok::CharacterProxy::EnableGravity(bool bValue)
 {

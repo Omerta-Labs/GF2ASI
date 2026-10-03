@@ -1,8 +1,8 @@
 #include "streammanager.h"
 
 // addons
-#include <Addons/tConsole.h>
-#include <Addons/Hook.h>
+#include "Platform/Diagnostics.h"
+#include <Platform/MemUtils.h>
 
 // C++
 #include <assert.h>
@@ -122,7 +122,7 @@ void EARS::Framework::StreamManager::AddDispatchLockComplete()
 	assert(StreamHandle);
 
 	const char* StreamFileName = GetFilename(StreamHandle);
-	tConsole::fPrintf("StreamManager : AddLockDispatchComplete : %u : %s", m_DispatchLockCount, StreamFileName);
+	EARS::Diag::Printf("StreamManager : AddLockDispatchComplete : %u : %s", m_DispatchLockCount, StreamFileName);
 #endif // DEBUG
 }
 

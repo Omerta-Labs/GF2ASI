@@ -1,7 +1,7 @@
 #include "building_store.h"
 
 // Addons
-#include "Addons/Hook.h"
+#include "Platform/MemUtils.h"
 
 namespace EARS::Modules
 {
