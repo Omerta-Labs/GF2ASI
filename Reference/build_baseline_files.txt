@@ -245,6 +245,7 @@ Source/Scripthook/SH_HashedNames/HashedNameRegistry.cpp
 Source/Scripthook/SH_ImGui/ImGuiCheckpointDebug.cpp
 Source/Scripthook/SH_ImGui/ImGuiManager.cpp
 Source/Scripthook/SH_ImGui/ImGuiNPCInspector.cpp
+Source/Scripthook/SH_ImGui/ImGuiPanels.cpp
 Source/Scripthook/SH_ImGui/ImGuiPhotoModeSystem.cpp
 Source/Scripthook/SH_ImGui/ImGuiUISystem.cpp
 Source/Scripthook/SH_ImGui/KeybindManager.cpp
