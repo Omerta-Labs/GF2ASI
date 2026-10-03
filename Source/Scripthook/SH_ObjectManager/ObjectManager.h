@@ -8,7 +8,7 @@
 
 // RenderWare Framework
 #include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/RwMaths.h"
+#include "SDK/ears_common/include/ears_common/rwtypes.h"
 
 // Scripthook
 #include "Utils/Singleton.h"

@@ -38,3 +38,11 @@ ears_framework/src/framework/toolkits/statemachine/SMBuilder.cpp	ears_framework/
 ears_framework/src/framework/toolkits/statemachine/SMBuilder.h	ears_framework/src/framework/toolkits/statemachine/smbuilder.h
 ears_common/include/ears_common/RwMaths.h	ears_common/include/ears_common/rwtypes.h
 ears_common/include/ears_common/SingleInternalLinkedListLightweight.h	ears_common/include/ears_common/singleinternallinkedlist.h
+
+# --- Phase 2d. Names no transform reaches and the map cannot settle, because
+#     the types are pure-virtual interfaces with no out-of-line definition, so
+#     every object hit is a use site.
+#     The original abbreviates "weapon" to "weap"; the directory was already
+#     right. EARS::WeaponUtils::IDamageListener is confirmed original -- the
+#     namespace appears in the PDB with vtables for a dozen implementors.
+ears_godfather/src/modules/utils/WeaponUtils.h	ears_godfather/src/modules/utils/weaputils.h

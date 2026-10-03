@@ -6,7 +6,7 @@
 // SDK
 #include "SDK/ears_framework/src/framework/toolkits/group/groupmanager.h"
 #include "SDK/ears_godfather/src/modules/npc/npc.h"
-#include "SDK/ears_godfather/src/modules/ui/UIHud.h"
+#include "SDK/ears_godfather/src/modules/ui/ui_hud.h"
 #include "SDK/ears_locale/include/ears_locale/localemanager.h"
 
 // CPP

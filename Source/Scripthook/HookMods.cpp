@@ -17,8 +17,8 @@
 #include "SDK/ears_framework/src/framework/toolkits/statemachine/smbuilder.h"
 #include "SDK/ears_godfather/src/modules/player/playermastersm.h"
 #include "SDK/ears_godfather/src/modules/player/PlayerDebugFlySM.h"
-#include "SDK/ears_godfather/src/modules/ui/UIPopup.h"
-#include "SDK/ears_godfather/src/modules/ui/UIFrontend.h"
+#include "SDK/ears_godfather/src/modules/ui/ui_popup.h"
+#include "SDK/ears_godfather/src/modules/ui/ui_frontend.h"
 #include "SDK/ears_godfather/src/modules/vehicles/statemachines/vehicleentrysm.h"
 
 #include "SDK/ears_godfather/src/modules/missions/checkpoint.h"
@@ -27,7 +27,7 @@
 #include "SDK/ears_godfather/src/modules/debug/demopackagemanager.h"
 #include "SDK/ears_godfather/src/modules/debug/demopackage.h"
 
-#include "SDK/rwfilesystem/include/rw/core/filesys/rwfilesysmanager.h"
+#include "SDK/rwfilesystem/include/rw/core/filesys/manager.h"
 
 // Pl2
 #include <polyhook2/Detour/x86Detour.hpp>

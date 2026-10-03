@@ -2,7 +2,7 @@
 
 // CPP
 #include "SDK/ears_common/include/ears_common/bitflags.h"
-#include "SDK/ears_framework/src/framework/toolkits/statemachine/AnimateStateMachine.h"
+#include "SDK/ears_framework/src/framework/toolkits/statemachine/animatesm.h"
 
 namespace EARS
 {

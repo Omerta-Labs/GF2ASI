@@ -20,6 +20,13 @@ Phases:
       Otherwise the per-package rule below applies, and 2d corrects any that
       land in the wrong directory.
 
+  2d  Names for the files the manifest cannot match, from
+      Tools/triage_unmatched.py -- which uses the linker map, so it can place a
+      file whose name bears no resemblance to the original. Any original claimed
+      by more than one project file is a merge, not a rename, and is reported
+      separately rather than planned: several of our classes shared one file in
+      the original, and combining them is hand work.
+
   2c  File basenames to exact original lowercase, for every file that matches
       the manifest. Directories are already lowercase after 2b, so these are
       same-directory, case-only renames. Files with no manifest match are left
@@ -148,16 +155,57 @@ def plan_2c(sdk: Path, manifest: Path) -> list[tuple[str, str]]:
     return moves
 
 
+def plan_2d(sdk: Path, manifest: Path) -> list[tuple[str, str]]:
+    """Triage's proposals, minus the groups that are really merges."""
+    import subprocess
+    rows = subprocess.run(
+        [sys.executable, str(Path(__file__).parent / "triage_unmatched.py"),
+         "--emit-renames"],
+        capture_output=True, encoding="utf-8", errors="surrogateescape",
+        check=True).stdout.splitlines()
+
+    proposals = [tuple(r.split("	", 1)) for r in rows if "	" in r]
+    claimants: dict[str, list[str]] = collections.defaultdict(list)
+    for cur, orig in proposals:
+        claimants[orig].append(cur)
+
+    moves, merges = [], {}
+    for cur, orig in proposals:
+        # Two ways a proposal is really a merge. Several unmatched files may
+        # claim one original -- the three gun state machines all report
+        # npcguncombatsm.obj. Or one unmatched file may claim an original that
+        # an already-placed file occupies, which no collision check between
+        # proposals can see.
+        occupied = (sdk / orig).is_file() and orig != cur
+        if len(claimants[orig]) > 1 or occupied:
+            group = claimants[orig][:]
+            if occupied and orig not in group:
+                group.append(orig + "   (already placed)")
+            merges.setdefault(orig, group)
+            continue
+        if cur != orig:
+            moves.append((cur, orig))
+
+    if merges:
+        print(f"{sum(len(v) for v in merges.values())} files in "
+              f"{len(merges)} merge groups, left for 2d-ii:", file=sys.stderr)
+        for orig, cur in sorted(merges.items()):
+            print(f"  {orig}", file=sys.stderr)
+            for c in sorted(cur):
+                print(f"      {c}", file=sys.stderr)
+    return moves
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--phase", required=True, choices=("2b", "2c"))
+    parser.add_argument("--phase", required=True, choices=("2b", "2c", "2d"))
     parser.add_argument("--sdk", type=Path, default=DEFAULT_SDK)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--out", type=Path, help="write TSV here instead of stdout")
     args = parser.parse_args()
 
-    planner = {"2b": plan_2b, "2c": plan_2c}[args.phase]
+    planner = {"2b": plan_2b, "2c": plan_2c, "2d": plan_2d}[args.phase]
     moves = planner(args.sdk, args.manifest)
     rows = "".join(f"{old}\t{new}\n" for old, new in moves)
     if args.out:

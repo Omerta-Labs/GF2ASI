@@ -3,7 +3,7 @@
 // SDK
 #include "SDK/ears_godfather/src/modules/families/family.h"
 #include "SDK/ears_godfather/src/modules/npc/npc.h"
-#include "SDK/ears_godfather/src/modules/ui/UIHud.h"
+#include "SDK/ears_godfather/src/modules/ui/ui_hud.h"
 
 // Addons
 #include "Addons/Hook.h"

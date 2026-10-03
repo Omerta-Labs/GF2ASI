@@ -2,7 +2,7 @@
 
 // SDK
 #include "SDK/ears_godfather/src/modules/families/family.h"
-#include "SDK/ears_godfather/src/modules/sentient/SentientConstants.h"
+#include "SDK/ears_godfather/src/modules/sentient/sentient_constants.h"
 #include "SDK/ears_godfather/src/modules/npcscheduling/simnpc.h"
 
 // CPP

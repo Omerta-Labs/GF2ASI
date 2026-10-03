@@ -6,7 +6,7 @@
 #include "SDK/ears_common/include/ears_common/safeptr.h"
 #include "SDK/ears_godfather/src/modules/generic/scriptactor.h"
 #include "SDK/ears_godfather/src/modules/npc/scriptedsequence.h"
-#include "SDK/ears_godfather/src/modules/utils/WeaponUtils.h"
+#include "SDK/ears_godfather/src/modules/utils/weaputils.h"
 #include "SDK/ears_physics/src/ears_physics/characters/characterproxy.h"
 #include "SDK/ears_statemachine/include/ears_statemachine/statemachine.h"
 

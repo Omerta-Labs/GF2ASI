@@ -12,7 +12,7 @@
 
 // Common
 #include "SDK/ears_common/include/ears_common/guid.h"
-#include "SDK/ears_common/include/ears_common/RwMaths.h"
+#include "SDK/ears_common/include/ears_common/rwtypes.h"
 
 // ImGui
 #include "Addons/imgui/imgui.h"

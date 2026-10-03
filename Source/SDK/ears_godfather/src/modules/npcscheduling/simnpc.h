@@ -6,13 +6,13 @@
 #include "SDK/ears_common/include/ears_common/guid.h"
 #include "SDK/ears_common/include/ears_common/safeptr.h"
 #include "SDK/ears_common/include/ears_common/string.h"
-#include "SDK/ears_common/include/ears_common/RwMaths.h"
+#include "SDK/ears_common/include/ears_common/rwtypes.h"
 
 // SDK Framework
 #include "SDK/ears_framework/src/framework/core/base/base.h"
 
 // SDK Godfather
-#include "SDK/ears_godfather/src/modules/sentient/SentientConstants.h"
+#include "SDK/ears_godfather/src/modules/sentient/sentient_constants.h"
 
 namespace EARS
 {

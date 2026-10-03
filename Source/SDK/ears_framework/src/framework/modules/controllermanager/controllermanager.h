@@ -3,7 +3,7 @@
 // SDK
 #include "SDK/ears_common/include/ears_common/singleton.h"
 #include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
-#include "SDK/ears_framework/src/framework/modules/controllermanager/Bitmask.h"
+#include "SDK/ears_framework/src/framework/modules/controllermanager/eventbitmask.h"
 #include "SDK/ears_framework/src/framework/modules/controllermanager/controllereventconfig.h"
 
 // C++

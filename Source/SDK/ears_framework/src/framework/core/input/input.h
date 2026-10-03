@@ -3,7 +3,7 @@
 // SDK
 #include "SDK/ears_common/include/ears_common/singleton.h"
 #include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
-#include "SDK/rwcontroller/include/rw/core/controller/rwcontroller.h"
+#include "SDK/rwcontroller/include/rw/core/controller/manager.h"
 
 namespace EARS
 {

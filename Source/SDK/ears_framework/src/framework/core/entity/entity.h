@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/RwMaths.h"
+#include "SDK/ears_common/include/ears_common/rwtypes.h"
 #include "SDK/ears_framework/src/framework/core/base/base.h"
 #include "SDK/ears_rt_llrender/include/ears_rt_llrender/lltransform.h"
 

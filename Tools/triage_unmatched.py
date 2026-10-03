@@ -172,7 +172,18 @@ def main() -> int:
                 tally = sym_index.get(type_name.lower())
                 if not tally:
                     continue
-                for obj, _n in tally.most_common():
+                # Rank by name relatedness first, count second. Raw count picks
+                # the file with the most *uses*, not the one that defines the
+                # type: Bitmask has 12 hits in controllermanager.obj against 6
+                # in eventbitmask.obj, and eventbitmask is plainly its home.
+                needle = type_name.lower().replace("_", "")
+
+                def rank(item: tuple[str, int]) -> tuple[int, int]:
+                    stem = item[0].rsplit(".", 1)[0].replace("_", "")
+                    related = needle in stem or stem in needle
+                    return (1 if related else 0, item[1])
+
+                for obj, _n in sorted(tally.items(), key=rank, reverse=True):
                     if obj.startswith("bb_runtime."):
                         continue
                     cands = by_stem[pkg].get(obj.rsplit(".", 1)[0], [])

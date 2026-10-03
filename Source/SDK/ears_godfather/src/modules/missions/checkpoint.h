@@ -2,7 +2,7 @@
 
 // SDK (Common)
 #include "SDK/ears_common/include/ears_common/string.h"
-#include "SDK/ears_common/include/ears_common/RwMaths.h"
+#include "SDK/ears_common/include/ears_common/rwtypes.h"
 
 // SDK (Framework)
 #include "SDK/ears_framework/src/framework/core/base/base.h"

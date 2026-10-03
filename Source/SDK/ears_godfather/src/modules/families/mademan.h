@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK Godfather
-#include "SDK/ears_godfather/src/modules/sentient/SentientConstants.h"
+#include "SDK/ears_godfather/src/modules/sentient/sentient_constants.h"
 
 // C++
 #include <stdint.h>

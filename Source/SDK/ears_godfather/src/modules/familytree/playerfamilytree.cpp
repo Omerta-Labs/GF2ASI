@@ -6,7 +6,7 @@
 // SDK
 #include "SDK/ears_godfather/src/modules/npc/npc.h"
 #include "SDK/ears_godfather/src/modules/npcscheduling/simnpc.h"
-#include "SDK/ears_godfather/src/modules/ui/UIHud.h"
+#include "SDK/ears_godfather/src/modules/ui/ui_hud.h"
 
 // CPP
 #include <bitset>

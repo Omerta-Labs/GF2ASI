@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK/ears_framework/src/framework/toolkits/statemachine/AnimateStateMachine.h"
+#include "SDK/ears_framework/src/framework/toolkits/statemachine/animatesm.h"
 
 // Addons
 #include "Addons/Hook.h"

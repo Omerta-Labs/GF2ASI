@@ -1,4 +1,4 @@
-#include "SDK/ears_common/include/ears_common/RwMaths.h"
+#include "SDK/ears_common/include/ears_common/rwtypes.h"
 
 // C++
 #include <cmath>

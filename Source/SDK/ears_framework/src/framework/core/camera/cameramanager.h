@@ -1,7 +1,7 @@
 #pragma once
 
 // SDK
-#include "SDK/ears_common/include/ears_common/RwMaths.h"
+#include "SDK/ears_common/include/ears_common/rwtypes.h"
 #include "SDK/ears_common/include/ears_common/singleton.h"
 #include "SDK/ears_framework/src/game_framework/framework/core/eventhandler/ceventhandler.h"
 

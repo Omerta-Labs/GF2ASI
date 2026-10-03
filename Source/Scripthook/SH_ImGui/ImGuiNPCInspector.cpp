@@ -13,8 +13,8 @@
 #include "SDK/ears_godfather/src/modules/component/playerupgradecomponent.h"
 #include "SDK/ears_godfather/src/modules/mobface/mobfacemanager.h"
 #include "SDK/ears_godfather/src/modules/partedmodel/partedmodelmgr.h"
-#include "SDK/ears_rt_cct/include/ears_rt_cct/ChrCntrl_AnimView.h"
-#include "SDK/ears_rt_cct/include/ears_rt_cct/ChrCntrl_Character.h"
+#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_animview.h"
+#include "SDK/ears_rt_cct/include/ears_rt_cct/chrcntl_character.h"
 
 #include "SDK/ears_godfather/src/modules/player/playermastersm.h"
 
