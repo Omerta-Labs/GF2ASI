@@ -1,0 +1,27 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "vs2022",
+      "displayName": "Visual Studio 2022 — Win32",
+      "description": "32-bit is mandatory: godfather2.exe is a 32-bit process and the SDK is full of hardcoded addresses into its image.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "Win32",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "GF2ASI_GAME_DIR": "J:/Games/The Godfather II"
+      }
+    },
+    {
+      "name": "vs2019",
+      "inherits": "vs2022",
+      "displayName": "Visual Studio 2019 — Win32",
+      "generator": "Visual Studio 16 2019"
+    }
+  ],
+  "buildPresets": [
+    { "name": "debug",   "configurePreset": "vs2022", "configuration": "Debug" },
+    { "name": "release", "configurePreset": "vs2022", "configuration": "Release" }
+  ]
+}

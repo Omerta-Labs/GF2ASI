@@ -4,9 +4,17 @@ Captured at Phase 0 so the Phase 1 CMake port can be checked for producing the
 same thing. Recorded from the premake-generated `GF2ASI.vcxproj`; `premake5.lua`
 is the only tracked build file, and the `.sln`/`.vcxproj` are gitignored output.
 
-Translation units are listed in `build_baseline_files.txt` (259 of them).
+Translation units are listed in `build_baseline_files.txt` (269 of them).
 Headers are not listed — they are not compiled, and premake globs them purely so
 they show up in the IDE.
+
+The committed `.vcxproj` lists only 259, because premake had not been re-run
+since the shadow and lighting work was added (`Core/Graphics/*`,
+`Modules/Lights/*`, `Modules/TimeOfDay/EARSLightTODMessages.cpp`). Since premake
+globs `**.cpp`, the real baseline is whatever is on disk, so this file is
+generated from the glob rather than read out of the stale project file. CMake's
+`CONFIGURE_DEPENDS` picks new files up without a manual regenerate, which is
+what went wrong here.
 
 ## Configuration
 

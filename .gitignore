@@ -37,7 +37,12 @@
 *.out
 *.app
 
-# premake stuff
+# premake stuff -- kept until the CMake build is confirmed working, then removed
 /.vs
 /obj
 premake5.lua
+
+# cmake
+/build
+/out
+CMakeUserPresets.json

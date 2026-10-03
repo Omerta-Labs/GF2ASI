@@ -41,6 +41,9 @@ Source/SDK/EARS_Framework/Core/Entity/Entity.cpp
 Source/SDK/EARS_Framework/Core/EventHandler/CEventHandler.cpp
 Source/SDK/EARS_Framework/Core/Graphics/MaterialHash.cpp
 Source/SDK/EARS_Framework/Core/Graphics/MaterialManager.cpp
+Source/SDK/EARS_Framework/Core/Graphics/RenderingParams.cpp
+Source/SDK/EARS_Framework/Core/Graphics/ShadowHelper.cpp
+Source/SDK/EARS_Framework/Core/Graphics/ShadowLightCameraManager.cpp
 Source/SDK/EARS_Framework/Core/Input/Input.cpp
 Source/SDK/EARS_Framework/Core/Player/PlayerManager.cpp
 Source/SDK/EARS_Framework/Core/ResourceManager/CResourceHandler.cpp
@@ -54,12 +57,18 @@ Source/SDK/EARS_Framework/Modules/ControllerManager/Bitmask.cpp
 Source/SDK/EARS_Framework/Modules/ControllerManager/ControllerDataManager.cpp
 Source/SDK/EARS_Framework/Modules/ControllerManager/ControllerEventConfig.cpp
 Source/SDK/EARS_Framework/Modules/ControllerManager/ControllerManager.cpp
+Source/SDK/EARS_Framework/Modules/Lights/DirectionalShadowParams.cpp
 Source/SDK/EARS_Framework/Modules/ScreenFX/ScreenFX.cpp
 Source/SDK/EARS_Framework/Toolkits/GroupManager/GroupManager.cpp
 Source/SDK/EARS_Framework/Toolkits/Lua/LuaScriptManager.cpp
 Source/SDK/EARS_Framework/Toolkits/StateMachine/AnimateStateMachine.cpp
 Source/SDK/EARS_Framework/Toolkits/StateMachine/InterruptableStateMachine.cpp
 Source/SDK/EARS_Framework/Toolkits/StateMachine/SMBuilder.cpp
+Source/SDK/EARS_Godfather/Core/Graphics/GFCharLightingData.cpp
+Source/SDK/EARS_Godfather/Core/Graphics/GFShaderData.cpp
+Source/SDK/EARS_Godfather/Core/Graphics/GodfatherShadows.cpp
+Source/SDK/EARS_Godfather/Core/Graphics/LightingTODMessages.cpp
+Source/SDK/EARS_Godfather/Core/Graphics/SkyTODMessages.cpp
 Source/SDK/EARS_Godfather/Main/GameServices.cpp
 Source/SDK/EARS_Godfather/Modules/Buildings/BuildingManager.cpp
 Source/SDK/EARS_Godfather/Modules/Buildings/BuildingStore.cpp
@@ -202,6 +211,7 @@ Source/SDK/EARS_Godfather/Modules/Scoring/ScoreKeeper.cpp
 Source/SDK/EARS_Godfather/Modules/Sentient/Sentient.cpp
 Source/SDK/EARS_Godfather/Modules/Sentient/StateMachines/GrabReactStateMachine.cpp
 Source/SDK/EARS_Godfather/Modules/Sentient/StateMachines/SentientSM.cpp
+Source/SDK/EARS_Godfather/Modules/TimeOfDay/EARSLightTODMessages.cpp
 Source/SDK/EARS_Godfather/Modules/TimeOfDay/TimeOfDayManager.cpp
 Source/SDK/EARS_Godfather/Modules/Trinity/TrinityGameCamera.cpp
 Source/SDK/EARS_Godfather/Modules/Trinity/TrinityGameInterface.cpp
