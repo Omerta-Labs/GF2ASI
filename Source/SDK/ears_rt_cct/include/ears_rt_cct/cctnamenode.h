@@ -16,17 +16,38 @@ namespace EA
 		/**
 		 * A small object associating a name to an AnimNode
 		 * Stored within game files and loaded at runtime.
+		 * Appears to be inline in original codebase.
 		 */
 		struct CCTNameNode
 		{
 		public:
 
-			CCTNameNode();
-			CCTNameNode(const char* InName, ChrCntl_AnimNode_s* InNode);
-			~CCTNameNode();
+			CCTNameNode()
+				: m_Name(nullptr)
+				, m_Node(nullptr)
+			{
+				// otherwise empty
+			}
+
+			CCTNameNode(const char* InName, ChrCntl_AnimNode_s* InNode)
+				: m_Name(InName)
+				, m_Node(InNode)
+			{
+				// otherwise empty
+			}
+
+			~CCTNameNode()
+			{
+				m_Name = nullptr;
+				m_Node = nullptr;
+			}
 
 			// shift the CCTNameNode by a fixed offset
-			void Relocate(int32_t InOffset);
+			void Relocate(int32_t InOffset)
+			{
+				m_Node = (m_Node + InOffset);
+				m_Name += InOffset;
+			}
 
 			// getters
 			const char* GetName() const { return m_Name; }
