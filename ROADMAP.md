@@ -67,23 +67,23 @@ file has not been created yet — so the two columns are "fill in" versus "start
 | package | done | missing | no-file | total | % |
 |---|---|---|---|---|---|
 | ears_statemachine | 37 | 40 | 2 | 79 | 46.8% |
-| ears_locale | 6 | 74 | 100 | 180 | 3.3% |
-| ears_godfather | 815 | 6,247 | 18,036 | 25,098 | 3.2% |
-| ears_common | 14 | 122 | 304 | 440 | 3.2% |
-| ears_framework | 214 | 1,455 | 6,640 | 8,309 | 2.6% |
-| ears_trinity | 3 | 0 | 302 | 305 | 1.0% |
-| ears_rt_cct | 6 | 149 | 599 | 754 | 0.8% |
-| ears_rt_llrender | 1 | 51 | 830 | 882 | 0.1% |
-| ears_physics | 1 | 149 | 807 | 957 | 0.1% |
-| ears_alchemy | 0 | 0 | 2,867 | 2,867 | 0.0% |
-| ears_audio | 0 | 0 | 705 | 705 | 0.0% |
-| ears_online | 0 | 0 | 365 | 365 | 0.0% |
-| ears_graph | 0 | 0 | 228 | 228 | 0.0% |
-| ears_xmlrpc | 0 | 0 | 135 | 135 | 0.0% |
-| ears_rt_math | 0 | 0 | 92 | 92 | 0.0% |
+| ears_locale | 6 | 74 | 97 | 177 | 3.4% |
+| ears_godfather | 815 | 6,147 | 17,573 | 24,535 | 3.3% |
+| ears_common | 14 | 121 | 283 | 418 | 3.3% |
+| ears_framework | 214 | 1,374 | 6,314 | 7,902 | 2.7% |
+| ears_rt_cct | 6 | 138 | 520 | 664 | 0.9% |
+| ears_trinity | 3 | 0 | 340 | 343 | 0.9% |
+| ears_physics | 1 | 143 | 796 | 940 | 0.1% |
+| ears_rt_llrender | 1 | 46 | 761 | 808 | 0.1% |
+| ears_alchemy | 0 | 0 | 2,443 | 2,443 | 0.0% |
+| ears_audio | 0 | 0 | 695 | 695 | 0.0% |
+| ears_online | 0 | 0 | 364 | 364 | 0.0% |
+| ears_graph | 0 | 0 | 213 | 213 | 0.0% |
+| ears_xmlrpc | 0 | 0 | 97 | 97 | 0.0% |
+| ears_rt_math | 0 | 0 | 57 | 57 | 0.0% |
 | ears_rt_callstack | 0 | 0 | 21 | 21 | 0.0% |
 | rwfilesystem | 0 | 0 | 19 | 19 | 0.0% |
-| **total** | **1,097** | **8,287** | **32,052** | **41,436** | **2.6%** |
+| **total** | **1,097** | **8,083** | **30,595** | **39,775** | **2.8%** |
 
 ### Files, in the twelve mirrored packages
 
@@ -109,8 +109,8 @@ file has not been created yet — so the two columns are "fill in" versus "start
 written. **4** have nothing missing.
 
 Separately there are **106** namespaces holding free functions, of which the
-global namespace alone has **3,499**. These show up in the tooling with the
-namespace in the class column — `EARS::Alchemy` with 579 "members" is 579 free
+global namespace alone has **1,840**. The CSV's `scope_kind` column tells them
+apart from real classes — `EARS::Alchemy` with 579 "members" is 579 free
 functions across many files, not a type.
 
 ### Where the thunks are
@@ -170,10 +170,10 @@ Self-contained, few dependencies, and a contributor can finish one:
 | package | files | functions |
 |---|---|---|
 | ears_rt_callstack | 5 | 21 |
-| ears_rt_math | 13 | 92 |
-| ears_graph | 17 | 228 |
-| ears_xmlrpc | 10 | 135 |
-| ears_audio | 37 | 705 |
+| ears_rt_math | 13 | 57 |
+| ears_xmlrpc | 10 | 97 |
+| ears_graph | 17 | 213 |
+| ears_audio | 37 | 695 |
 
 ### 4. The long tail
 
@@ -211,22 +211,22 @@ Files with the most functions outstanding:
 
 | left | done | file |
 |---|---|---|
-| 588 | 6 | ears_godfather/src/modules/sentient/sentient.cpp |
-| 495 | 5 | ears_godfather/src/modules/player/player.cpp |
+| 578 | 6 | ears_godfather/src/modules/sentient/sentient.cpp |
+| 493 | 5 | ears_godfather/src/modules/player/player.cpp |
 | 343 | 2 | ears_godfather/src/modules/npc/npc.cpp |
 | 240 | 0 | ears_godfather/src/main/gameservices.cpp |
-| 228 | 0 | ears_godfather/src/modules/vehicles/behaviors/whitebox_car/whitebox_car.cpp |
+| 223 | 0 | ears_godfather/src/modules/vehicles/behaviors/whitebox_car/whitebox_car.cpp |
 | 220 | 19 | ears_godfather/src/modules/families/family.cpp |
-| 208 | 12 | ears_framework/src/framework/core/animated/animated.cpp |
-| 205 | 15 | ears_framework/src/framework/core/entity/entity.cpp |
+| 197 | 12 | ears_framework/src/framework/core/animated/animated.cpp |
+| 193 | 15 | ears_framework/src/framework/core/entity/entity.cpp |
 | 193 | 3 | ears_godfather/src/modules/buildings/building_store.cpp |
-| 141 | 12 | ears_framework/src/framework/core/streammanager/streammanager.cpp |
+| 140 | 12 | ears_framework/src/framework/core/streammanager/streammanager.cpp |
 
 ## Regenerating this
 
-The exhaustive list — every one of the 41,436 functions with its class, file,
+The exhaustive list — every one of the 39,775 functions with its class, file,
 object, mangled name and Xbox address — is generated, not committed. It is
-~41k rows, and committing it would bury the signal in diff noise.
+~40k rows, and committing it would bury the signal in diff noise.
 
 ```bash
 python Tools/sdk_coverage.py                       # files, per package
@@ -242,34 +242,39 @@ Both read ground truth from the Xbox 360 build output at
 
 ## Reading the numbers honestly
 
-Five things will mislead you otherwise. All five are properties of the measuring,
-not of the code.
+Three limits remain. Each is a property of what a linker map can tell us, not
+something left unfixed.
 
-**Header-inline functions are attributed to the wrong file.** The original
-emitted them into whichever object used them, not into their own file's object.
-`npc.cpp` reads 2 of 345 largely because most of what we have is inline in
-`npc.h`. Per-file totals understate header-heavy types, and a function can read
-as missing while sitting in the header — `StateTable::IsReferenced`,
-`ClearRefCount` and `DecRefCount` all do.
+**A function the original inlined everywhere is invisible.** If the compiler
+inlined it at every call site, no out-of-line copy exists in any object, so it
+is in neither the numerator nor the denominator: writing it scores nothing, and
+not writing it is not counted as missing. `--summary` reports the size of the
+blind spot as **"written, no symbol in the map": 404 functions**. That figure
+mixes originals that were inlined away with helpers that are simply ours, and
+the map cannot separate them.
 
-**Addresses are Xbox 360** (`0x82xxxxxx`). The PC build this project targets has
-different ones. Use them to locate the PC equivalent, never to paste into a
-thunk.
+This is why `npc.cpp` reads 2 of 345 while we have seven `NPC` members written.
+The tool does parse `npc.h` alongside `npc.cpp` — our own inline definitions are
+counted — but five of those seven have no symbol in the map to match against.
+Expect this to bite hardest on header-heavy types, which in EARS is most of
+`ears_common`.
 
-**A class can be counted against another package.** It is attributed to the
-object it was compiled into, so `EARS::Framework::FastPoolGroupIAllocator`
-appears under `ears_statemachine` because it landed in `statemachinemanager.obj`.
-Seven of that package's forty "missing" functions are this.
-
-**Namespace-scope free functions appear as classes**, with the namespace in the
-class column. See above.
+**Addresses are Xbox 360** (`0x82xxxxxx`), which is why the column is called
+`x360_address`. The PC build this project targets has different ones. Use them
+to locate the PC equivalent, never to paste into a thunk.
 
 **Matching is case-insensitive and ignores types.** It keys on
 `(class, function)`, so our parameter or return types differing from the
 original does not register as missing — and the original's
-`NPC::ActivateHudIndicator` matches our `ActivateHUDIndicator`.
-`function_coverage.py --summary` lists every casing divergence so they can be
-aligned.
+`NPC::ActivateHudIndicator` matches our `ActivateHUDIndicator`. That is
+deliberate; `function_coverage.py --summary` lists every casing divergence so
+they can be aligned.
+
+One thing that looks like a measurement error and is not: **a class is
+attributed to the object it was compiled into.**
+`EARS::Framework::FastPoolGroupIAllocator` appears under `ears_statemachine`
+because it landed in `statemachinemanager.obj`, which accounts for six of that
+package's forty "missing" functions. That is a fact about the original build.
 
 Templates, vtables, RTTI, string literals and compiler-generated destructors —
 around 31,000 symbols — are counted separately and excluded from all of the

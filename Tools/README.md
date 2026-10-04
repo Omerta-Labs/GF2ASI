@@ -213,28 +213,54 @@ python Tools/function_coverage.py --file modules/families/family.cpp --summary
 
 The expected set is every `.text` symbol in an EARS or RenderWare object, with
 class and function pulled out of the mangled name. The done set comes from
-parsing our own sources for the matching file. Both sides key on
-`(class, function)`, so a difference in our parameter or return types does not
-register as missing.
+parsing our own sources — the matching `.cpp` **and its paired header**, so our
+own inline definitions are counted. Both sides key on `(class, function)`, so a
+difference in our parameter or return types does not register as missing.
 
 Matching is **case-insensitive**, which is not laziness: the original has
 `NPC::ActivateHudIndicator` where we wrote `ActivateHUDIndicator`. Our acronym
 casing often differs, and `--summary` lists every such divergence so it can be
 aligned if you want.
 
-Three things to know before trusting a figure:
+Three columns exist to stop specific misreadings:
 
-- Functions the original defined inline in a header are emitted into whichever
-  objects used them, not into their own file's object. They are attributed to
-  the wrong file or missed, so per-file totals understate header-heavy types.
-  `npc.cpp` reads 2 of 345 because most of what we have is inline in `npc.h`.
-- Addresses are Xbox 360 (`0x82xxxxxx`). The PC build the project targets has
-  different ones, so treat them as a cross-reference for locating the PC
-  equivalent, never as something to paste into a thunk.
-- Templates, vtables, RTTI, string literals and compiler-generated destructors
-  are counted separately and excluded from the tallies — around 31k symbols.
+- `scope_kind` — `class`, `namespace` or `global`. A namespace holding free
+  functions mangles the same way a class does, so without this `EARS::Alchemy`
+  reads as a 579-member class rather than 579 free functions across many files.
+- `emitted_in` — how many objects the symbol was found in. Above 1 means the
+  original defined it inline and the compiler emitted a copy into every object
+  that used it: `__lvx` lands in 260. Such a symbol has no owning file, so
+  `original_file` names one arbitrarily and means little. Rows are deduplicated
+  by symbol, keeping the best status, so one inline function can no longer read
+  as missing in a hundred files at once.
+- `x360_address` — named for the console it came from, because the PC build this
+  project targets has different addresses. Use it to locate the PC equivalent,
+  never to paste into a thunk.
 
-The CSV is not committed. It is ~41k rows and regenerating it would produce a
+Object-to-file resolution uses the library name in the map, not just the object
+basename. The manifest has four files called `assert.cpp` and 33 object stems are
+ambiguous across packages; without the library, all of `assert.obj` landed under
+`ears_common`.
+
+Two limits remain, and neither is fixable from a linker map:
+
+- **A function the original inlined at every call site is absent from the map.**
+  No out-of-line copy exists anywhere, so it is in neither the numerator nor the
+  denominator — writing it scores nothing, and not writing it is not counted as
+  missing. `--summary` reports this as "written, no symbol in the map", which is
+  currently 404: a mix of originals inlined away and helpers that are ours. The
+  map cannot separate the two. This is why `npc.cpp` reads 2 of 345 while we
+  have seven `NPC` members written — five of them have no symbol to match.
+- **A class is attributed to the object it was compiled into.**
+  `EARS::Framework::FastPoolGroupIAllocator` appears under `ears_statemachine`
+  because it landed in `statemachinemanager.obj`. That is a fact about the
+  original build, not a measurement error, and it accounts for six of that
+  package's forty "missing" functions.
+
+Templates, vtables, RTTI, string literals and compiler-generated destructors are
+counted separately and excluded from the tallies — around 31k symbols.
+
+The CSV is not committed. It is ~40k rows and regenerating it would produce a
 large diff every time, which would bury the signal rather than track it.
 
 ## check_sources.py

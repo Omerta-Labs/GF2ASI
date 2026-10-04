@@ -38,7 +38,7 @@ not have to be patches to a binary.
 | | done | total | |
 |---|---|---|---|
 | Files, in mirrored packages | 464 | 2,968 | 15.6% |
-| Functions | 1,097 | 41,436 | 2.6% |
+| Functions | 1,097 | 39,775 | 2.8% |
 | Classes with anything written | 222 | 3,479 | |
 | Classes with nothing missing | 4 | 3,479 | |
 
