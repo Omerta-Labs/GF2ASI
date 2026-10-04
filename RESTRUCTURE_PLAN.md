@@ -1,5 +1,9 @@
 # GF2ASI Restructure Plan
 
+**Status: phases 0-5 complete.** Kept as the record of why the tree is laid out the way it is,
+and of the decisions behind it. Ongoing reconstruction work is tracked in
+[ROADMAP.md](ROADMAP.md) instead.
+
 Target: three build targets, SDK folder structure matching the original EARS source tree,
 and a modding layer the SDK can call into without depending on it.
 
