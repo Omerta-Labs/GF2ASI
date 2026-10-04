@@ -28,6 +28,17 @@ namespace SH
 		 */
 		void CloseLevelServices();
 
+		/**
+		 * Read the [PhotoMode] camera tuning out of gf2asi_settings.ini into
+		 * the engine's MarketingCameraSettings, and write it back.
+		 *
+		 * Static because the settings live in the engine singleton the camera
+		 * reads, not on this object, so they apply whether or not photo mode
+		 * has ever been entered.
+		 */
+		static void LoadConfig();
+		static void SaveConfig();
+
 	private:
 
 		void StartPhotoMode();

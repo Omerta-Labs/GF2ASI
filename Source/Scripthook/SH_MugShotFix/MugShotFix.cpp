@@ -1,8 +1,8 @@
 #include "MugShotFix.h"
 
 // Addons
+#include "Addons/ConfigFile.h"
 #include "Addons/Hook.h"
-#include "Addons/Settings.h"
 #include "Addons/tConsole.h"
 
 #include <algorithm>
@@ -10,6 +10,34 @@
 
 namespace
 {
+	/**
+	 * [MugShot] in gf2asi_settings.ini. The member initialisers are the
+	 * defaults, so a key that is not in the file leaves that value alone.
+	 */
+	struct MugShotTuning
+	{
+		// Raise the head shot render target above its stock 128x128.
+		bool bEnable = true;
+
+		// Square size of the head shot texture, in pixels. Range checked
+		// against the clamps below when the patch is applied rather than here,
+		// so an out of range value is reported once instead of silently
+		// corrected on load.
+		uint32_t Resolution = 512;
+	};
+
+	MugShotTuning Tuning;
+
+	void LoadTuning()
+	{
+		const Mod::ConfigFile& File = Mod::Config::SettingsFile();
+
+		Tuning.bEnable = File.GetBool(L"MugShot", L"Enable", Tuning.bEnable);
+		Tuning.Resolution = File.GetUInt(L"MugShot", L"Resolution", Tuning.Resolution);
+
+		tConsole::fPrintf("MugShot head shot: %u (Resolution=%u)", Tuning.bEnable, Tuning.Resolution);
+	}
+
 	// Game globals (Steam exe)
 
 	// The two "push 128" immediates inside MobFaceManager::LoadResource
@@ -57,7 +85,8 @@ namespace
 
 void Mod::MugShotFix::StaticApplyHooks()
 {
-	const MugShotTuning& Tuning = Settings::GetCheckedRef().GetMugShotTuning();
+	LoadTuning();
+
 	if (!Tuning.bEnable)
 	{
 		return;

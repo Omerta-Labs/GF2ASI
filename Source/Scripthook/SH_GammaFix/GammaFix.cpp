@@ -1,14 +1,15 @@
 #include "GammaFix.h"
 
 // Addons
+#include "Addons/ConfigFile.h"
 #include "Addons/Hook.h"
-#include "Addons/Settings.h"
 #include "Addons/tConsole.h"
 
 // Pl2
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <d3d9.h>
 
@@ -19,6 +20,41 @@ void __cdecl HOOK_Displ_SetGamma(float* xGamContBrite);
 
 namespace
 {
+	/**
+	 * The gamma settings, in the shared [Fixes] section of
+	 * gf2asi_settings.ini rather than a section of their own - these two keys
+	 * predate the per-fix sections the later fixes use.
+	 */
+	struct GammaTuning
+	{
+		// Whether the brightness/gamma option should work in windowed mode and
+		// stop clobbering desktop calibration in fullscreen.
+		// Default off until it has been tested enough for release.
+		bool bApplyBrightnessFix = false;
+
+		// First slot of the gamma triple the game hands to Displ_SetGamma -
+		// the exponent the ramp is raised to. Valid range is [0.8, 1.2]; the
+		// PC build runs at 0.8, the console versions default to 1.0. Higher is
+		// darker and punchier, lower is brighter and flatter.
+		float Contrast = 0.8f;
+	};
+
+	GammaTuning Tuning;
+
+	void LoadTuning()
+	{
+		const Mod::ConfigFile& File = Mod::Config::SettingsFile();
+
+		Tuning.bApplyBrightnessFix = File.GetBool(L"Fixes", L"ApplyBrightnessFix", Tuning.bApplyBrightnessFix);
+
+		// Held to the same range the game's own options code clamps to
+		Tuning.Contrast = File.GetFloat(L"Fixes", L"GammaContrast", Tuning.Contrast);
+		Tuning.Contrast = std::clamp(Tuning.Contrast, 0.8f, 1.2f);
+
+		tConsole::fPrintf("Wants Brightness fix: %u", Tuning.bApplyBrightnessFix);
+		tConsole::fPrintf("Gamma contrast: %.2f", Tuning.Contrast);
+	}
+
 	// Game globals (Steam exe)
 	hook::Type<IDirect3DDevice9*> Dx9Device = hook::Type<IDirect3DDevice9*>(0x1205750);
 	hook::Type<D3DPRESENT_PARAMETERS> Dx9PresentParams = hook::Type<D3DPRESENT_PARAMETERS>(0x11D9188);
@@ -198,9 +234,9 @@ void __cdecl HOOK_Displ_SetGamma(float* xGamContBrite)
 	// reachable in the PC menus changes it (the video calibration screen is
 	// dead), so it is always applied, and independent of the brightness fix so
 	// it still works with that off.
-	Params[0] = Settings::GetCheckedRef().GetGammaContrast();
+	Params[0] = Tuning.Contrast;
 
-	if (!Settings::GetCheckedRef().ApplyBrightnessFix())
+	if (!Tuning.bApplyBrightnessFix)
 	{
 		PLH::FnCast(Displ_SetGamma_Old, &HOOK_Displ_SetGamma)(Params);
 		return;
@@ -222,6 +258,8 @@ void __cdecl HOOK_Displ_SetGamma(float* xGamContBrite)
 
 void Mod::GammaFix::StaticApplyHooks()
 {
+	LoadTuning();
+
 	CaptureDesktopGammaRamp();
 
 	PLH::ZydisDisassembler dis(PLH::Mode::x86);
@@ -232,7 +270,7 @@ void Mod::GammaFix::StaticApplyHooks()
 
 void Mod::GammaFix::OnEndScene()
 {
-	if (!Settings::GetCheckedRef().ApplyBrightnessFix())
+	if (!Tuning.bApplyBrightnessFix)
 	{
 		return;
 	}

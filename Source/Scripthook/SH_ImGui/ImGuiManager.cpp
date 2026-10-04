@@ -1,10 +1,10 @@
 #include "ImGuiManager.h"
 
 // Addons
+#include "Addons/ConfigFile.h"
 #include "Addons/Hook.h"
 #include "Addons/tConsole.h"
 #include "Addons/tLog.h"
-#include "Addons/Settings.h"
 #include "Addons/ImGuiRuntime.h"
 #include "Scripthook/SH_ObjectManager/ObjectManager.h"
 #include "Scripthook/SH_ImGui/GameEventIds.h"
@@ -203,7 +203,9 @@ void ImGuiManager::RegisterShortcutActions()
 		[this]() { PhotoModeSystem.Toggle(); },
 		[this]() { return PhotoModeSystem.IsActive(); } });
 
-	Keybinds.LoadBindings(Settings::GetCheckedRef().GetKeybindsFilePath());
+	Keybinds.LoadBindings(Mod::Config::KeybindsFile().GetPath());
+
+	PhotoModeSystem.LoadConfig();
 }
 
 

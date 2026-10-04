@@ -1,8 +1,8 @@
 #include "VSyncFix.h"
 
 // Addons
+#include "Addons/ConfigFile.h"
 #include "Addons/Hook.h"
-#include "Addons/Settings.h"
 #include "Addons/tConsole.h"
 
 // Pl2
@@ -22,6 +22,17 @@ void __cdecl HOOK_Displ_WaitForFrameLock(int InVBlankCount);
 
 namespace
 {
+	// [Fixes] ApplyVSyncFix in gf2asi_settings.ini. Default on: the fix only
+	// corrects a present interval the game gets wrong in every configuration.
+	bool bApplyVSyncFix = true;
+
+	void LoadTuning()
+	{
+		bApplyVSyncFix = Mod::Config::SettingsFile().GetBool(L"Fixes", L"ApplyVSyncFix", bApplyVSyncFix);
+
+		tConsole::fPrintf("Wants VSync fix: %u", bApplyVSyncFix);
+	}
+
 	// Game globals (Steam exe)
 
 	// Present parameters the renderer hands to CreateDevice and Reset. Rebuilt
@@ -236,7 +247,9 @@ void __cdecl HOOK_Displ_WaitForFrameLock(int InVBlankCount)
 
 void Mod::VSyncFix::StaticApplyHooks()
 {
-	if (!Settings::GetCheckedRef().ApplyVSyncFix())
+	LoadTuning();
+
+	if (!bApplyVSyncFix)
 	{
 		return;
 	}

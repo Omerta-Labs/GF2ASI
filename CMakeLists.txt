@@ -59,6 +59,9 @@ set(GF2ASI_DEBUGGER_ARGS "" CACHE STRING
 option(GF2ASI_DEPLOY
     "Copy the built .asi into GF2ASI_GAME_DIR/scripts after linking" ON)
 
+option(GF2ASI_USE_PCH
+    "Give each target a precompiled header" ON)
+
 set(GF2ASI_GAME_PATH "${GF2ASI_GAME_DIR}/${GF2ASI_GAME_EXE}")
 
 # Both of these are configure-time decisions, so a game directory that appears
@@ -263,6 +266,50 @@ source_group(TREE "${CMAKE_SOURCE_DIR}" FILES
     ${GF2ASI_SOURCES} ${GF2ASI_HEADERS} ${GF2ASI_NATVIS})
 
 #-----------------------------------------------------------------------------
+# Precompiled headers
+#-----------------------------------------------------------------------------
+# One per target, force-included by the compiler, so no source file has to
+# name it. Contents are the headers a target's own sources already pull in
+# most, which is also where the parse time goes.
+#
+# Two ordering constraints are baked in here:
+#
+#  - MemUtils.h defines NOMINMAX before it includes Windows.h. Forcing it into
+#    every SDK translation unit makes that uniform across the target, where
+#    today it depends on which header a file happens to include first.
+#
+#  - GF2ASI's own sources do use the Windows min/max macros, so its header
+#    includes <windows.h> directly and ahead of everything else, leaving them
+#    defined exactly as they are today.
+#
+# Vendored sources are left out: imgui and the Discord SDK are third-party
+# code with their own include order, and nothing is gained by forcing ours
+# into them.
+
+if(GF2ASI_USE_PCH)
+    target_precompile_headers(GF2SDK PRIVATE
+        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_SOURCE_DIR}/Source/Platform/MemUtils.h>")
+
+    target_precompile_headers(GF2Mod PRIVATE
+        "${CMAKE_SOURCE_DIR}/Source/Addons/Hook.h"
+        "${CMAKE_SOURCE_DIR}/Source/Addons/tConsole.h")
+
+    foreach(_vendor_source ${GF2MOD_SOURCES})
+        if(_vendor_source MATCHES "/Source/Addons/(imgui|discord)/")
+            set_source_files_properties("${_vendor_source}" PROPERTIES
+                SKIP_PRECOMPILE_HEADERS ON)
+        endif()
+    endforeach()
+
+    target_precompile_headers(GF2ASI PRIVATE
+        "<windows.h>"
+        "<d3d9.h>"
+        "<polyhook2/Detour/x86Detour.hpp>"
+        "<polyhook2/ZydisDisassembler.hpp>"
+        "${CMAKE_SOURCE_DIR}/Source/Addons/imgui/imgui.h")
+endif()
+
+#-----------------------------------------------------------------------------
 # Output and runtime
 #-----------------------------------------------------------------------------
 
@@ -343,4 +390,4 @@ list(LENGTH GF2MOD_SOURCES _n_mod)
 list(LENGTH GF2ASI_SOURCES _n_asi)
 math(EXPR _n_asi "${_n_asi} + 5")       # dllmain, GF2Hook, HookMods, ScripthookEvents
 message(STATUS "GF2ASI: ${_n_sdk} SDK + ${_n_mod} Mod + ${_n_asi} ASI "
-               "translation units (262 total -- see Reference/build_baseline.md)")
+               "translation units (265 total -- see Reference/build_baseline.md)")

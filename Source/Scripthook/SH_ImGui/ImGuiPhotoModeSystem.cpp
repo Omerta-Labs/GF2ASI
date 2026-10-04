@@ -1,9 +1,10 @@
 #include "ImGuiPhotoModeSystem.h"
 
 // Addons
+#include "Addons/ConfigFile.h"
 #include "Addons/Hook.h"
-#include "Addons/Settings.h"
 #include "Addons/imgui/imgui.h"
+#include "Addons/tConsole.h"
 
 // Scripthook
 #include "Scripthook/SH_ImGui/ImGuiManager.h"
@@ -268,7 +269,7 @@ namespace SH
 
 			if (bWantsSave)
 			{
-				Settings::GetCheckedRef().SaveCameraSettings();
+				SaveConfig();
 			}
 		}
 
@@ -520,5 +521,44 @@ namespace SH
 		{
 			StopPhotoMode();
 		}
+	}
+
+	void ImGuiPhotoModeSystem::LoadConfig()
+	{
+		const Mod::ConfigFile& File = Mod::Config::SettingsFile();
+
+		// The struct's member initialisers are the defaults, so a missing key
+		// leaves that value at its factory setting. Angular values are radians.
+		EARS::Modules::MarketingCameraSettings& CameraSettings = EARS::Modules::MarketingCamera::GetCameraSettings();
+		CameraSettings.m_MoveSpeed = File.GetFloat(L"PhotoMode", L"MoveSpeed", CameraSettings.m_MoveSpeed);
+		CameraSettings.m_MoveSpeedModifier = File.GetFloat(L"PhotoMode", L"MoveSpeedModifier", CameraSettings.m_MoveSpeedModifier);
+		CameraSettings.m_RotateSpeed = File.GetFloat(L"PhotoMode", L"RotateSpeed", CameraSettings.m_RotateSpeed);
+		CameraSettings.m_RotationSmoothRampUp = File.GetFloat(L"PhotoMode", L"RotationSmoothRampUp", CameraSettings.m_RotationSmoothRampUp);
+		CameraSettings.m_RotationSmoothDecay = File.GetFloat(L"PhotoMode", L"RotationSmoothDecay", CameraSettings.m_RotationSmoothDecay);
+		CameraSettings.m_MouseSensitivity = File.GetFloat(L"PhotoMode", L"MouseSensitivity", CameraSettings.m_MouseSensitivity);
+		CameraSettings.m_bGamepadRotationSmoothing = File.GetBool(L"PhotoMode", L"GamepadRotationSmoothing", CameraSettings.m_bGamepadRotationSmoothing);
+		CameraSettings.m_bMouseSmoothing = File.GetBool(L"PhotoMode", L"MouseSmoothing", CameraSettings.m_bMouseSmoothing);
+		CameraSettings.m_MouseSmoothTime = File.GetFloat(L"PhotoMode", L"MouseSmoothTime", CameraSettings.m_MouseSmoothTime);
+
+		tConsole::fPrintf("PhotoMode Camera: MoveSpeed=%.2f, Boost=x%.2f, RotateSpeed=%.2f rad/s, StickSmooth=%u (RampUp=%.2fs, Decay=%.2fs), MouseSens=x%.2f, MouseSmooth=%u (%.2fs)",
+			CameraSettings.m_MoveSpeed, CameraSettings.m_MoveSpeedModifier, CameraSettings.m_RotateSpeed,
+			CameraSettings.m_bGamepadRotationSmoothing, CameraSettings.m_RotationSmoothRampUp, CameraSettings.m_RotationSmoothDecay,
+			CameraSettings.m_MouseSensitivity, CameraSettings.m_bMouseSmoothing, CameraSettings.m_MouseSmoothTime);
+	}
+
+	void ImGuiPhotoModeSystem::SaveConfig()
+	{
+		Mod::ConfigFile& File = Mod::Config::SettingsFile();
+
+		const EARS::Modules::MarketingCameraSettings& CameraSettings = EARS::Modules::MarketingCamera::GetCameraSettings();
+		File.SetFloat(L"PhotoMode", L"MoveSpeed", CameraSettings.m_MoveSpeed);
+		File.SetFloat(L"PhotoMode", L"MoveSpeedModifier", CameraSettings.m_MoveSpeedModifier);
+		File.SetFloat(L"PhotoMode", L"RotateSpeed", CameraSettings.m_RotateSpeed);
+		File.SetFloat(L"PhotoMode", L"RotationSmoothRampUp", CameraSettings.m_RotationSmoothRampUp);
+		File.SetFloat(L"PhotoMode", L"RotationSmoothDecay", CameraSettings.m_RotationSmoothDecay);
+		File.SetFloat(L"PhotoMode", L"MouseSensitivity", CameraSettings.m_MouseSensitivity);
+		File.SetBool(L"PhotoMode", L"GamepadRotationSmoothing", CameraSettings.m_bGamepadRotationSmoothing);
+		File.SetBool(L"PhotoMode", L"MouseSmoothing", CameraSettings.m_bMouseSmoothing);
+		File.SetFloat(L"PhotoMode", L"MouseSmoothTime", CameraSettings.m_MouseSmoothTime);
 	}
 }
