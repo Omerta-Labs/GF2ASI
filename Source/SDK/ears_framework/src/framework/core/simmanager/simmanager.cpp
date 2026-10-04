@@ -20,6 +20,16 @@ RWS::CAttributeHandler* EARS::Framework::SimManager::Find(const EARS::Common::gu
 	return MemUtils::CallClassMethod<RWS::CAttributeHandler*, EARS::Framework::SimManager*, const EARS::Common::guid128_t&, RWS::CAttributeHandler*>(0x0445FF0, this, InstanceID, StartHandler);
 }
 
+void EARS::Framework::SimManager::AddEntityRecord(const EARS::Common::guid128_t& InID, const RWS::CAttributePacket* InPacket, RWS::CEventHandler& InHandler, uint32_t StreamID)
+{
+	return MemUtils::CallClassMethod<void>(0x4467C0, this, InID, InPacket, InHandler, StreamID);
+}
+
+void EARS::Framework::SimManager::AddStreamedEntityRecord(const RWS::CAttributePacket& InPacket, RWS::CEventHandler& InHandler)
+{
+	AddEntityRecord(InPacket.GetInstanceID(), &InPacket, InHandler, InPacket.GetStreamHandle());
+}
+
 int EARS::Framework::SimManager::FindSimGroupOverride(const EARS::Common::guid32_t& Guid) const
 {
 	for (uint32_t idx = 0; idx < m_SimGroupOverrides.Size(); idx++)

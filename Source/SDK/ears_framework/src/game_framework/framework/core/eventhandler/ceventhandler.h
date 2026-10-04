@@ -9,6 +9,9 @@
 // CPP
 #include <cstdint>
 
+// Example: RWS_DEFINE_EVENT(iMsgDoRender ,0,"Sent each frame to begin rendering.")
+#define RWS_DEFINE_EVENT(name, type, desc) const char * const name##Str = #name; extern CEventId name
+
 /**
  * NB: This is indeed from RenderWare's old Studio example project.
  * HOWEVER - This has been modified to meet the requirements of the GF2 engine.
@@ -202,6 +205,10 @@ namespace RWS
 		void LinkMsg(CEventId* Msg, uint32_t Priority);
 		void UnlinkMsg(CEventId* Msg);
 
+		void LinkMsgOnce(RWS::CEventId& InId);
+
+		void ReplaceLinkedMsg(CEventId& InEventId, const char* InMsgName, const char* InFormatString);
+
 		uint32_t GetEventHandlerFlags() const { return m_EventHandlerFlags; }
 
 		bool IsActive() const;
@@ -212,12 +219,14 @@ namespace RWS
 
 		bool IsSuperHeavyWeight() const;
 
+		void RegisterForDeleteNotification();
+
 		// NB: In original game exe this implemented the logic.
 		// But instead I have moved it into CRegisteredMsgs
 		// The content of the function appears to be more suited abstracted in CRegisteredMsgs
 		static void ProcessPendingUnlinks(RWS::CRegisteredMsgs& RegisteredMsg) { RegisteredMsg.ProcessPendingUnlinks(); }
 
-	private:
+	protected: // confirmed with DiaSymbolView
 
 		enum class CEventHandlerFlags
 		{

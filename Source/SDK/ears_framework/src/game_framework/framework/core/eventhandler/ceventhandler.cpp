@@ -62,6 +62,16 @@ void RWS::CEventHandler::UnlinkMsg(CEventId* Msg)
 	MemUtils::CallClassMethod<void, RWS::CEventHandler*, CEventId*>(0x04086D0, this, Msg);
 }
 
+void RWS::CEventHandler::LinkMsgOnce(RWS::CEventId& InMsgId)
+{
+	MemUtils::CallClassMethod<void>(0x0408680, this, InMsgId);
+}
+
+void RWS::CEventHandler::ReplaceLinkedMsg(CEventId& InEventId, const char* InMsgName, const char* InFormatString)
+{
+	MemUtils::CallClassMethod<void>(0x04089B0, this, InEventId, InMsgName, InFormatString);
+}
+
 bool RWS::CEventHandler::IsActive() const
 {
 	return m_EventHandlerFlags & 1;
@@ -80,6 +90,11 @@ bool RWS::CEventHandler::IsHeavyWeight() const
 bool RWS::CEventHandler::IsSuperHeavyWeight() const
 {
 	return m_EventHandlerFlags & 8;
+}
+
+void RWS::CEventHandler::RegisterForDeleteNotification()
+{
+	m_EventHandlerFlags |= (uint32_t)CEventHandlerFlags::CEVENTHANDLER_FLAG_IS_LIGHT_WEIGHT;
 }
 
 RWS::CRegisteredMsgs* RWS::CEventId::GetRegisteredInfo() const

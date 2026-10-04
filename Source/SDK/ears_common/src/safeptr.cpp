@@ -1,5 +1,10 @@
 #include "ears_common/safeptr.h"
 
+SafeObj::SafeObj()
+	: m_SafePtrList(nullptr)
+{
+}
+
 SafeObj::~SafeObj()
 {
 	// On destruction, invalidate every SafePtr still referencing this object so
@@ -9,8 +14,8 @@ SafeObj::~SafeObj()
 		SafePtrBase* const Current = m_SafePtrList;
 		m_SafePtrList = Current->m_Next;
 
-		Current->m_Obj = nullptr;
 		Current->m_Next = nullptr;
+		Current->m_Obj = nullptr;
 	}
 }
 

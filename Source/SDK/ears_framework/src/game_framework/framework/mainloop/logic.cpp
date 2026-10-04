@@ -2,30 +2,36 @@
 
 #include "Platform/MemUtils.h"
 
-namespace RWS::MainLoop::Logic
+namespace RWS
 {
-	void Running(uint32_t context)
-	{
-		MemUtils::CallCdeclMethod<void>(0x40EA60, context);
-	}
+	extern CEventId iMsgRunningTick = hook::Type<RWS::CEventId>(0x012069C4);
+	extern CEventId iMsgPausedTick = hook::Type<RWS::CEventId>(0x12069B4);
 
-	void Paused(uint32_t context)
+	namespace MainLoop::Logic
 	{
-		MemUtils::CallCdeclMethod<void>(0x40EAA0, context);
-	}
+		void Running(uint32_t context)
+		{
+			MemUtils::CallCdeclMethod<void>(0x40EA60, context);
+		}
 
-	void PushPause(uint32_t context)
-	{
-		MemUtils::CallCdeclMethod<void>(0x40EAC0, context);
-	}
+		void Paused(uint32_t context)
+		{
+			MemUtils::CallCdeclMethod<void>(0x40EAA0, context);
+		}
 
-	void PopPause(uint32_t context)
-	{
-		MemUtils::CallCdeclMethod<void>(0x40EAF0, context);
-	}
+		void PushPause(uint32_t context)
+		{
+			MemUtils::CallCdeclMethod<void>(0x40EAC0, context);
+		}
 
-	void Frozen()
-	{
-		MemUtils::CallCdeclMethod<void>(0x40EB90);
-	}
-}
+		void PopPause(uint32_t context)
+		{
+			MemUtils::CallCdeclMethod<void>(0x40EAF0, context);
+		}
+
+		void Frozen()
+		{
+			MemUtils::CallCdeclMethod<void>(0x40EB90);
+		}
+	} //~ MainLoop::Logic
+} //~ RWS

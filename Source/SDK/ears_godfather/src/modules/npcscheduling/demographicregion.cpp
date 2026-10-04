@@ -27,7 +27,7 @@ std::string EARS::Modules::DemographicRegion::GetDebugName() const
 	const EARS::Common::guid128_t LocalGuid = InqInstanceID();
 	if(const RWS::CAttributePacket* Packet = SimMgr->GetAttributePacket(&LocalGuid, 0))
 	{
-		RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(*Packet, 0x84BF4579);
+		RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator(*Packet, 0x84BF4579);
 		PacketIt.SeekTo(0);
 
 		return PacketIt->GetAs_char_ptr();

@@ -80,7 +80,7 @@ bool Mod::ObjectManager::RequestSpawnCar(const ObjectSpawnRequestParams& Request
 
 	// now we need to check whether the dependency stream is loaded
 	// this is stored in Animated packet command buffer
-	RWS::CAttributeCommandIterator AnimatedIt = RWS::CAttributeCommandIterator::MakeIterator(*Packet, 0xAE986323);
+	RWS::CAttributeCommandIterator AnimatedIt = RWS::CAttributeCommandIterator(*Packet, 0xAE986323);
 	AnimatedIt.SeekTo(5);
 
 	// NB: This is Stream GUID!
@@ -172,7 +172,7 @@ void Mod::ObjectManager::ImGuiDrawContents()
 				}
 				else if (ClassID == 0x10E5319E)
 				{
-					RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0xA5975EB2);
+					RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator(Packet, 0xA5975EB2);
 					PacketIt.SeekTo(0x55); // seek straight to parts name
 
 					// create entity and fetch name
@@ -184,7 +184,7 @@ void Mod::ObjectManager::ImGuiDrawContents()
 				}
 				else if (ClassID == 0xF26FB813 || ClassID == 0x332D5A20 || ClassID == 0x4ECFBE13)
 				{
-					RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator::MakeIterator(Packet, 0x4ECFBE13);
+					RWS::CAttributeCommandIterator PacketIt = RWS::CAttributeCommandIterator(Packet, 0x4ECFBE13);
 					PacketIt.SeekTo(0); // seek straight to item name
 
 					EntityEntry NewEntry = {};

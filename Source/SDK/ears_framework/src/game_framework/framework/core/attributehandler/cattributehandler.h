@@ -5,6 +5,7 @@
 #include "ears_common/commontypes.h"
 #include "ears_common/doubleinternallinkedlist2.h"
 #include "ears_common/guid.h"
+#include "ears_common/rwtypes.h"
 
 // SDK Framework
 #include "framework/core/attributehandler/cclassfactory.h"
@@ -80,19 +81,68 @@ namespace RWS
 		RWS::CAttributeHandler* m_Head = nullptr;
 	};
 
+	namespace __Internal
+	{
+		struct CAttributeDataChunk
+		{
+			uint32_t m_Size = 0;
+			uint32_t m_Type = 0;
+
+			union
+			{
+				uint32_t m_RWS_DWORD;
+				float m_Float;
+				char char_;
+				unsigned int uint32_t_;
+				unsigned __int16 uint16_t_;
+				unsigned __int8 uint8_t_;
+				int int32_t_;
+				__int16 int16_t_;
+				char int8_t_;
+				EARS::Common::guid128_t m_GUID;
+				uint32_t RwRGBA_;						// RwRGBATag
+				RwMatrixTag RwMatrixTagNoCtor_;			// RwMatrixTagNoCtor
+				RwV3d RwV3d_;
+			};
+		};
+	};
+
 	struct CAttributeCommand
 	{
 	public:
+
+		CAttributeCommand() { /* empty implementation */ }
+
+		struct CompactData
+		{
+			const void* m_pData = nullptr;
+			uint16_t m_CommandID = 0;
+			uint16_t m_CompactTag = 0;
+			uint32_t m_Data = 0;
+		};
+
+		uint32_t GetCommandId() const;
+
+		bool IsCompact() const;
 
 		const char* GetAs_char_ptr() const;
 
 		EARS::Common::guid128_t* GetAs_RWS_GUID() const;
 
+		float GetAs_float() const { return m_Chunk.m_Float; }
+
+		uint32_t GetAs_uint32() const { return m_Chunk.uint32_t_; }
+
 	private:
 
-		// TODO: This is a union, but im too lazy to implement union right now
-		char m_Padding[0x48];
+		union
+		{
+			CompactData m_CommandData;
+			const RWS::__Internal::CAttributeDataChunk m_Chunk;
+		};
 	};
+
+	static_assert(sizeof(CAttributeCommand) == 0x48);
 
 	struct CAttributeDataChunk
 	{
@@ -123,11 +173,14 @@ namespace RWS
 	{
 	public:
 
+		CAttributeCommandIterator() = delete;
+		CAttributeCommandIterator(const CAttributePacket& InPacket, const uint32_t InTargetClassID);
+
 		// Have we reached the end of the command buffer
 		bool IsFinished() const;
 
 		// Get the current ID of the command we're at
-		uint32_t GetCommandID() const { return m_CurIdx; }
+		uint32_t GetCommandID() const;
 
 		// Query whether this command is actually used / set
 		bool TestBit(uint32_t m_Idx) const;
@@ -142,8 +195,6 @@ namespace RWS
 		//const CAttributeDataChunk& operator*() const;
 		const CAttributeCommand* operator->() const;
 		//const CAttributeDataChunk* GetDataChunk(void) { return pCurrChunk_; }
-
-		static CAttributeCommandIterator MakeIterator(const RWS::CAttributePacket& InPacket, uint32_t InTargetClassID);
 
 	private:
 
@@ -198,8 +249,8 @@ namespace RWS
 	public:
 
 		// NB: The release version does not have GetClassID nor does RWS_GetClassName!
-		virtual ~CAttributeHandler() = 0;
-		virtual void HandleAttributes(const RWS::CAttributePacket& InPacket) = 0;
+		virtual ~CAttributeHandler();
+		virtual void HandleAttributes(const RWS::CAttributePacket& InPacket);
 		virtual void HandleAttributesFromProxy(const RWS::CAttributePacket& InPacket);
 		virtual void DisableMessages() = 0;
 
@@ -207,7 +258,10 @@ namespace RWS
 		void DisableMessagesToComponents();
 
 		/** Fetch the Instance ID of this Attribute Handler. */
-		EARS::Common::guid128_t InqInstanceID() const { return m_InstanceId; }
+		const EARS::Common::guid128_t& InqInstanceID() const { return m_InstanceId; }
+
+		/** Unpack the flags from the handler and return - useful to query specific flags */
+		uint32_t GetAttributeHandlerFlags() const { return m_FlagsAndID & 0xFFFFF000; }
 
 		bool HasAttributeHandlerFlag(const uint32_t InFlag) const;
 
@@ -232,21 +286,18 @@ namespace RWS
 		void  operator delete(void*, void*) noexcept {}
 		void  operator delete(void*, std::align_val_t, void*) noexcept {}
 
-	private:
-
-		/**
-		 * Unpack the flags from the handler and return - useful to query specific flags
-		 */
-		uint32_t GetAttributeHandlerFlags() const { return m_FlagsAndID & 0xFFFFF000; }
-
-		void FreeRuntimeUID();
-
+	protected:	// following is available to derived types
+		
 		RWS::CAttributeHandler** m_PrevNextHandlerFromPacket = nullptr;
 		RWS::CAttributeHandler* m_NextHandlerFromPacket = nullptr;
 		uint32_t m_FlagsAndID = 0;
 		uint32_t m_SubID = 0;
 		uint32_t m_hStream = 0;
 		EARS::Common::guid128_t m_InstanceId;
+
+	private: // following is not
+
+		void FreeRuntimeUID();
 
 		// TODO: Figure out whether or not this is correct
 		char m_AttributeHandler_Padding[0x4];

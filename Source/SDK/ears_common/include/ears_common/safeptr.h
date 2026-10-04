@@ -32,6 +32,7 @@ struct SafeObj
 {
 public:
 
+	SafeObj();
 	virtual ~SafeObj();
 
 private:

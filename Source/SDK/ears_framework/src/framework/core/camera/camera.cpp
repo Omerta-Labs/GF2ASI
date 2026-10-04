@@ -8,7 +8,7 @@
 namespace EARS::Framework
 {
 	CameraInfo::CameraInfo()
-		: Base()
+		: Base(nullptr, 0)
 		, m_bFreeOnPop(false)
 		, m_bIsNonInterruptable(false)
 	{

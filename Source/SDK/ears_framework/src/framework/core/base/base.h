@@ -15,6 +15,9 @@ namespace EARS
 		{
 		public:
 
+			Base() = delete;
+			Base(const RWS::CAttributePacket& InAttr);
+			Base(const EARS::Common::guid128_t* InGuid, const uint32_t InStreamHandle);
 			virtual ~Base();
 
 			//~ Begin RWS::CEventHandler Interface
@@ -37,7 +40,8 @@ namespace EARS
 		private:
 
 			// We add flag to EventHandler to determine type
-			enum class CEventHandlerFlags
+			// This is a continuation of CEventHandlerFlags
+			enum
 			{
 				CEVENTHANDLER_FLAG_BASE = 0x10
 			};
