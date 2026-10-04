@@ -43,9 +43,54 @@ endif()
 # Options
 #-----------------------------------------------------------------------------
 
+# Override these without touching tracked files by putting them in
+# CMakeUserPresets.json, which is not in the repository.
+
 set(GF2ASI_GAME_DIR "J:/Games/The Godfather II" CACHE PATH
     "Game install. The built .asi is copied into <dir>/scripts after linking, "
     "and this is where the Visual Studio debugger launches from.")
+
+set(GF2ASI_GAME_EXE "godfather2.exe" CACHE STRING
+    "Executable inside GF2ASI_GAME_DIR that the debugger launches.")
+
+set(GF2ASI_DEBUGGER_ARGS "" CACHE STRING
+    "Extra command line the debugger passes to the game.")
+
+option(GF2ASI_DEPLOY
+    "Copy the built .asi into GF2ASI_GAME_DIR/scripts after linking" ON)
+
+set(GF2ASI_GAME_PATH "${GF2ASI_GAME_DIR}/${GF2ASI_GAME_EXE}")
+
+# Both of these are configure-time decisions, so a game directory that appears
+# later -- an unmounted drive, a fresh install -- needs a reconfigure.
+set(_gf2_can_deploy FALSE)
+
+if(NOT IS_DIRECTORY "${GF2ASI_GAME_DIR}")
+    message(WARNING
+        "GF2ASI_GAME_DIR is not a directory (${GF2ASI_GAME_DIR}). The build will "
+        "not deploy and the debugger has nothing to launch. Pass "
+        "-DGF2ASI_GAME_DIR=<path>, or set it in CMakeUserPresets.json.")
+else()
+    if(GF2ASI_DEPLOY)
+        set(_gf2_can_deploy TRUE)
+    endif()
+
+    if(NOT EXISTS "${GF2ASI_GAME_PATH}")
+        message(WARNING
+            "${GF2ASI_GAME_EXE} is not in ${GF2ASI_GAME_DIR}; set GF2ASI_GAME_EXE "
+            "to the executable to debug.")
+    endif()
+
+    # Nothing loads a .asi on its own. This project is developed against the
+    # dinput8.dll proxy loader; without a loader the game starts clean and the
+    # deployed file is simply ignored, which looks exactly like a build that
+    # did not take.
+    if(NOT EXISTS "${GF2ASI_GAME_DIR}/dinput8.dll")
+        message(WARNING
+            "No ASI loader (dinput8.dll) in ${GF2ASI_GAME_DIR}; the game will "
+            "start without loading the .asi.")
+    endif()
+endif()
 
 #-----------------------------------------------------------------------------
 # Shared settings
@@ -226,7 +271,12 @@ set_target_properties(GF2ASI PROPERTIES
     SUFFIX ".asi"                       # loaded by an ASI loader, not as a DLL
     PREFIX ""
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    VS_DEBUGGER_COMMAND "${GF2ASI_GAME_DIR}/godfather2.exe"
+    VS_DEBUGGER_COMMAND "${GF2ASI_GAME_PATH}"
+    VS_DEBUGGER_COMMAND_ARGUMENTS "${GF2ASI_DEBUGGER_ARGS}"
+
+    # The game resolves relative paths against its own directory -- the ImGui
+    # font is loaded as "scripts/Roboto-Medium.ttf", and settings and keybinds
+    # likewise -- so the debugger has to start there, not in the build tree.
     VS_DEBUGGER_WORKING_DIRECTORY "${GF2ASI_GAME_DIR}"
 )
 
@@ -270,18 +320,20 @@ target_link_libraries(GF2ASI PRIVATE
 # Deploy
 #-----------------------------------------------------------------------------
 
-if(EXISTS "${GF2ASI_GAME_DIR}")
+if(_gf2_can_deploy)
+    # discord_game_sdk.dll goes alongside the .asi because the Discord SDK is
+    # linked through an import library, so the loader resolves it while loading
+    # the .asi itself -- a missing copy fails the whole module, not just Discord.
     add_custom_command(TARGET GF2ASI POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${GF2ASI_GAME_DIR}/scripts"
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different
                 "$<TARGET_FILE:GF2ASI>" "${GF2ASI_GAME_DIR}/scripts/"
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                "${CMAKE_SOURCE_DIR}/Vendors/discord/libs/discord_game_sdk.dll"
+                "${GF2ASI_GAME_DIR}/scripts/"
         COMMENT "Deploying $<TARGET_FILE_NAME:GF2ASI> to ${GF2ASI_GAME_DIR}/scripts"
         VERBATIM
     )
-else()
-    message(STATUS
-        "GF2ASI_GAME_DIR does not exist (${GF2ASI_GAME_DIR}); skipping deploy. "
-        "Set -DGF2ASI_GAME_DIR=<path> to enable it.")
 endif()
 
 set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT GF2ASI)
