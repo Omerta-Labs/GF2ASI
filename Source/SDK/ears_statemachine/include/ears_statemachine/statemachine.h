@@ -62,11 +62,11 @@ namespace EARS
 			{
 				StateMachineTypeID m_TypeID;
 				
-				struct DataUnion
+				union DataUnion
 				{
-					uint32_t m_IntegerVal = 0;
-					float m_FloatVal = 0.0f;;
-					void* m_PointerVal = nullptr;
+					uint32_t m_IntegerVal;
+					float m_FloatVal;
+					void* m_PointerVal;
 				} m_Data;
 			};
 

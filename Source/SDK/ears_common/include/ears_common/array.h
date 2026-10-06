@@ -93,13 +93,16 @@ public:
 		return -1;
 	}
 
+	// Unordered removal: the last element is moved into the hole. Cheaper than
+	// Delete, but it reorders, so an index held across a DeleteFast is stale.
 	void DeleteFast(uint32_t ObjectIdx)
 	{
 		if (ObjectIdx != (m_Size - 1))
 		{
 			m_Items[ObjectIdx] = m_Items[m_Size - 1];
-			m_Size--;
 		}
+
+		m_Size--;
 	}
 
 	/**

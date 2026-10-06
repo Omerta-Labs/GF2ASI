@@ -105,8 +105,8 @@ void _cdecl HOOK_PlayerMasterSM_BuildStateMachine()
 {
 	//PLH::FnCast(HOOK_PlayerMasterSM_BuildStateMachine_Old, &HOOK_PlayerMasterSM_BuildStateMachine)();
 
-	void* thread_new_allocator = MemUtils::CallCdeclMethod<void*>(0x09C8F80);
-	EARS::Framework::SMBuilder Builder = EARS::Framework::SMBuilder::MakeBuilder("playerMasterStateTable", thread_new_allocator);
+	EA::Allocator::IAllocator* thread_new_allocator = MemUtils::CallCdeclMethod<EA::Allocator::IAllocator*>(0x09C8F80);
+	EARS::Framework::SMBuilder Builder = { "playerMasterStateTable", thread_new_allocator };
 	EARS::Framework::SMBuilderState* StartState = Builder.AddState("start", -1);
 	StartState->AddChild("playerLogicalStateTable", true);
 	StartState->AddChild("playerLowerBodyStateTable", true);
@@ -140,8 +140,6 @@ void _cdecl HOOK_PlayerMasterSM_BuildStateMachine()
 
 	// TODO: While the scripthook features are defined in derived type, we still want to replace original PlayerMasterSM.
 	Builder.CompileAndRegister(0xB08AE1F6, S_PlayerMasterSM_FactoryFn, "PlayerMasterSM");
-
-	Builder.Destroy();
 }
 
 #if OVERRIDE_LAUNCH_CMD

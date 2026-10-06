@@ -222,8 +222,8 @@ namespace EARS
 		void EARS::Modules::PlayerDebugFlySM::BuildStateMachine()
 		{
 			// TODO: Check whether the state machine has already been built!
-			void* thread_new_allocator = MemUtils::CallCdeclMethod<void*>(0x09C8F80);
-			EARS::Framework::SMBuilder Builder = EARS::Framework::SMBuilder::MakeBuilder("playerDebugFlyStateTable", thread_new_allocator);
+			EA::Allocator::IAllocator* thread_new_allocator = MemUtils::CallCdeclMethod<EA::Allocator::IAllocator*>(0x09C8F80);
+			EARS::Framework::SMBuilder Builder = { "playerDebugFlyStateTable", thread_new_allocator };
 
 			// IDLE STATE
 			EARS::Framework::SMBuilderState* IdleState = Builder.AddState("idle", -1);
@@ -238,8 +238,6 @@ namespace EARS
 			ExitState->AddEnterMessage(0x2);
 
 			Builder.CompileAndRegister(0x29CC4DD4, S_PlayerDebugFlySM_FactoryFn, "PlayerDebugFlySM");
-
-			Builder.Destroy();
 		}
 	}
 }

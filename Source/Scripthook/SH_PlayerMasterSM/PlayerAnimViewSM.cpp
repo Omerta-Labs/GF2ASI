@@ -57,8 +57,8 @@ namespace SH
 	void PlayerAnimViewSM::BuildStateMachine()
 	{
 		// TODO: Check whether the state machine has already been built!
-		void* thread_new_allocator = MemUtils::CallCdeclMethod<void*>(0x09C8F80);
-		EARS::Framework::SMBuilder Builder = EARS::Framework::SMBuilder::MakeBuilder("playerDebugAnimViewStateTable", thread_new_allocator);
+		EA::Allocator::IAllocator* thread_new_allocator = MemUtils::CallCdeclMethod<EA::Allocator::IAllocator*>(0x09C8F80);
+		EARS::Framework::SMBuilder Builder = { "playerDebugAnimViewStateTable", thread_new_allocator };
 
 		// IDLE STATE
 		EARS::Framework::SMBuilderState* IdleState = Builder.AddState("idle", -1);
@@ -69,7 +69,5 @@ namespace SH
 		ExitState->AddEnterMessage(0x2);
 
 		Builder.CompileAndRegister(Private::ANIM_VEW_SM_HASH, Private::S_PlayerAnimViewSM_FactoryFn, "PlayerAnimViewSM");
-
-		Builder.Destroy();
 	}
 }

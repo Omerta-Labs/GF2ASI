@@ -2,6 +2,8 @@
 
 #include "Platform/MemUtils.h"
 
+// SDK
+#include "ears_common/commontypes.h"
 #include "ears_statemachine/statemachine.h"
 
 // C++
@@ -14,6 +16,11 @@ namespace EARS
 		StateTable* StateMachineManager::GetStateTableFromID(uint32_t InTableID) const
 		{
 			return MemUtils::CallClassMethod<StateTable*, const StateMachineManager*, uint32_t>(0x0621530, this, InTableID);
+		}
+
+		uint32_t StateMachineManager::GetStateTableIDFromName(const char* InName) const
+		{
+			return EARS::Common::HashString_SDBM(InName);
 		}
 
 		StateMachine* StateMachineManager::CreateStateMachineFromTableID(uint32_t StateTableID, StateMachineParams* Params)

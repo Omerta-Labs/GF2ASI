@@ -13,42 +13,49 @@ namespace EARS::Common
 	{
 	public:
 
+		TVPContainer()
+			: m_TVP(nullptr)
+			, m_Allocator(nullptr)
+		{
+
+		}
+
 		TVPContainer(const EA::TagValuePair& InTVP, EA::Allocator::IAllocator* InAllocator)
 		{
-			m_pTVP = CopyTVP(InTVP, InAllocator);
-			m_pAllocator = InAllocator;
-			m_pAllocator->AddRef();
+			m_TVP = CopyTVP(InTVP, InAllocator);
+			m_Allocator = InAllocator;
+			m_Allocator->AddRef();
 		}
 
 		TVPContainer(const TVPContainer& InOther)
 		{
-			m_pTVP = InOther.m_pTVP ? CopyTVP(*InOther.m_pTVP, InOther.m_pAllocator) : nullptr;
-			m_pAllocator = InOther.m_pAllocator;
-			m_pAllocator->AddRef();
+			m_TVP = InOther.m_TVP ? CopyTVP(*InOther.m_TVP, InOther.m_Allocator) : nullptr;
+			m_Allocator = InOther.m_Allocator;
+			m_Allocator->AddRef();
 		}
 
 		~TVPContainer()
 		{
-			if (m_pTVP)
+			if (m_TVP)
 			{
-				m_pAllocator->Free(m_pTVP, 0);
+				m_Allocator->Free(m_TVP, 0);
 			}
 
-			m_pAllocator->Release();
+			m_Allocator->Release();
 		}
 
 		// Deep-copies a tag chain into one contiguous block allocated from the
 		// given allocator. Returns null for an empty (default) tag.
 		static EA::TagValuePair* CopyTVP(const EA::TagValuePair& InTVP, EA::Allocator::IAllocator* InAllocator);
 
-		const EA::TagValuePair& Get() const { return m_pTVP ? *m_pTVP : s_nullTVP; }
-		EA::Allocator::IAllocator& GetAllocator() const { return *m_pAllocator; }
+		const EA::TagValuePair& Get() const { return m_TVP ? *m_TVP : s_nullTVP; }
+		EA::Allocator::IAllocator& GetAllocator() const { return *m_Allocator; }
 
 	private:
 
 		static EA::TagValuePair s_nullTVP;
 
-		EA::TagValuePair* m_pTVP = nullptr;
-		EA::Allocator::IAllocator* m_pAllocator = nullptr;
+		EA::TagValuePair* m_TVP = nullptr;
+		EA::Allocator::IAllocator* m_Allocator = nullptr;
 	};
 }

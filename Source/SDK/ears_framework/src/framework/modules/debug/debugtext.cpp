@@ -7,9 +7,6 @@
 // SDK
 #include "framework/mainloop/logic.h"
 
-// C++
-#include <string>
-
 namespace EARS::Framework::Modules
 {
 	DebugText::DebugText(const RWS::CAttributePacket& InAttr)
@@ -29,7 +26,9 @@ namespace EARS::Framework::Modules
 			m_DebugString = nullptr;
 		}
 
-		// TODO: Unlink messages
+		UnLinkMsg(RWS::iMsgRunningTick);
+		UnLinkMsg(RWS::iMsgPausedTick);
+		UnLinkMsg(m_TargetName);
 	}
 
 	void DebugText::HandleAttributes(const RWS::CAttributePacket& InPacket)
@@ -67,6 +66,7 @@ namespace EARS::Framework::Modules
 						// allocate and copy
 						m_DebugString = new char[Length];
 						std::strncpy(m_DebugString, Text, Length);
+						m_DebugString[Length] = '\0';
 					}
 
 					break;
@@ -89,6 +89,8 @@ namespace EARS::Framework::Modules
 					break;
 				}
 			}
+
+			CommandIt++;
 		}
 	}
 
@@ -124,8 +126,8 @@ namespace EARS::Framework::Modules
 
 			if (m_TimeRemaining <= 0.0f)
 			{
-				UnlinkMsg(&RWS::iMsgRunningTick);
-				UnlinkMsg(&RWS::iMsgPausedTick);
+				UnLinkMsg(RWS::iMsgRunningTick);
+				UnLinkMsg(RWS::iMsgPausedTick);
 			}
 		}
 		else if (MsgEvent.IsEvent(RWS::iMsgPausedTick))
@@ -140,8 +142,8 @@ namespace EARS::Framework::Modules
 
 			if (m_TimeRemaining < 0.0f)
 			{
-				UnlinkMsg(&RWS::iMsgRunningTick);
-				UnlinkMsg(&RWS::iMsgPausedTick);
+				UnLinkMsg(RWS::iMsgRunningTick);
+				UnLinkMsg(RWS::iMsgPausedTick);
 			}
 		}
 	}
