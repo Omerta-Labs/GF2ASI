@@ -43,24 +43,51 @@ endif()
 # Options
 #-----------------------------------------------------------------------------
 
-# Override these without touching tracked files by putting them in
-# CMakeUserPresets.json, which is not in the repository.
+# Set any of these in LocalConfig.cmake, next to this file. It is read first and
+# whatever it sets wins, it is not tracked, and editing it takes effect on the
+# next configure -- unlike a default below, which an existing cache ignores.
+# Copy LocalConfig.cmake.example to get started.
+#
+# They are cache variables otherwise, so a preset, the CMake GUI or -D all still
+# work for anyone who prefers that.
+#
+# The NOT DEFINED guards are load-bearing. Creating a cache entry removes a
+# normal variable of the same name, so an unguarded set(... CACHE ...) would
+# discard the local override on the first configure and honour it on every one
+# after -- which is worse than either behaviour on its own.
+#
+# Each docstring has to be a single argument. Split one across two strings and
+# CMake stops recognising the CACHE signature, silently falls back to plain
+# set(), and leaves behind a normal variable holding the literal text
+# "value;CACHE;PATH;doc...". Nothing can then set it: there is no cache entry
+# for a preset or the GUI to write, and a -D is shadowed by the normal variable.
+# GF2ASI_GAME_DIR was in exactly that state.
 
-set(GF2ASI_GAME_DIR "J:/Games/The Godfather II" CACHE PATH
-    "Game install. The built .asi is copied into <dir>/scripts after linking, "
-    "and this is where the Visual Studio debugger launches from.")
+include("${CMAKE_SOURCE_DIR}/LocalConfig.cmake" OPTIONAL)
 
-set(GF2ASI_GAME_EXE "godfather2.exe" CACHE STRING
-    "Executable inside GF2ASI_GAME_DIR that the debugger launches.")
+if(NOT DEFINED GF2ASI_GAME_DIR)
+    set(GF2ASI_GAME_DIR "J:/Games/The Godfather II" CACHE PATH
+        "Game install; the .asi deploys to <dir>/scripts and the debugger starts here")
+endif()
 
-set(GF2ASI_DEBUGGER_ARGS "" CACHE STRING
-    "Extra command line the debugger passes to the game.")
+if(NOT DEFINED GF2ASI_GAME_EXE)
+    set(GF2ASI_GAME_EXE "godfather2.exe" CACHE STRING
+        "Executable inside GF2ASI_GAME_DIR that the debugger launches")
+endif()
 
-option(GF2ASI_DEPLOY
-    "Copy the built .asi into GF2ASI_GAME_DIR/scripts after linking" ON)
+if(NOT DEFINED GF2ASI_DEBUGGER_ARGS)
+    set(GF2ASI_DEBUGGER_ARGS "" CACHE STRING
+        "Extra command line the debugger passes to the game")
+endif()
 
-option(GF2ASI_USE_PCH
-    "Give each target a precompiled header" ON)
+if(NOT DEFINED GF2ASI_DEPLOY)
+    option(GF2ASI_DEPLOY
+        "Copy the built .asi into GF2ASI_GAME_DIR/scripts after linking" ON)
+endif()
+
+if(NOT DEFINED GF2ASI_USE_PCH)
+    option(GF2ASI_USE_PCH "Give each target a precompiled header" ON)
+endif()
 
 set(GF2ASI_GAME_PATH "${GF2ASI_GAME_DIR}/${GF2ASI_GAME_EXE}")
 
@@ -70,10 +97,12 @@ set(_gf2_can_deploy FALSE)
 
 if(NOT IS_DIRECTORY "${GF2ASI_GAME_DIR}")
     message(WARNING
-        "GF2ASI_GAME_DIR is not a directory (${GF2ASI_GAME_DIR}). The build will "
-        "not deploy and the debugger has nothing to launch. Pass "
-        "-DGF2ASI_GAME_DIR=<path>, or set it in CMakeUserPresets.json.")
+        "GF2ASI_GAME_DIR is not a directory [${GF2ASI_GAME_DIR}]. The build will "
+        "not deploy and the debugger has nothing to launch. Set it in "
+        "LocalConfig.cmake next to CMakeLists.txt -- copy "
+        "LocalConfig.cmake.example.")
 else()
+    message(STATUS "GF2ASI: game directory ${GF2ASI_GAME_DIR}")
     if(GF2ASI_DEPLOY)
         set(_gf2_can_deploy TRUE)
     endif()
@@ -384,10 +413,3 @@ if(_gf2_can_deploy)
 endif()
 
 set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT GF2ASI)
-
-list(LENGTH GF2SDK_SOURCES _n_sdk)
-list(LENGTH GF2MOD_SOURCES _n_mod)
-list(LENGTH GF2ASI_SOURCES _n_asi)
-math(EXPR _n_asi "${_n_asi} + 5")       # dllmain, GF2Hook, HookMods, ScripthookEvents
-message(STATUS "GF2ASI: ${_n_sdk} SDK + ${_n_mod} Mod + ${_n_asi} ASI "
-               "translation units (265 total -- see Reference/build_baseline.md)")

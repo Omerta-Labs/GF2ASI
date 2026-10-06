@@ -1,0 +1,30 @@
+#=============================================================================
+# Per-machine settings. Copy this file to LocalConfig.cmake and edit it.
+#
+#   LocalConfig.cmake is gitignored, so your paths never reach a commit.
+#
+# CMakeLists.txt reads it before it declares any of its own defaults, so
+# whatever is set here wins. Editing it takes effect on the next configure;
+# there is no need to delete the build directory or pass anything on the
+# command line.
+#=============================================================================
+
+# Where the game is installed. The built .asi is copied into <dir>/scripts
+# after linking, and the Visual Studio debugger starts the game from here.
+set(GF2ASI_GAME_DIR "J:/Games/The Godfather II")
+
+# Forward slashes, or escaped backslashes -- "D:\Games\The Godfather II".
+# A bare backslash is an escape character to CMake and will not do what you
+# expect.
+
+# The executable the debugger launches, inside GF2ASI_GAME_DIR.
+# set(GF2ASI_GAME_EXE "godfather2.exe")
+
+# Extra command line for the game when launched from the debugger.
+# set(GF2ASI_DEBUGGER_ARGS "")
+
+# Copy the .asi into <game>/scripts after linking.
+# set(GF2ASI_DEPLOY ON)
+
+# Precompiled header per target. Turn off if a PCH is getting in the way.
+# set(GF2ASI_USE_PCH ON)

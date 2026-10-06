@@ -48,3 +48,6 @@ premake5.lua
 /out
 CMakeUserPresets.json
 /_build
+
+# per-machine paths; LocalConfig.cmake.example is the tracked template
+/LocalConfig.cmake

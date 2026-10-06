@@ -53,32 +53,33 @@ hardcoded addresses into its image, so CMake fails the configure if you point it
 at a 64-bit generator.
 
 ```bash
-cmake --preset vs2022
+cmake --preset vs2026        # or vs2022; see CMakePresets.json
 cmake --build build --config Release
 ```
 
-Point it at your own game install either on the command line:
+Point it at your own game install by copying `LocalConfig.cmake.example` to
+`LocalConfig.cmake` and editing one line:
 
-```bash
-cmake --preset vs2022 -DGF2ASI_GAME_DIR="D:/Games/The Godfather II"
+```cmake
+set(GF2ASI_GAME_DIR "D:/Games/The Godfather II")
 ```
 
-or, so it survives a reconfigure without touching a tracked file, in a
-`CMakeUserPresets.json` (which is gitignored):
+`LocalConfig.cmake` is gitignored, so your paths never reach a commit. CMake
+reads it before it declares any of its own defaults, so what you set there wins
+and takes effect on the next configure — no command-line arguments, and no need
+to delete the build directory. Use forward slashes, or escape backslashes
+(`"D:\\Games\\The Godfather II"`) — a bare backslash is a CMake escape
+character.
 
-```json
-{
-  "version": 3,
-  "configurePresets": [
-    { "name": "mine", "inherits": "vs2022",
-      "cacheVariables": { "GF2ASI_GAME_DIR": "D:/Games/The Godfather II" } }
-  ]
-}
-```
-
-Other options: `GF2ASI_GAME_EXE` (the executable the debugger launches),
-`GF2ASI_DEBUGGER_ARGS`, `GF2ASI_DEPLOY` (copy the `.asi` into
+The same file sets the rest: `GF2ASI_GAME_EXE` (the executable the debugger
+launches), `GF2ASI_DEBUGGER_ARGS`, `GF2ASI_DEPLOY` (copy the `.asi` into
 `<game>/scripts` after linking, on by default) and `GF2ASI_USE_PCH`.
+
+All of them are cache variables when `LocalConfig.cmake` does not set them, so
+a preset, the CMake GUI or `-D` work too if you prefer. Bear in mind that a
+cache variable is written once: with the Visual Studio generator, changing a
+default in `CMakeLists.txt` afterwards has no effect on an existing build
+directory, which is the reason `LocalConfig.cmake` exists.
 
 A successful build deploys `GF2ASI.asi` and `discord_game_sdk.dll` into
 `<game>/scripts`. CMake warns at configure time if the game directory is
