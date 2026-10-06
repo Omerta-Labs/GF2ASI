@@ -8,7 +8,7 @@ namespace EARS::Modules
 	void Checkpoint::StopLoading()
 	{
 		static hook::Type<RWS::CEventId> iMsgStreamSetLoadCompleteEvent = hook::Type<RWS::CEventId>(0x120E970);
-		UnlinkMsg(&iMsgStreamSetLoadCompleteEvent);
+		UnLinkMsg(iMsgStreamSetLoadCompleteEvent);
 
 		m_bIsLoading = false;	
 	}

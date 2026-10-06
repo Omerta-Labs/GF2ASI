@@ -102,17 +102,17 @@ namespace EARS::Modules
 
 			if (PrivateEvents::RunningTickEvent.get().GetMsgId() != 0)
 			{
-				LinkMsg(&PrivateEvents::RunningTickEvent, 0x8000);
+				LinkMsg(PrivateEvents::RunningTickEvent);
 			}
 
 			if (PrivateEvents::PausedTickEvent.get().GetMsgId() != 0)
 			{
-				LinkMsg(&PrivateEvents::PausedTickEvent, 0x8000);
+				LinkMsg(PrivateEvents::PausedTickEvent);
 			}
 
 			if (PrivateEvents::DoRenderEvent.get().GetMsgId() != 0)
 			{
-				LinkMsg(&PrivateEvents::DoRenderEvent, 0x8000);
+				LinkMsg(PrivateEvents::DoRenderEvent);
 			}
 		}
 	}
@@ -123,9 +123,9 @@ namespace EARS::Modules
 		{
 			m_bActive = false;
 
-			UnlinkMsg(&PrivateEvents::RunningTickEvent);
-			UnlinkMsg(&PrivateEvents::PausedTickEvent);
-			UnlinkMsg(&PrivateEvents::DoRenderEvent);
+			UnLinkMsg(PrivateEvents::RunningTickEvent);
+			UnLinkMsg(PrivateEvents::PausedTickEvent);
+			UnLinkMsg(PrivateEvents::DoRenderEvent);
 		}
 	}
 

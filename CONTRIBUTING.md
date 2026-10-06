@@ -64,6 +64,29 @@ the original — `ActivateHUDIndicator` against the original's
 `ActivateHudIndicator` — the original wins; `function_coverage.py --summary`
 lists every such divergence.
 
+**Identifier names we do not take from the original.** Everything above is about
+the names the linker map pins: files, classes, functions, their signatures. Three
+kinds of identifier are deliberately *not* recovered from the original, because
+they are invisible to every consumer of the code and consistency across the tree
+is worth more than fidelity to one 2008 author's habits:
+
+| Kind | Form | Example |
+|---|---|---|
+| Class and struct members | `m_` + CapitalisedName, `m_b` for a `bool` | `m_Arr`, `m_ClassName`, `m_bApplyOnLoad` |
+| Parameters, in | `In` + CapitalisedName, `bIn` for a `bool` | `InVenueID`, `InCapacity`, `bInResetCamera` |
+| Parameters, out | `Out` + CapitalisedName | `OutSearchKey`, `OutPosition` |
+| Local variables | CapitalisedName, `b` for a `bool` | `ObjIdx`, `Element`, `bRemoved` |
+
+Apply this even when the disassembly or the PDB hands you the original spelling.
+`RegArr`'s debug asserts name its member `mArr` and the PDB gives its nested
+`RegData` fields as `mKey`/`mData`; in this tree they are `m_Arr`, `m_Key` and
+`m_Data`. Keep the original *word* — `mArr` becomes `m_Arr`, not `m_Items` — and
+restyle it. Where the original name is the only record of what a field means,
+that belongs in a comment, not in the spelling.
+
+None of this is layout-affecting, so it cannot cause the silent wrong read that
+a misplaced field can.
+
 **Class layout.** Members go in the class they belong to, in the original order,
 with a `static_assert` on `sizeof` wherever the size is known. These types are
 reinterpret_cast over live game memory, so a field in the wrong place is a

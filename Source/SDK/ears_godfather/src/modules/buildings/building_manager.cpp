@@ -16,7 +16,7 @@ namespace EARS::Modules
 		}
 		
 		// Otherwise the last resort is to iterate through registered store list
-		if (BuildingStore** FoundStore = m_Stores.Search(InVenueID))
+		if (BuildingStore* const* FoundStore = m_Stores.Search(InVenueID))
 		{
 			return *FoundStore;
 		}
@@ -42,7 +42,7 @@ namespace EARS::Modules
 
 	Building* BuildingManager::GetBuildingByVenueID(const uint32_t InVenueID) const
 	{
-		if (Building** FoundBuilding = m_ActiveBuildingList.Search(InVenueID))
+		if (Building* const* FoundBuilding = m_ActiveBuildingList.Search(InVenueID))
 		{
 			return *FoundBuilding;
 		}

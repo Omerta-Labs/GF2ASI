@@ -157,36 +157,36 @@ void DiscordManager::OpenLevelServices()
 	// We can only apply if discord is active
 	if (m_Core)
 	{
-		LinkMsg(&Events::RunningTickEvent, 0x8000);
-		LinkMsg(&Events::PlayerAsDriverEnterVehicleEvent, 0x8000);
-		LinkMsg(&Events::PlayerExitVehicleEvent, 0x8000);
-		LinkMsg(&Events::CityChangedEvent, 0x8000);
-		LinkMsg(&Events::EnteredSelectMenuEvent, 0x8000);
-		LinkMsg(&Events::ExitedSelectMenuEvent, 0x8000);
-		LinkMsg(&Events::ChaseStartedEvent, 0x8000);
-		LinkMsg(&Events::ChaseEndedEvent, 0x8000);
-		LinkMsg(&Events::ExtortionSuccessCompleteEvent, 0x8000);
-		LinkMsg(&Events::PlayerLostVenueEvent, 0x8000);
-		LinkMsg(&Events::EnteredPauseMapEvent, 0x8000);
-		LinkMsg(&Events::ExitedPauseMapEvent, 0x8000);
+		LinkMsg(Events::RunningTickEvent);
+		LinkMsg(Events::PlayerAsDriverEnterVehicleEvent);
+		LinkMsg(Events::PlayerExitVehicleEvent);
+		LinkMsg(Events::CityChangedEvent);
+		LinkMsg(Events::EnteredSelectMenuEvent);
+		LinkMsg(Events::ExitedSelectMenuEvent);
+		LinkMsg(Events::ChaseStartedEvent);
+		LinkMsg(Events::ChaseEndedEvent);
+		LinkMsg(Events::ExtortionSuccessCompleteEvent);
+		LinkMsg(Events::PlayerLostVenueEvent);
+		LinkMsg(Events::EnteredPauseMapEvent);
+		LinkMsg(Events::ExitedPauseMapEvent);
 	}
 }
 
 void DiscordManager::CloseLevelServices()
 {
 	// remove other events
-	UnlinkMsg(&Events::RunningTickEvent);
-	UnlinkMsg(&Events::PlayerAsDriverEnterVehicleEvent);
-	UnlinkMsg(&Events::PlayerExitVehicleEvent);
-	UnlinkMsg(&Events::CityChangedEvent);
-	UnlinkMsg(&Events::EnteredSelectMenuEvent);
-	UnlinkMsg(&Events::ExitedSelectMenuEvent);
-	UnlinkMsg(&Events::ChaseStartedEvent);
-	UnlinkMsg(&Events::ChaseEndedEvent);
-	UnlinkMsg(&Events::ExtortionSuccessCompleteEvent);
-	UnlinkMsg(&Events::PlayerLostVenueEvent);
-	UnlinkMsg(&Events::EnteredPauseMapEvent);
-	UnlinkMsg(&Events::ExitedPauseMapEvent);
+	UnLinkMsg(Events::RunningTickEvent);
+	UnLinkMsg(Events::PlayerAsDriverEnterVehicleEvent);
+	UnLinkMsg(Events::PlayerExitVehicleEvent);
+	UnLinkMsg(Events::CityChangedEvent);
+	UnLinkMsg(Events::EnteredSelectMenuEvent);
+	UnLinkMsg(Events::ExitedSelectMenuEvent);
+	UnLinkMsg(Events::ChaseStartedEvent);
+	UnLinkMsg(Events::ChaseEndedEvent);
+	UnLinkMsg(Events::ExtortionSuccessCompleteEvent);
+	UnLinkMsg(Events::PlayerLostVenueEvent);
+	UnLinkMsg(Events::EnteredPauseMapEvent);
+	UnLinkMsg(Events::ExitedPauseMapEvent);
 }
 
 void DiscordManager::UpdateState(std::string text)

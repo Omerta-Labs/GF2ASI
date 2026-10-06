@@ -9,6 +9,7 @@
 
 // SDK Framework
 #include "framework/core/attributehandler/cclassfactory.h"
+#include "framework/core/attributehandler/earsattributetypes.h"
 
 // Forward declare
 namespace EARS
@@ -213,6 +214,15 @@ namespace RWS
 	{
 	public:
 
+		enum PacketFlags
+		{
+			PACKET_IS_COMPACT = 1,
+			PACKET_COMPACT_IS_BASE = 2,
+			PACKET_IS_DYNAMIC = 4,
+			PACKET_HAS_COMPONENT_LIST = 8,
+			PACKET_IS_OWNED_BY_SIMMANAGER = 16
+		};
+
 		// Fetch the Stream Handle this AttributePacket was likely loaded by
 		inline uint32_t GetStreamHandle() const { return m_hStream; }
 
@@ -220,8 +230,14 @@ namespace RWS
 		// This is stored within the data chunks.
 		uint32_t GetIdOfClassToCreate() const;
 
+		// Check whether the Packet is compact
+		bool IsCompact() const { return ((m_Flags & PacketFlags::PACKET_IS_COMPACT) == PacketFlags::PACKET_IS_COMPACT); }
+
+		// Resolve EntityPacket only if PACKET_IS_COMPACT is true.
+		const EARS::Framework::EntityPacket* EntPacket() const;
+
 		// Get the instance of this packet
-		const EARS::Common::guid128_t& GetInstanceID() const;
+		const EARS::Common::guid128_t& GetInstanceId() const;
 
 		// Check whether this Packet has any entities registered to them
 		bool HasEntities() const { return (m_EntityList.IsEmpty() == false); }
@@ -239,9 +255,12 @@ namespace RWS
 		CAttributePacket* m_NextSibling = nullptr;
 		CAttributePacketEntityList m_EntityList;
 		CAttributePacket* m_pHashNext = nullptr;
+
+		// NB: This is actually EARS::Framework::EntityPacket!
+		// Take this with an extreme pinch of salt!
 		uint8_t m_Flags = 0;
 		uint8_t m_pad[3];
-		//RWS::__Internal::CAttributeDataChunk firstChunk_;
+		RWS::__Internal::CAttributeDataChunk m_FirstChunk;
 	};
 
 	class CAttributeHandler : public EARS::Common::DoubleLinkedListNodeMixin2<CAttributeHandler>

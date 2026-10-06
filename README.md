@@ -112,8 +112,9 @@ Vendors/            prebuilt third-party libraries
 ## Documentation
 
 - [CONTRIBUTING.md](CONTRIBUTING.md) — how changes get in, including the rules
-  for AI-assisted work, what "matching the original" means, and the annotations
-  used to flag bugs and optimisations.
+  for AI-assisted work, what "matching the original" means, the naming standard
+  for members, parameters and locals, and the annotations used to flag bugs and
+  optimisations.
 - [ROADMAP.md](ROADMAP.md) — what is left, by package, file and class.
 - [RESTRUCTURE_PLAN.md](RESTRUCTURE_PLAN.md) — the repository restructure that
   got the tree into the original layout. Phases 0–5 are done; it is kept as the

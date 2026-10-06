@@ -104,7 +104,7 @@ void ImGuiManager::HandleEvents(const RWS::CMsg& MsgEvent)
 	{
 		ProcessBuildingTeleport();
 
-		UnlinkMsg(&DefinedEvents::iMsgPlayerTeleportDoneExceptFade);
+		UnLinkMsg(DefinedEvents::iMsgPlayerTeleportDoneExceptFade);
 	}
 	else if (MsgEvent.IsEvent(DefinedEvents::PlayerExitVehicleEvent))
 	{
@@ -220,11 +220,11 @@ void ImGuiManager::RegisterShortcutActions()
 void ImGuiManager::OpenLevelServices()
 {
 	// apply more events
-	LinkMsg(&DefinedEvents::RunningTickEvent, 0x8000);
-	LinkMsg(&DefinedEvents::PausedTickEvent, 0x8000);
-	LinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent, 0x8000);
-	LinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent, 0x8000);
-	LinkMsg(&DefinedEvents::PlayerExitVehicleEvent, 0x8000);
+	LinkMsg(DefinedEvents::RunningTickEvent);
+	LinkMsg(DefinedEvents::PausedTickEvent);
+	LinkMsg(DefinedEvents::PlayerAsDriverEnterVehicleEvent);
+	LinkMsg(DefinedEvents::PlayerAsPassengerEnterVehicleEvent);
+	LinkMsg(DefinedEvents::PlayerExitVehicleEvent);
 
 	CheckpointDebug.OpenLevelServices();
 }
@@ -258,14 +258,14 @@ void ImGuiManager::CloseLevelServices()
 	}
 
 	// remove other events
-	UnlinkMsg(&DefinedEvents::RunningTickEvent);
-	UnlinkMsg(&DefinedEvents::PausedTickEvent);
-	UnlinkMsg(&DefinedEvents::PlayerAsDriverEnterVehicleEvent);
-	UnlinkMsg(&DefinedEvents::PlayerAsPassengerEnterVehicleEvent);
-	UnlinkMsg(&DefinedEvents::PlayerExitVehicleEvent);
+	UnLinkMsg(DefinedEvents::RunningTickEvent);
+	UnLinkMsg(DefinedEvents::PausedTickEvent);
+	UnLinkMsg(DefinedEvents::PlayerAsDriverEnterVehicleEvent);
+	UnLinkMsg(DefinedEvents::PlayerAsPassengerEnterVehicleEvent);
+	UnLinkMsg(DefinedEvents::PlayerExitVehicleEvent);
 
 	// Just in case player exits mid-teleport
-	UnlinkMsg(&DefinedEvents::iMsgPlayerTeleportDoneExceptFade);
+	UnLinkMsg(DefinedEvents::iMsgPlayerTeleportDoneExceptFade);
 
 	Mod::ImGuiRuntime::DropFrame();
 }

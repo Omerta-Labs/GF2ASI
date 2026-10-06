@@ -89,7 +89,7 @@ void Mod::SDKHooks::InitialiseModLoader()
 				RecoverPtr<RWS::CAttributePacket>(SimGroupTOC->m_EntPackets[idx], (uint8_t*)SimGroupTOC);
 				RWS::CAttributePacket* Pckt = SimGroupTOC->m_EntPackets[idx];
 
-				const EARS::Common::guid128_t PcktID = Pckt->GetInstanceID();
+				const EARS::Common::guid128_t PcktID = Pckt->GetInstanceId();
 				EARS::Diag::Printf("Loaded behaviour [0x%X-0x%X-0x%X-0x%X] from SimGroupOverride file [%s]", PcktID[0], PcktID[1], PcktID[2], PcktID[3], AsPath.c_str());
 
 				g_RegisteredPackets.insert({ PcktID, Pckt });

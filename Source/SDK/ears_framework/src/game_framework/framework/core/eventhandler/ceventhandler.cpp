@@ -30,10 +30,9 @@ RWS::CRegisteredMsgs* RWS::CMsg::GetRegisteredInfo() const
 
 RWS::CEventHandler::CEventHandler()
 	: m_EventHandlerFlags(1)
-	, m_SomeMsgUnion(nullptr)
+	, m_LinkedMsgsLight(nullptr)
 {
-	//m_SomeShit = MemUtils::CallCdeclMethod<void*>(0x409510);
-	// TODO: This should match engine code
+
 }
 
 RWS::CEventHandler::~CEventHandler()
@@ -52,24 +51,118 @@ void RWS::CEventHandler::EnableMessages()
 	m_EventHandlerFlags |= 1;
 }
 
-void RWS::CEventHandler::LinkMsg(CEventId* Msg, uint32_t Priority)
+void RWS::CEventHandler::LinkMsg(RWS::CEventId& InId, const char* InFormatString, uint16_t InPriority)
 {
-	MemUtils::CallCdeclMethod<void, RWS::CEventHandler*, CEventId*, uint32_t>(0x0408900, this, Msg, Priority);
+	if (InId.IsValid())
+	{
+		LinkMsgToEventHandler(this, InId, InFormatString, InPriority);
+	}
 }
 
-void RWS::CEventHandler::UnlinkMsg(CEventId* Msg)
+void RWS::CEventHandler::LinkMsg(RWS::CEventId& InId)
 {
-	MemUtils::CallClassMethod<void, RWS::CEventHandler*, CEventId*>(0x04086D0, this, Msg);
+	if (InId.IsValid())
+	{
+		LinkMsgToEventHandler(this, InId, nullptr, MSG_PRIORITY_DEFAULT);
+	}
 }
 
-void RWS::CEventHandler::LinkMsgOnce(RWS::CEventId& InMsgId)
+void RWS::CEventHandler::LinkMsgToEventHandler(RWS::CEventHandler* InHandler, RWS::CEventId& InId, const char* InFormatString, uint16_t InPriority)
 {
-	MemUtils::CallClassMethod<void>(0x0408680, this, InMsgId);
+	// InFormatString only ever fed the debug build's event tooling; see RegisterMsg.
+	(void)InFormatString;
+
+	// The id's link count rises even when the handler was already linked, so it
+	// counts links rather than linked handlers.
+	InId.IncLinkedCount();
+
+	if (RWS::CLinkedMsg* pLinkedMsg = InHandler->GetLinkedMsg(InId))
+	{
+		// Already linked: deepen the existing entry instead of adding a second one.
+		// The original asserts here that InPriority matches the entry's priority -
+		// a second link at a different priority silently keeps the first one's.
+		pLinkedMsg->m_Linked = pLinkedMsg->m_Linked + 1;
+	}
+	else
+	{
+		InHandler->LinkMessageInternal(InId, InPriority);
+	}
 }
 
-void RWS::CEventHandler::ReplaceLinkedMsg(CEventId& InEventId, const char* InMsgName, const char* InFormatString)
+RWS::CLinkedMsg* RWS::CEventHandler::GetLinkedMsg(const RWS::CEventId& InId) const
 {
-	MemUtils::CallClassMethod<void>(0x04089B0, this, InEventId, InMsgName, InFormatString);
+	const uint32_t MsgId = InId.GetMsgId();
+
+	// Only the light table is checked for null. A handler carrying either weight
+	// flag has been through LinkMessageInternal, which never leaves the pointer
+	// null once it has set them, and the engine relies on that here too.
+	if (!IsHeavyWeight())
+	{
+		return (m_LinkedMsgsLight ? m_LinkedMsgsLight->Lookup(MsgId) : nullptr);
+	}
+
+	if (!IsSuperHeavyWeight())
+	{
+		return m_LinkedMsgsHeavy->Lookup(MsgId);
+	}
+
+	return m_LinkedMsgsSuperHeavy->Lookup(MsgId);
+}
+
+void RWS::CEventHandler::LinkMessageInternal(RWS::CEventId& InId, uint16_t InPriority)
+{
+	// TODO: still the engine's. The logic is recovered - allocate a CLinkedMsg
+	// holding (this, InId.GetMsgId(), InPriority); create the 4-bin table if this
+	// handler has none; Add to whichever table the weight flags select and, on
+	// NEED_TO_GROW, allocate the next size up, assign the old table into it, free
+	// the old one and set the next weight flag; then add the entry to
+	// InId.GetRegisteredInfo(). What blocks writing it here is allocation: the
+	// CLinkedMsg and all three table sizes come from EARS::Framework::FastPool
+	// free lists, which this tree does not have yet, and the PC build inlined the
+	// CLinkedMsg pool pop so there is no entry point to borrow for it either.
+	//
+	// `this` arrives in ESI rather than ECX, with the id and priority on the stack
+	// and popped by the callee.
+	MemUtils::CallEsiVoidMethod(0x04084D0, this, &InId, InPriority);
+}
+
+void RWS::CEventHandler::LinkMsgOnce(RWS::CEventId& InId)
+{
+	MemUtils::CallClassMethod<void, RWS::CEventHandler*, RWS::CEventId*>(0x0408680, this, &InId);
+}
+
+void RWS::CEventHandler::UnLinkMsg(RWS::CEventId& InId) const
+{
+	MemUtils::CallClassMethod<void, const RWS::CEventHandler*, RWS::CEventId*>(0x04086D0, this, &InId);
+}
+
+void RWS::CEventHandler::RegisterMsg(RWS::CEventId& InId, const char* InMsgName, const char* InFormatString)
+{
+	// Same story as LinkMsgToEventHandler: InFormatString survives in the original
+	// signature but not in the PC image. 0x408240 hashes InMsgName and tail-calls
+	// 0x408260, which reads only the id and the hash, so the optimiser dropped the
+	// description and its callers push two arguments.
+	(void)InFormatString;
+
+	// Static, so a plain cdecl call with no this.
+	MemUtils::CallCdeclMethod<void, RWS::CEventId*, const char*>(0x0408240, &InId, InMsgName);
+}
+
+void RWS::CEventHandler::UnRegisterMsg(RWS::CEventId& InId)
+{
+	MemUtils::CallCdeclMethod<void, RWS::CEventId*>(0x0408310, &InId);
+}
+
+void RWS::CEventHandler::ReplaceLinkedMsg(RWS::CEventId& InId, const char* InMsgName, const char* InFormatString)
+{
+	UnLinkMsg(InId);
+	UnRegisterMsg(InId);
+
+	if (InMsgName && *InMsgName)
+	{
+		RegisterMsg(InId, InMsgName, InFormatString);
+		LinkMsg(InId, InFormatString, MSG_PRIORITY_DEFAULT);
+	}
 }
 
 bool RWS::CEventHandler::IsActive() const

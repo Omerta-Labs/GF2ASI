@@ -23,8 +23,8 @@ namespace
 
 	// Engine CEventId globals (godfather2.exe) the addition handler links to, and the
 	// priority GFStreamAdditionHandler uses for its stream-message links.
-	RWS::CEventId* const iMsgGameDatabaseLoading = reinterpret_cast<RWS::CEventId*>(0x1206A28);
-	RWS::CEventId* const iMsgStreamBeginLoad = reinterpret_cast<RWS::CEventId*>(0x1206794);
+	hook::Type<RWS::CEventId> iMsgGameDatabaseLoading = hook::Type<RWS::CEventId>(0x1206A28);
+	hook::Type<RWS::CEventId> iMsgStreamBeginLoad = hook::Type<RWS::CEventId>(0x1206794);
 	const uint16_t STREAM_MSG_PRIORITY = 0x8000;
 
 	std::string StripExtension(const std::string& FileName)
@@ -426,7 +426,7 @@ void SH::ModManager::EnsureAdditionHandlerLinked()
 		m_pAdditionHandler = new ModStreamAdditionHandler();
 	}
 
-	m_pAdditionHandler->LinkMsg(iMsgGameDatabaseLoading, STREAM_MSG_PRIORITY);
+	m_pAdditionHandler->LinkMsg(iMsgGameDatabaseLoading);
 	m_bHandlerLinked = true;
 
 	tConsole::fPrintf("ModManager: stream-addition handler linked to iMsgGameDatabaseLoading");
@@ -476,7 +476,7 @@ void SH::ModStreamAdditionHandler::HandleEvents(const RWS::CMsg& Msg)
 		// A database load has begun - arm for its first stream begin-load.
 		if (!m_bArmed)
 		{
-			LinkMsg(iMsgStreamBeginLoad, STREAM_MSG_PRIORITY);
+			LinkMsg(iMsgStreamBeginLoad);
 			m_bArmed = true;
 		}
 	}
@@ -484,7 +484,7 @@ void SH::ModStreamAdditionHandler::HandleEvents(const RWS::CMsg& Msg)
 	{
 		// Unlink FIRST: the Load calls below dispatch iMsgStreamBeginLoad themselves, so
 		// this keeps us from re-entering. Then inject the additions once for this DB load.
-		UnlinkMsg(iMsgStreamBeginLoad);
+		UnLinkMsg(*iMsgStreamBeginLoad);
 		m_bArmed = false;
 
 		SH::ModManager::GetInstance().ApplyStreamAdditions();

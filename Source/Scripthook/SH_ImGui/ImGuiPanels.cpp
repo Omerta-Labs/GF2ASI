@@ -333,7 +333,7 @@ void ImGuiManager::DrawTab_BuildingSettings()
 					// we need to first teleport to new city to get world partitions sync'd up
 					CityMgr->TeleportToCity(Store.GetCityID());
 
-					LinkMsg(&DefinedEvents::iMsgPlayerTeleportDoneExceptFade, 0x8000);
+					LinkMsg(DefinedEvents::iMsgPlayerTeleportDoneExceptFade);
 				}
 				else
 				{
@@ -804,7 +804,7 @@ void ImGuiManager::DrawTab_SimMgrSettings()
 
 		if (FoundPacket)
 		{
-			const EARS::Common::guid128_t PacketID = FoundPacket->GetInstanceID();
+			const EARS::Common::guid128_t PacketID = FoundPacket->GetInstanceId();
 			const uint32_t ClassID = FoundPacket->GetIdOfClassToCreate();
 			const uint32_t StreamHdl = FoundPacket->GetStreamHandle();
 
@@ -1074,7 +1074,7 @@ bool ImGuiManager::SetVehicleGodMode(EARS::Vehicles::WhiteboxCar* InVehicle, boo
 		EARS::Modules::StandardDamageComponent* DamageComp = InVehicle->GetDamageComponent();
 		if (!DamageComp)
 		{
-			C_Logger::Printf("Missing StandardDamageComponent on %x, cannot apply GodMode!", InVehicle);
+			//C_Logger::Printf("Missing StandardDamageComponent on %x, cannot apply GodMode!", InVehicle);
 			return false;
 		}
 

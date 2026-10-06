@@ -5,9 +5,9 @@
 // their members forward to the original code at fixed addresses, and their
 // globals are read through hook::Type.
 //
-// MSVC x86 only. CallEaxVoidMethod is inline __asm because no calling
-// convention passes the first argument in EAX, which the game's __usercall
-// functions require.
+// MSVC x86 only. The CallEax* thunks are inline __asm because no calling
+// convention passes arguments in EAX, which the game's __usercall and
+// __userpurge functions require.
 //=============================================================================
 
 #pragma once
@@ -74,6 +74,47 @@ namespace MemUtils
 		__asm
 		{
 			mov eax, eaxArg
+			mov edx, address
+			call edx
+		}
+	}
+
+	// Invokes a function that receives `this` in ESI and two further arguments on the
+	// stack, which it pops itself (IDA "__usercall f(this@<esi>, a, b)"; callee ends
+	// `retn 8`). ESI is callee-saved, so the thunk restores it around the call.
+	inline void CallEsiVoidMethod(unsigned long address, void* esiArg, void* stackArg0, unsigned long stackArg1) {
+		__asm
+		{
+			push esi
+			push stackArg1
+			push stackArg0
+			mov esi, esiArg
+			mov edx, address
+			call edx
+			pop esi
+		}
+	}
+
+	// Invokes a function that receives its first two arguments in EAX and ECX and three
+	// more on the stack, which it pops itself (IDA
+	// "__userpurge f@<eax>(a@<eax>, b@<ecx>, c, d, e)"; callee ends `retn 0Ch`).
+	// MSVC produces this convention for a member function it has specialised to its call
+	// sites: `this` is an ordinary stack argument rather than being in ECX, so __thiscall
+	// is as wrong here as __cdecl and __stdcall are.
+	//
+	// stackArg0 is the argument nearest the return address, so it is pushed last. Nothing
+	// cleans up after the call because the callee already did. The pushes do not disturb
+	// the remaining parameter reads: MSVC always gives a function containing __asm a frame
+	// pointer, so each named parameter resolves EBP-relative rather than off ESP.
+	inline void CallEaxEcxVoidMethod(unsigned long address, void* eaxArg, const void* ecxArg,
+	                                 void* stackArg0, void* stackArg1, unsigned long stackArg2) {
+		__asm
+		{
+			push stackArg2
+			push stackArg1
+			push stackArg0
+			mov eax, eaxArg
+			mov ecx, ecxArg
 			mov edx, address
 			call edx
 		}

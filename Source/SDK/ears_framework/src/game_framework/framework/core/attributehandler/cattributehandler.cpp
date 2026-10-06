@@ -44,6 +44,8 @@ void RWS::CAttributeHandler::HandleAttributes(const RWS::CAttributePacket& InPac
 		{
 			m_FlagsAndID &= 0x7FFFFFFF;
 		}
+
+		CommandIt++;
 	}
 #endif // DEBUG
 }
@@ -160,7 +162,15 @@ uint32_t RWS::CAttributePacket::GetIdOfClassToCreate() const
 	return MemUtils::CallClassMethod<uint32_t, const CAttributePacket*>(0x043AAF0, this);
 }
 
-const EARS::Common::guid128_t& RWS::CAttributePacket::GetInstanceID() const
+const EARS::Framework::EntityPacket* RWS::CAttributePacket::EntPacket() const
+{
+	// TODO: EARS ASSERT
+	assert(IsCompact());
+
+	return reinterpret_cast<const EARS::Framework::EntityPacket*>(&m_Flags);
+}
+
+const EARS::Common::guid128_t& RWS::CAttributePacket::GetInstanceId() const
 {
 	return MemUtils::CallClassMethod<const EARS::Common::guid128_t&, const RWS::CAttributePacket*>(0x043AB10, this);
 }

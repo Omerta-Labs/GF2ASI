@@ -32,7 +32,7 @@ void Mod::ObjectManager::HandleEvents(const RWS::CMsg& MsgEvent)
 		Spawn(CurrentRequestParams.ObjectGuid, CurrentRequestParams.DesiredPosition);
 		CurrentRequestParams = {};
 
-		UnlinkMsg(&DefinedEvents::iMsgStreamLoadCompleted);
+		UnLinkMsg(DefinedEvents::iMsgStreamLoadCompleted);
 	}
 }
 
@@ -147,7 +147,7 @@ void Mod::ObjectManager::ImGuiDrawContents()
 				if (ClassID == 0xD7E44D6A)
 				{
 					EntityEntry NewEntry = {};
-					NewEntry.GUID = Packet.GetInstanceID();
+					NewEntry.GUID = Packet.GetInstanceId();
 
 					// We need to get NPC name from active SimNPC
 					const auto& EntityIt = Packet.GetEntityIterator();
@@ -177,7 +177,7 @@ void Mod::ObjectManager::ImGuiDrawContents()
 
 					// create entity and fetch name
 					EntityEntry NewEntry = {};
-					NewEntry.GUID = Packet.GetInstanceID();
+					NewEntry.GUID = Packet.GetInstanceId();
 					NewEntry.Name = PacketIt->GetAs_char_ptr();
 
 					VehicleSpawnList.RegisterEntry(NewEntry);
@@ -188,7 +188,7 @@ void Mod::ObjectManager::ImGuiDrawContents()
 					PacketIt.SeekTo(0); // seek straight to item name
 
 					EntityEntry NewEntry = {};
-					NewEntry.GUID = Packet.GetInstanceID();
+					NewEntry.GUID = Packet.GetInstanceId();
 					NewEntry.Name = PacketIt->GetAs_char_ptr();
 
 					ItemSpawnList.RegisterEntry(NewEntry);
