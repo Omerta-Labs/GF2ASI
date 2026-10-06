@@ -53,11 +53,15 @@ namespace EARS
 			// Fetch an active handler for the specified packet
 			RWS::CAttributeHandler* Find(const EARS::Common::guid128_t& InstanceID, RWS::CAttributeHandler* StartHandler);
 
-			// Register an entity into the SimManager
-			void AddEntityRecord(const EARS::Common::guid128_t& InID, const RWS::CAttributePacket* InPacket, RWS::CEventHandler& InHandler, uint32_t StreamID);
+			// Register an entity into the SimManager. InPacket may be null, for an entity
+			// with no creation packet; otherwise the handler is attached either to the
+			// handler hash (dynamic packets) or to the packet's own entity list.
+			void AddEntityRecord(const EARS::Common::guid128_t& InId, RWS::CAttributePacket* InPacket, RWS::CAttributeHandler* InAttrHandler, uint32_t InStreamHandle);
 
-			// Register a streamed entity into the SimManager
-			void AddStreamedEntityRecord(const RWS::CAttributePacket& InPacket, RWS::CEventHandler& InHandler);
+			// Register a streamed entity into the SimManager, taking the instance id and
+			// stream handle from the packet. InPacketConst must be non-null and must carry
+			// a valid stream handle.
+			void AddStreamedEntityRecord(const RWS::CAttributePacket* InPacketConst, RWS::CAttributeHandler* InAttrHandler);
 			
 			// Check whether a SimGroup is currently being overriden.
 			// Result is the index into the override array.

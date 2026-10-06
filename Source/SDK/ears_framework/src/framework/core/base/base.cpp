@@ -17,7 +17,7 @@ namespace EARS::Framework
 		m_EventHandlerFlags |= CEVENTHANDLER_FLAG_BASE;
 		RegisterForDeleteNotification();
 
-		SimManager::GetInstance()->AddStreamedEntityRecord(InAttr, *this);
+		SimManager::GetInstance()->AddStreamedEntityRecord(&InAttr, this);
 	}
 
 	Base::Base(const EARS::Common::guid128_t* InGuid, const uint32_t InStreamHandle)
@@ -30,9 +30,11 @@ namespace EARS::Framework
 		m_EventHandlerFlags |= CEVENTHANDLER_FLAG_BASE;
 		RegisterForDeleteNotification();
 
-		m_InstanceId = EARS::Common::guid128_t(0xBEEF, 0xBEEF, 0xBEEF, 0xBEEF);
+		// Select guid if incoming one is nullptr
+		static EARS::Common::guid128_t PlaceholderGuid = EARS::Common::guid128_t(0xBEEF, 0xBEEF, 0xBEEF, 0xBEEF);
+		const EARS::Common::guid128_t* EntityGuid = (InGuid != nullptr ? InGuid : &PlaceholderGuid);
 
-		SimManager::GetInstance()->AddEntityRecord(m_InstanceId, nullptr, *this, 0);
+		SimManager::GetInstance()->AddEntityRecord(m_InstanceId, nullptr, this, InStreamHandle);
 	}
 
 	Base::~Base()

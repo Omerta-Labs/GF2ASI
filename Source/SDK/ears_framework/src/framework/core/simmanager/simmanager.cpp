@@ -20,14 +20,25 @@ RWS::CAttributeHandler* EARS::Framework::SimManager::Find(const EARS::Common::gu
 	return MemUtils::CallClassMethod<RWS::CAttributeHandler*, EARS::Framework::SimManager*, const EARS::Common::guid128_t&, RWS::CAttributeHandler*>(0x0445FF0, this, InstanceID, StartHandler);
 }
 
-void EARS::Framework::SimManager::AddEntityRecord(const EARS::Common::guid128_t& InID, const RWS::CAttributePacket* InPacket, RWS::CEventHandler& InHandler, uint32_t StreamID)
+void EARS::Framework::SimManager::AddEntityRecord(const EARS::Common::guid128_t& InId, RWS::CAttributePacket* InPacket, RWS::CAttributeHandler* InAttrHandler, uint32_t InStreamHandle)
 {
-	return MemUtils::CallClassMethod<void>(0x4467C0, this, InID, InPacket, InHandler, StreamID);
+	// 0x4467C0 is a member function MSVC specialised to its six call sites: the packet
+	// arrives in EAX, the instance id in ECX, and `this`, the handler and the stream
+	// handle on the stack, which it pops itself. Hence the thunk rather than a cast to
+	// a __thiscall pointer.
+	MemUtils::CallEaxEcxVoidMethod(0x4467C0, InPacket, &InId, this, InAttrHandler, InStreamHandle);
 }
 
-void EARS::Framework::SimManager::AddStreamedEntityRecord(const RWS::CAttributePacket& InPacket, RWS::CEventHandler& InHandler)
+void EARS::Framework::SimManager::AddStreamedEntityRecord(const RWS::CAttributePacket* InPacketConst, RWS::CAttributeHandler* InAttrHandler)
 {
-	AddEntityRecord(InPacket.GetInstanceID(), &InPacket, InHandler, InPacket.GetStreamHandle());
+	// The original takes the packet as const and casts it away to hand a mutable one to
+	// AddEntityRecord, which links the handler into the packet's entity list.
+	// Reconstructed rather than forwarded: the engine's copy of this function survives in
+	// the PC image at 0x446790 but is orphaned, with no symbol and no reference to it.
+	AddEntityRecord(InPacketConst->GetInstanceId(),
+		const_cast<RWS::CAttributePacket*>(InPacketConst),
+		InAttrHandler,
+		InPacketConst->GetStreamHandle());
 }
 
 int EARS::Framework::SimManager::FindSimGroupOverride(const EARS::Common::guid32_t& Guid) const
@@ -118,7 +129,7 @@ void EARS::Framework::SimManager::LoadResource(RWS::CResourceHandler::CResourceL
 		RWS::CAttributePacket* Pckt = SimGroupTOC->m_EntPackets[idx];
 
 		if (RWS::CAttributePacket* Replacement =
-			EARS::ModPoints::ResolveAttributePacket(Pckt->GetInstanceID()))
+			EARS::ModPoints::ResolveAttributePacket(Pckt->GetInstanceId()))
 		{
 			SimGroupTOC->m_EntPackets[idx] = Replacement;
 		}
@@ -178,5 +189,5 @@ void* EARS::Framework::SimManager::SpawnEntity(RWS::CAttributePacket* Packet, ui
 
 const EARS::Common::guid128_t& EARS::Framework::SimManager::AttrPacketGetKey::GetKey(const RWS::CAttributePacket* InPacket)
 {
-	return InPacket->GetInstanceID();
+	return InPacket->GetInstanceId();
 }
