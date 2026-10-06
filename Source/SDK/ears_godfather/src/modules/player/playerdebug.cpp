@@ -1,6 +1,7 @@
 #include "playerdebug.h"
 
 #include "ears_statemachine/statemachine.h"
+#include "ears_statemachine/statemachinemanager.h"
 #include "framework/core/camera/cameramanager.h"
 #include "framework/core/input/input.h"
 #include "framework/toolkits/statemachine/smbuilder.h"
@@ -221,7 +222,12 @@ namespace EARS
 		/* static */
 		void EARS::Modules::PlayerDebugFlySM::BuildStateMachine()
 		{
-			// TODO: Check whether the state machine has already been built!
+			const uint32_t TableID = EARS::StateMachineSys::StateMachineManager::GetStateTableIDFromName("playerDebugFlyStateTable");
+			if (EARS::StateMachineSys::StateMachineManager::GetInstance()->GetStateTableFromID(TableID) != nullptr)
+			{
+				return;
+			}
+
 			EA::Allocator::IAllocator* thread_new_allocator = MemUtils::CallCdeclMethod<EA::Allocator::IAllocator*>(0x09C8F80);
 			EARS::Framework::SMBuilder Builder = { "playerDebugFlyStateTable", thread_new_allocator };
 

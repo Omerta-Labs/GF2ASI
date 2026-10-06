@@ -94,9 +94,12 @@ namespace EARS
 
 			SafePtr<EARS::Framework::Animated> m_AnimatedOwner;		// 0x48
 
-		private:
+		protected:
 
-			// TransIDs extending InterruptableSMTransID (base TRANSID_LAST = 7)
+			// These two are protected rather than private because derived state machines name values
+			// from them in their BuildStateMachine.
+
+			// TransIDs extending InterruptableSMTransID (base TRANSID_LAST = 7).
 			enum AnimateSMTransID : uint32_t
 			{
 				TRANSID_ANIMDONE             = 7,   // primary anim finished (remaining_time <= 0 OR anim flags 0x2000003)
@@ -105,13 +108,14 @@ namespace EARS
 				TRANSID_LAST                 = 10
 			};
 
-			// MessageIDs extending InterruptableSMMessageID (base MESSAGE_LAST = 7)
+			// MessageIDs extending InterruptableSMMessageID (base MESSAGE_LAST = 7).
+			// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
 			enum AnimateSMMessageID : uint32_t
 			{
-				MESSAGE_PLAYANIM         = 7,   // PlayAnim() with AnimMsg struct at MsgData+4
-				MESSAGE_STOPANIM         = 8,   // stop/complete current anim (Animated vtable slot 89)
-				MESSAGE_SETFRAMERATESCALE = 9,  // set anim frame rate scale (AnimPlayer+0x130)
-				MESSAGE_LAST             = 10
+				MESSAGE_PLAYANIM          = 7,   // PlayAnim() with AnimMsg struct at MsgData+4
+				MESSAGE_APPLYGAMEMOVEMENT = 8,   // stop/complete current anim (Animated vtable slot 89)
+				MESSAGE_SCALEANIMSPEED    = 9,   // set anim frame rate scale (AnimPlayer+0x130)
+				MESSAGE_LAST              = 10
 			};
 
 			static constexpr uint32_t kStateMachine_AnimateStateMachine = 0xD42A2C49;

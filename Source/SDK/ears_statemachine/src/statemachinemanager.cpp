@@ -18,7 +18,8 @@ namespace EARS
 			return MemUtils::CallClassMethod<StateTable*, const StateMachineManager*, uint32_t>(0x0621530, this, InTableID);
 		}
 
-		uint32_t StateMachineManager::GetStateTableIDFromName(const char* InName) const
+		/* static */
+		uint32_t StateMachineManager::GetStateTableIDFromName(const char* InName)
 		{
 			return EARS::Common::HashString_SDBM(InName);
 		}

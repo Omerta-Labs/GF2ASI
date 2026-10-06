@@ -24,6 +24,29 @@ namespace EARS::Modules
 
 		static EARS::StateMachineSys::StateMachine* S_FollowPathStateMachine_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
 
+		// State indices for this SM's state table, as passed to SMBuilder::AddState.
+		// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
+		enum FollowPathSMStateID : uint32_t
+		{
+			STATE_INIT                    = 0,
+			STATE_CLEAR_STRAFE_N_REORIENT = 1,
+			STATE_SEEK_TO_START_NODE      = 2,
+			STATE_FIND_PATH               = 3,
+			STATE_FIND_PATH_FAILURE       = 4,
+			STATE_INIT_GRAPHCLIENT        = 5,
+			STATE_FOLLOW_GRAPHCLIENT      = 6,
+			STATE_SEEK_TO_SPECIAL_NODE    = 7,
+			STATE_ARRIVED_AT_SPECIAL_NODE = 8,
+			STATE_POST_SPECIAL_NODE       = 9,
+			STATE_FOLLOW_GRAPH_IDLE       = 10,
+			STATE_SEEK_TO_TARGET          = 11,
+			STATE_WAIT_GEO                = 12,
+			STATE_BLOCKED                 = 13,
+			STATE_NO_PATH_DONE            = 14,
+			STATE_DONE                    = 15,
+			FOLLOWPATHSM_LAST_STATE       = 16,
+		};
+
 
 	protected:
 

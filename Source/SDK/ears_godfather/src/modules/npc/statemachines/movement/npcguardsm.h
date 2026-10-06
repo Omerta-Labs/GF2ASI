@@ -25,6 +25,22 @@ namespace EARS::Modules
 
 		static EARS::StateMachineSys::StateMachine* S_NPCGuardSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
 
+		// State indices for this SM's state table, as passed to SMBuilder::AddState.
+		// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
+		enum NPCGuardSMStateID : uint32_t
+		{
+			STATE_INIT                  = 0,
+			STATE_FIND_CLOSEST_POINT    = 1,
+			STATE_GOTO_CLOSEST_NODE     = 2,
+			STATE_GOTO_POINT            = 3,
+			STATE_PATH_FAILURE          = 4,
+			STATE_PATH_FAILURE_IDLE     = 5,
+			STATE_PATH_ULTIMATE_FAILURE = 6,
+			STATE_REACHED_GUARD_RANGE   = 7,
+			STATE_DONE                  = 8,
+			NPCGUARDSM_LAST_STATE       = 9,
+		};
+
 	private:
 		char m_Padding[0x30];
 	};

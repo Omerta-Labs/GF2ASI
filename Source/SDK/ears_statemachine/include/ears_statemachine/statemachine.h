@@ -48,6 +48,14 @@ namespace EARS
 
 		struct Transition
 		{
+			// Bits of the transition entry's m_Flags word.
+			enum TransitionFlags : uint32_t
+			{
+				TFLAGS_DEFAULT  = 0x0,  // match against CurFlags
+				TFLAGS_TRANS_FN = 0x1,  // call CheckTransition instead
+				TFLAGS_LAST     = 0x2,
+			};
+
 			enum StateMachineTransID : uint32_t
 			{
 				TRANSID_NONE = 0x0,
@@ -83,7 +91,7 @@ namespace EARS
 			StateMachineParams()
 				: m_Transitions(nullptr)
 			{
-				SetClassID(0x49ABC3A3);
+				SetClassID(0x49ABC3A3); // kStateMachine_StateMachine
 			}
 
 			/** return the class id we expect to create */
@@ -205,6 +213,18 @@ namespace EARS
 		{
 		public:
 
+			static constexpr uint32_t kStateMachine_StateMachine = 0x49ABC3A3;
+
+			// Bits of m_EvalFlags.
+			enum StateMachineEvalFlags : uint32_t
+			{
+				EVAL_DEFAULT           = 0x0,
+				EVAL_BUSY              = 0x1,
+				EVAL_TERMINATE         = 0x2,
+				EVAL_CHECKTRANS        = 0x4,
+				EVAL_NOUPDATEMESSAGES  = 0x8,
+			};
+
 			// Linked-list view over a StateMachine's direct children.
 			// Iterates via m_Next sibling pointers; end sentinel is nullptr.
 			class ChildList
@@ -286,10 +306,10 @@ namespace EARS
 			bool HasChildren() const { return m_ChildHead != nullptr; }
 
 			// Is this State Machine currently considered busy?
-			bool IsBusy() const { return m_EvalFlags & 1; }
+			bool IsBusy() const { return m_EvalFlags & EVAL_BUSY; }
 
 			// Is this State Machine currently evaluating transitions?
-			bool GetEvaluateTransitions() const { return m_EvalFlags & 4; }
+			bool GetEvaluateTransitions() const { return m_EvalFlags & EVAL_CHECKTRANS; }
 
 			/* assign external transitions into state machine */
 			void SetExternalTransitions(TransitionList* ExternalTransitions) { m_ExternalTransitions = ExternalTransitions; }

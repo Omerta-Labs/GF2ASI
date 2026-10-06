@@ -49,6 +49,20 @@ namespace EARS::Modules
 
 		static VehicleEntrySM* S_VehicleEntrySM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
 
+		// State indices for this SM's state table, as passed to SMBuilder::AddState.
+		// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
+		enum VehicleEntrySMStateID : uint32_t
+		{
+			STATE_INIT            = 0,
+			STATE_STOPATVEHICLE   = 1,
+			STATE_WAITFORIDLEDOOR = 2,
+			STATE_TRACKTOVEHICLE  = 3,
+			STATE_ENTERVEHICLE    = 4,
+			STATE_ENTEREDVEHICLE  = 5,
+			STATE_TELEPORTENTRY   = 6,
+			STATE_TERMINATE       = 7,
+		};
+
 	private:
 
 		// TransIDs extending AnimateSMTransID (base TRANSID_LAST = 10)

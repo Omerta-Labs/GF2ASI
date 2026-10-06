@@ -24,6 +24,19 @@ namespace EARS::Modules
 
 		static EARS::StateMachineSys::StateMachine* S_NPCFollowSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
 
+		// State indices for this SM's state table, as passed to SMBuilder::AddState.
+		// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
+		enum NPCFollowSMStateID : uint32_t
+		{
+			STATE_INIT         = 0,
+			STATE_STAND_FOLLOW = 1,
+			STATE_SEEK_FAST    = 2,
+			STATE_STRAFE_FAST  = 3,
+			STATE_SEEK_SLOW    = 4,
+			STATE_BACKUP       = 5,
+			STATE_PATH_FAILURE = 6,
+		};
+
 	private:
 		char m_Padding[0x24];
 	};

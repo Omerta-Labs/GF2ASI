@@ -65,7 +65,7 @@ bool EARS::Framework::AnimateStateMachine::HandleStateMessage(uint32_t SimTime, 
 		PlayAnim(pAnim->AnimID, pAnim->bBlend, pAnim->bForceAnim, pAnim->bIgnoreGameMovementBlend, pAnim->FrameRateScale, true);
 		return true;
 	}
-	case MESSAGE_STOPANIM:
+	case MESSAGE_APPLYGAMEMOVEMENT:
 	{
 		// Animated vtable slot 89 (PC offset 0x164) — 360 name TBD
 		Animated* pAnimated = GetAnimated();
@@ -73,7 +73,7 @@ bool EARS::Framework::AnimateStateMachine::HandleStateMessage(uint32_t SimTime, 
 		reinterpret_cast<void(__thiscall*)(Animated*)>(vftable[89])(pAnimated);	// ApplyGameMovement()
 		return true;
 	}
-	case MESSAGE_SETFRAMERATESCALE:
+	case MESSAGE_SCALEANIMSPEED:
 	{
 		const float Speed = MsgData->GetFloatData();
 		Animated* pAnimated = GetAnimated();

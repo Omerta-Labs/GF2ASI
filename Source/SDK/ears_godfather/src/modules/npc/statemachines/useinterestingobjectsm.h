@@ -23,6 +23,28 @@ namespace EARS::Modules
 
 		static EARS::StateMachineSys::StateMachine* S_UseInterestingObjectSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
 
+		// State indices for this SM's state table, as passed to SMBuilder::AddState.
+		// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
+		enum UseInterestingObjectSMStateID : uint32_t
+		{
+			STATE_INIT                = 0,
+			STATE_PATH_TO_IO          = 1,
+			STATE_REACHED             = 2,
+			STATE_ORIENT_TO_OBJECT    = 3,
+			STATE_ORIENT_TO_TARGET    = 4,
+			STATE_ORIENT_TO_DIR       = 5,
+			STATE_WAIT_FOR_LOAD       = 6,
+			STATE_TEST_HOLSTER_WEAPON = 7,
+			STATE_HOLSTER_WEAPON      = 8,
+			STATE_START               = 9,
+			STATE_INTERACT            = 10,
+			STATE_START_AGAIN         = 11,
+			STATE_FINISHING           = 12,
+			STATE_RESET               = 13,
+			STATE_PATH_FAILURE        = 14,
+			STATE_TERMINATE           = 15,
+		};
+
 	private:
 		char m_Padding[0x48];
 	};

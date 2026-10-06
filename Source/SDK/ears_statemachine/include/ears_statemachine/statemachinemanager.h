@@ -32,8 +32,9 @@ namespace EARS
 			/* Fetch State Table using Given ID */
 			StateTable* GetStateTableFromID(uint32_t InTableID) const;
 
-			/* Resolve State ID from name */
-			uint32_t GetStateTableIDFromName(const char* InName) const;
+			/* Resolve State ID from name.  Static in the original; the PC build inlines it
+			   into every caller as a bare EARS::Common::HashString_SDBM of the name. */
+			static uint32_t GetStateTableIDFromName(const char* InName);
 
 			/* Create a new StateMachine instance from a table ID; params may be nullptr */
 			StateMachine* CreateStateMachineFromTableID(uint32_t StateTableID, StateMachineParams* Params);

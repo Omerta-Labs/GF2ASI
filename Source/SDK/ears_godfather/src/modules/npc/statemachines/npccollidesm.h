@@ -24,6 +24,15 @@ namespace EARS::Modules
 
 		static EARS::StateMachineSys::StateMachine* S_NPCCollideSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
 
+		// State indices for this SM's state table, as passed to SMBuilder::AddState.
+		// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
+		enum NPCCollideSMStateID : uint32_t
+		{
+			STATE_INIT              = 0,
+			STATE_ORIENT_TO_COLLIDE = 1,
+			STATE_PLAY_COLLIDE      = 2,
+		};
+
 	private:
 		char m_Padding[0x28];
 	};

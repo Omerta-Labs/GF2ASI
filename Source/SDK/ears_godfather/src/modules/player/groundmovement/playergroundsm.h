@@ -23,6 +23,20 @@ namespace EARS::Modules
 
 		static EARS::StateMachineSys::StateMachine* S_PlayerGroundSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
 
+		// State indices for this SM's state table, as passed to SMBuilder::AddState.
+		// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
+		enum PlayerGroundSMStateID : uint32_t
+		{
+			STATE_INIT            = 0,
+			STATE_IDLE            = 1,
+			STATE_IDLETURN        = 2,
+			STATE_FLICKTURN       = 3,
+			STATE_LOCOMOTE        = 4,
+			STATE_LOCOMOTE180TURN = 5,
+			STATE_FACETOFACE      = 6,
+			STATE_DISABLED        = 7,
+		};
+
 	private:
 		char m_Padding[0x6C];
 	};

@@ -25,6 +25,15 @@ namespace EARS::Modules
 
 		static EARS::StateMachineSys::StateMachine* S_NPCWitnessIdleSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
 
+		// State indices for this SM's state table, as passed to SMBuilder::AddState.
+		// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
+		enum NPCWitnessIdleSMStateID : uint32_t
+		{
+			STATE_INIT    = 0,
+			STATE_CAN_SEE = 1,
+			STATE_WAIT    = 2,
+		};
+
 	private:
 		char m_Padding[0x8];
 	};

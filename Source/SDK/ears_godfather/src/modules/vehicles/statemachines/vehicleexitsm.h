@@ -24,6 +24,19 @@ namespace EARS::Modules
 
 		static EARS::StateMachineSys::StateMachine* S_VehicleExitSM_FactoryFn(unsigned int InID, EARS::StateMachineSys::StateMachineParams* InSMParams);
 
+		// State indices for this SM's state table, as passed to SMBuilder::AddState.
+		// UNVERIFIED: the enum tag is ours; the enumerator names and values are the original's.
+		enum VehicleExitSMStateID : uint32_t
+		{
+			STATE_INIT             = 0,
+			STATE_WAIT_FOR_CLEAR   = 1,
+			STATE_CHANGE_SEAT      = 2,
+			STATE_EXITVEHICLE      = 3,
+			STATE_SPAWN_ON_VEHICLE = 4,
+			STATE_DESPAWN          = 5,
+			STATE_TERMINATE        = 6,
+		};
+
 	private:
 		char m_Padding[0xB0];
 	};
