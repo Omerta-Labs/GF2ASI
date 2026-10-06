@@ -106,7 +106,7 @@ bool EARS::StateMachineSys::StateMachine::HandleStateMessage(uint32_t SimTime, f
 	{
 		// Spawn children: MsgData->m_Data.m_PointerVal → AddChildrenMessageData*
 		AddChildrenMessageData* data = reinterpret_cast<AddChildrenMessageData*>(MsgData->GetPointerData());
-		if ((data->m_Flags & 1) != 0)
+		if ((data->m_Flags & StateMachineEvalFlags::EVAL_BUSY) != 0)
 		{
 			SetEvaluateTransitions(true);
 		}
@@ -125,7 +125,7 @@ bool EARS::StateMachineSys::StateMachine::HandleStateMessage(uint32_t SimTime, f
 	case State::StateMessageID::MESSAGE_TERMINATE:
 	{
 		// Remove from tree if we are not already terminating and have a tree
-		if (!(m_EvalFlags & 2) && m_Tree)
+		if (!(m_EvalFlags & StateMachineEvalFlags::EVAL_TERMINATE) && m_Tree)
 		{
 			m_Tree->Remove(this);
 		}
@@ -172,35 +172,23 @@ bool EARS::StateMachineSys::StateMachine::CheckTransition(uint32_t SimTime, floa
 void EARS::StateMachineSys::StateMachine::InitialiseChild(StateMachine& ChildMachine)
 {
 	// nothing in default implementation
-	int z = 0;
 }
 
 EARS::StateMachineSys::StateMachine* EARS::StateMachineSys::StateMachine::Update(uint32_t SimTime, float FrameTime, uint32_t CurFlags, uint32_t& TerminateLevel, uint32_t EvalLevel)
 {
-	// Source: PC ASM 0x624870 — reconstructed from x86 body.
-	//
-	//
-	// EvalFlags bits used here:
-	//   bit 0 (1): currently updating (set on entry, cleared on exit)
-	//   bit 1 (2): self-termination requested (triggers delete + parent notify on exit)
-	//   bit 2 (4): override children — force transition processing even when children exist
-	//   bit 3 (8): child-termination signal received from child (triggers re-evaluation)
-	//
 	// External TransitionList helpers (sub_625390 / sub_625340):
 	//   sub_625390: search and consume a pending transition entry in an active slave list
 	//   sub_625340: record a fired transition into a master list for slave SMs to consume
 	//   Both are inlined below from their PC ASM bodies.
 
-
-
-	m_EvalFlags |= 1;   // mark as actively updating
+	m_EvalFlags |= StateMachineEvalFlags::EVAL_BUSY;   // mark as actively updating
 
 	State* curState = m_States[m_CurStateIdx];
 	if (!curState)
 		goto cleanup;
 
 	// --- Update messages (skipped if self-termination is already pending) ---
-	if (!(m_EvalFlags & 8))
+	if (!(m_EvalFlags & StateMachineEvalFlags::EVAL_NOUPDATEMESSAGES))
 	{
 		State::StateMessage** msgPtr = curState->m_UpdateMessages;
 		for (State::StateMessage* msg = *msgPtr; msg; msg = *++msgPtr)
@@ -220,18 +208,18 @@ EARS::StateMachineSys::StateMachine* EARS::StateMachineSys::StateMachine::Update
 		while (true)
 		{
 			// Abort if termination was requested mid-loop
-			if (m_EvalFlags & 2)
+			if (m_EvalFlags & StateMachineEvalFlags::EVAL_TERMINATE)
 				goto cleanup;
 
 			// sub_624720: can we process transitions?
 			// false when: has a tree AND has children AND EvalFlags&4 is clear
 			// (children drive their own transitions; parent waits unless overridden)
-			if (m_Tree && m_ChildHead && !(m_EvalFlags & 4))
+			if (m_Tree && m_ChildHead && !(m_EvalFlags & StateMachineEvalFlags::EVAL_CHECKTRANS))
 				goto cleanup;
 
 			// --- Evaluate current transition ---
 			bool fired;
-			if (transition->m_Flags & 1)
+			if (transition->m_Flags & StateMachineEvalFlags::EVAL_BUSY)
 			{
 				// CheckTransition path
 				if (m_ExternalTransitions && m_ExternalTransitions->IsActive() && !m_ExternalTransitions->IsMaster())
@@ -299,7 +287,7 @@ EARS::StateMachineSys::StateMachine* EARS::StateMachineSys::StateMachine::Update
 				for (State::StateMessage* msg = *enterPtr; msg; msg = *++enterPtr)
 				{
 					HandleStateMessage(SimTime, FrameTime, CurFlags, msg->m_MessageID, msg->m_StateMessageData);
-					if (m_EvalFlags & 2)
+					if (m_EvalFlags & StateMachineEvalFlags::EVAL_TERMINATE)
 					{
 						goto cleanup;   // termination triggered during enter processing
 					}
@@ -324,10 +312,10 @@ EARS::StateMachineSys::StateMachine* EARS::StateMachineSys::StateMachine::Update
 
 cleanup:
 	// Clear "updating" (bit 0) and "child-terminate" (bit 3) flags
-	m_EvalFlags      &= ~(1u | 8u);
+	m_EvalFlags      &= ~(StateMachineEvalFlags::EVAL_BUSY | StateMachineEvalFlags::EVAL_NOUPDATEMESSAGES);
 	m_TimeInCurrentState += FrameTime;
 
-	if (m_EvalFlags & 2)
+	if (m_EvalFlags & StateMachineEvalFlags::EVAL_TERMINATE)
 	{
 		// Self-termination: save parent before we delete ourselves
 		StateMachine* parent = m_Parent;
@@ -335,7 +323,7 @@ cleanup:
 
 		if (parent)
 		{
-			parent->m_EvalFlags |= 8;   // signal child-termination to parent
+			parent->m_EvalFlags |= StateMachineEvalFlags::EVAL_NOUPDATEMESSAGES;   // signal child-termination to parent
 			TerminateLevel = EvalLevel;
 			parent->Update(SimTime, FrameTime, CurFlags, TerminateLevel, EvalLevel + 1);
 		}
@@ -377,8 +365,6 @@ void EARS::StateMachineSys::StateMachine::AddChild(uint32_t SimTime, float Frame
 
 void EARS::StateMachineSys::StateMachine::RemoveChild(EARS::StateMachineSys::StateMachine* ChildMachine)
 {
-	// source: ?RemoveChild@StateMachine@StateMachineSys@EARS@@UAAXPAV123@@Z
-	// Reconstructed from Xbox 360 PPC disassembly (PDB [0003:00F38FF0], 0x198 bytes).
 	// Unlinks ChildMachine from the singly-linked child list (head/tail/next),
 	// then clears its m_Tree and m_Next pointers. Does NOT clear m_Parent.
 	assert(ChildMachine != nullptr); // "pChild", statemachine.cpp line 553
@@ -425,9 +411,8 @@ void EARS::StateMachineSys::StateMachine::RemoveChild(EARS::StateMachineSys::Sta
 
 void EARS::StateMachineSys::StateMachine::SpawnChild(uint32_t SimTime, float FrameTime, uint32_t TableID)
 {
-	//// source: ?SpawnChild@StateMachine@StateMachineSys@EARS@@UAAXIIM@Z
-	StateMachineManager* mgr = StateMachineManager::GetInstance();
-	StateMachine* pChild = mgr->CreateStateMachineFromTableID(TableID, nullptr);
+	StateMachineManager* StateMachineMgr = StateMachineManager::GetInstance();
+	StateMachine* pChild = StateMachineMgr->CreateStateMachineFromTableID(TableID, nullptr);
 	pChild->SetExternalTransitions(m_ExternalTransitions);
 	InitialiseChild(*pChild);
 	AddChild(SimTime, FrameTime, pChild);
@@ -435,7 +420,6 @@ void EARS::StateMachineSys::StateMachine::SpawnChild(uint32_t SimTime, float Fra
 
 const EARS::StateMachineSys::StateMachineSnapshot* EARS::StateMachineSys::StateMachine::ReadInitDataFromSnapShot(const StateMachineSnapshot* pSnap)
 {
-	// source: ReadInitDataFromSnapShot virtual (base class body decoded from 360 ASM).
 	// The base class implementation is a no-op data-wise; it simply advances the
 	// snapshot cursor past this node's 0x10-byte slot and returns the next pointer.
 	// Derived classes override to read m_CurStateIdx / m_EvalFlags before calling super.
@@ -444,7 +428,6 @@ const EARS::StateMachineSys::StateMachineSnapshot* EARS::StateMachineSys::StateM
 
 EARS::StateMachineSys::StateMachineSnapshot* EARS::StateMachineSys::StateMachine::WriteInitDataToSnapShot(StateMachineSnapshot* pSnap)
 {
-	// source: WriteInitDataToSnapshot virtual (base class body decoded from 360 ASM).
 	// Clears the padding/numChildren field at offset 0x0E, advances the cursor by
 	// one node (0x10 bytes) and returns the next write pointer.
 	// Derived classes override to write m_CurStateIdx / m_EvalFlags before calling super.
@@ -454,11 +437,10 @@ EARS::StateMachineSys::StateMachineSnapshot* EARS::StateMachineSys::StateMachine
 
 const char* EARS::StateMachineSys::StateMachine::GetCurrentStateName() const
 {
-	// source: ?GetCurrentStateName@StateMachine@StateMachineSys@EARS@@QBAPBDXZ
 	// Returns the name of the current state, or nullptr if no state table is loaded.
-	if (const State* curState = m_States[m_CurStateIdx])
+	if (const State* CurrentState = m_States[m_CurStateIdx])
 	{
-		return curState->m_Name;
+		return CurrentState->m_Name;
 	}
 
 	return nullptr;
@@ -466,12 +448,11 @@ const char* EARS::StateMachineSys::StateMachine::GetCurrentStateName() const
 
 const char* EARS::StateMachineSys::StateMachine::GetTableName() const
 {
-	// source: ?GetTableName@StateMachine@StateMachineSys@EARS@@QBAPBDXZ
 	// Looks up the state table by ID via StateMachineManager and returns its name.
-	StateMachineManager* mgr = StateMachineManager::GetInstance();
-	if (StateTable* table = mgr->GetStateTableFromID(m_StateTableID))
+	StateMachineManager* StateMachineMgr = StateMachineManager::GetInstance();
+	if (const StateTable* Table = StateMachineMgr->GetStateTableFromID(m_StateTableID))
 	{
-		return table->GetName();
+		return Table->GetName();
 	}
 
 	return nullptr;
@@ -479,8 +460,6 @@ const char* EARS::StateMachineSys::StateMachine::GetTableName() const
 
 unsigned int EARS::StateMachineSys::StateMachine::PrintStateMachine(char* buf, unsigned int bufSize, unsigned int level) const
 {
-	// source: ?PrintStateMachine@StateMachine@StateMachineSys@EARS@@QBAIPADII@Z
-	// Reconstructed from Xbox 360 PPC disassembly.
 	// Appends a tree-formatted line to buf for this state machine and recurses into children.
 	// Format per node: ".  " × level + "<TableName> <StateName> <TimeInState>\n"
 	// Returns the remaining buffer capacity (bufSize decremented by each formatted line).
@@ -540,17 +519,16 @@ void EARS::StateMachineSys::StateMachine::SetEvaluateTransitions(bool bCheck)
 	// bit 0 of m_Flags controls EvalFlags bit 2 (used by CanProcessTransitions check)
 	if (bCheck)
 	{
-		m_EvalFlags |= 4;
+		m_EvalFlags |= StateMachineEvalFlags::EVAL_TERMINATE;
 	}
 	else
 	{
-		m_EvalFlags &= ~4u;
+		m_EvalFlags &= ~StateMachineEvalFlags::EVAL_TERMINATE;
 	}
 }
 
 void EARS::StateMachineSys::StateMachine::TerminateChildren()
 {
-	// source: sub_624D20 (PC address 0x624D20) — reconstructed from x86 body.
 	while (StateMachine* child = m_ChildHead)
 	{
 		child->TerminateChildren();   // recurse depth-first
@@ -563,7 +541,7 @@ void EARS::StateMachineSys::StateMachine::Destroy()
 {
 	if (IsBusy())
 	{
-		m_EvalFlags |= 2;    // currently updating — defer deletion
+		m_EvalFlags |= StateMachineEvalFlags::EVAL_TERMINATE;    // currently updating — defer deletion
 	}
 	else
 	{
@@ -600,7 +578,5 @@ void EARS::StateMachineSys::StateMachine::operator delete(void* p)
 
 void EARS::StateMachineSys::StateMachineTree::Remove(StateMachine* pSM)
 {
-	// source: ?Remove@StateMachineTree@StateMachineSys@EARS@@QAAXPAVStateMachine@23@@Z
-	// PC address: 0x624F30
 	MemUtils::CallClassMethod<void, StateMachineTree*, StateMachine*>(0x624F30, this, pSM);
 }
