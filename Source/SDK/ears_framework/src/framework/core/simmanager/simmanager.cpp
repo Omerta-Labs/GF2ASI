@@ -10,6 +10,9 @@
 #include "framework/core/attributehandler/cattributehandler.h"
 #include "framework/core/streammanager/streammanager.h"
 
+// C++
+#include <assert.h>
+
 RWS::CAttributePacket* EARS::Framework::SimManager::GetAttributePacket(const EARS::Common::guid128_t* InGuid, int bMaskStream)
 {
 	return MemUtils::CallClassMethod<RWS::CAttributePacket*, SimManager*, const EARS::Common::guid128_t*, int>(0x04461C0, this, InGuid, bMaskStream);
@@ -45,8 +48,8 @@ int EARS::Framework::SimManager::FindSimGroupOverride(const EARS::Common::guid32
 {
 	for (uint32_t idx = 0; idx < m_SimGroupOverrides.Size(); idx++)
 	{
-		const SimGroupOverride* CurrentOverride = m_SimGroupOverrides[idx];
-		if (CurrentOverride->m_SimGroupGUID == Guid)
+		const SimGroupOverride& CurrentOverride = m_SimGroupOverrides[idx];
+		if (CurrentOverride.m_SimGroupGUID == Guid)
 		{
 			return idx;
 		}
@@ -63,12 +66,12 @@ bool EARS::Framework::SimManager::SimGroupDispatchEnabled(const SimGroupTOC& Sim
 	const int32_t OverrideIdx = FindSimGroupOverride(SimGroupTOC.m_Guid);
 	if (OverrideIdx >= 0)
 	{
-		const SimGroupOverride* OverrideInst = m_SimGroupOverrides[OverrideIdx];
-		if ((OverrideInst->m_OverrideFlags & (int)SimGroupOverrideFlags::OVERRIDE_FORCE_ENABLE) != 0)
+		const SimGroupOverride& OverrideInst = m_SimGroupOverrides[OverrideIdx];
+		if ((OverrideInst.m_OverrideFlags & (int)SimGroupOverrideFlags::OVERRIDE_FORCE_ENABLE) != 0)
 		{
 			bDispatchedEnabled = true;
 		}
-		else if ((OverrideInst->m_OverrideFlags & (int)SimGroupOverrideFlags::OVERRIDE_FORCE_DISABLE) != 0)
+		else if ((OverrideInst.m_OverrideFlags & (int)SimGroupOverrideFlags::OVERRIDE_FORCE_DISABLE) != 0)
 		{
 			bDispatchedEnabled = false;
 		}
@@ -141,7 +144,7 @@ void EARS::Framework::SimManager::LoadResource(RWS::CResourceHandler::CResourceL
 	if (bNeedsDispatchLock)
 	{
 		const int32_t OverrideIdx = FindSimGroupOverride(SimGroupTOC->m_Guid);
-		if (OverrideIdx >= 0 && ((m_SimGroupOverrides[OverrideIdx]->m_OverrideFlags & (int)SimGroupOverrideFlags::IGNORE_DISPATCH_LOCK) == 0))
+		if (OverrideIdx >= 0 && ((m_SimGroupOverrides[OverrideIdx].m_OverrideFlags & (int)SimGroupOverrideFlags::IGNORE_DISPATCH_LOCK) == 0))
 		{
 			bNeedsDispatchLock = false;
 		}
