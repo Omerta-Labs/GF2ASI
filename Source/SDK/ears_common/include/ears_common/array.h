@@ -4,12 +4,43 @@
 #include "framework/core/memory/globalheapallocator.h"
 
 // C++
+#include <new>
 #include <stdint.h>
 
 template <typename TType>
 struct Array
 {
 public:
+
+	Array()
+		: m_Items(nullptr)
+		, m_Size(0)
+		, m_Capacity(0)
+	{
+		// empty, does nothing
+	}
+
+	// Allocates InCapacity elements up front without constructing any of them,
+	// so Size() is still 0. Does not go through Reserve.
+	Array(uint32_t InCapacity)
+		: m_Items((TType*)EARS::Allocator::GlobalHeapAllocator::OperatorNewArray(sizeof(TType) * InCapacity))
+		, m_Size(0)
+		, m_Capacity(InCapacity)
+	{
+	}
+
+	~Array()
+	{
+		for (int32_t Idx = (int32_t)m_Size - 1; Idx >= 0; Idx--)
+		{
+			m_Items[Idx].~TType();
+		}
+
+		if (m_Items)
+		{
+			EARS::Allocator::GlobalHeapAllocator::OperatorDeleteArray(m_Items);
+		}
+	}
 
 	void Add(const TType& Object)
 	{
@@ -27,24 +58,23 @@ public:
 		}
 	}
 
-	void Reserve(unsigned int InCapacity)
+	void Reserve(uint32_t InCapacity)
 	{
 		if (InCapacity > m_Capacity)
 		{			
 			// TODO: Should be using new operator[]
-			TType* NewArr = (TType*)EARS::Allocator::GlobalHeapAllocator::OperatorNewArray(4 * InCapacity);
+			TType* NewArr = (TType*)EARS::Allocator::GlobalHeapAllocator::OperatorNewArray(sizeof(TType) * InCapacity);
 			if (m_Items)
 			{
-				TType* Itr = NewArr;
-				for (unsigned int i = 0; i < m_Size; i++)
+				for (uint32_t i = 0; i < m_Size; i++)
 				{
-					*Itr = m_Items[i];
-					++Itr;
+					new (&NewArr[i]) TType(m_Items[i]);
 				}
+
+				// TODO: Should be using delete operator[]
+				EARS::Allocator::GlobalHeapAllocator::OperatorDeleteArray(m_Items);
 			}
 
-			// TODO: Should be using delete operator[]
-			EARS::Allocator::GlobalHeapAllocator::OperatorDeleteArray(m_Items);
 			m_Items = NewArr;
 			m_Capacity = InCapacity;
 		}
@@ -72,11 +102,96 @@ public:
 		}
 	}
 
-	inline unsigned int Capacity() const { return m_Capacity; }
-	inline unsigned int Size() const { return m_Size; }
+	/**
+	 * Opens a slot at ObjectIdx and returns it, shuffling every later element up
+	 * one. ObjectIdx may equal Size(), which appends. The returned element is
+	 * default-constructed; for a trivial TType that leaves it uninitialised.
+	 */
+	TType& Insert(uint32_t ObjectIdx)
+	{
+		if (m_Size == m_Capacity)
+		{
+			UpsizePwr2();
+		}
+
+		if (ObjectIdx == m_Size)
+		{
+			new (&m_Items[m_Size]) TType;
+			return m_Items[m_Size++];
+		}
+
+		// The slot one past the end is raw memory, so the element moved into it
+		// is copy-constructed; the rest of the shuffle is plain assignment.
+		new (&m_Items[m_Size]) TType(m_Items[m_Size - 1]);
+
+		for (uint32_t Idx = m_Size - 1; Idx > ObjectIdx; Idx--)
+		{
+			m_Items[Idx] = m_Items[Idx - 1];
+		}
+
+		m_Size++;
+
+		new (&m_Items[ObjectIdx]) TType;
+		return m_Items[ObjectIdx];
+	}
+
+	// Order-preserving removal: every later element shifts down one. Unlike
+	// DeleteFast this never reorders, which is what a sorted array needs.
+	void Delete(uint32_t ObjectIdx)
+	{
+		for (uint32_t Idx = ObjectIdx; Idx < (m_Size - 1); Idx++)
+		{
+			m_Items[Idx] = m_Items[Idx + 1];
+		}
+
+		m_Size--;
+	}
+
+	void Resize(uint32_t InSize)
+	{
+		if (InSize > m_Size)
+		{
+			Reserve(InSize);
+
+			for (uint32_t Idx = m_Size; Idx < InSize; Idx++)
+			{
+				new (&m_Items[Idx]) TType;
+			}
+
+			m_Size = InSize;
+		}
+		else if (InSize < m_Size)
+		{
+			for (int32_t Idx = (int32_t)m_Size - 1; Idx >= (int32_t)InSize; Idx--)
+			{
+				m_Items[Idx].~TType();
+			}
+
+			m_Size = InSize;
+		}
+	}
+
+	// Drops every element and the allocation with it, so Capacity() goes to 0.
+	void clear()
+	{
+		for (int32_t Idx = (int32_t)m_Size - 1; Idx >= 0; Idx--)
+		{
+			m_Items[Idx].~TType();
+		}
+
+		m_Size = 0;
+		EARS::Allocator::GlobalHeapAllocator::OperatorDeleteArray(m_Items);
+		m_Items = nullptr;
+		m_Capacity = 0;
+	}
+
+	void resize(uint32_t InSize) { Resize(InSize); }
+
+	inline uint32_t Capacity() const { return m_Capacity; }
+	inline uint32_t Size() const { return m_Size; }
 	inline bool IsEmpty() const { return (Size() == 0); }
 
-	TType& operator[](unsigned int idx) const { return m_Items[idx]; }
+	TType& operator[](uint32_t idx) const { return m_Items[idx]; }
 
 public:
 
@@ -92,11 +207,11 @@ private:
 
 	void UpsizePwr2()
 	{
-		const unsigned int NextCapacity = (m_Capacity ? 2 * m_Capacity : 1);
+		const uint32_t NextCapacity = (m_Capacity ? 2 * m_Capacity : 1);
 		Reserve(NextCapacity);
 	}
 
 	TType* m_Items;
-	unsigned int m_Size;
-	unsigned int m_Capacity;
+	uint32_t m_Size = 0;
+	uint32_t m_Capacity = 0;
 };

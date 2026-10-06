@@ -13,7 +13,7 @@ namespace EARS
 		{
 		public:
 
-			static bool Equal(const TType& Left, const TType& Right) = 0;
+			static bool Equal(const TType& Left, const TType& Right) { return (Left == Right); }
 		};
 
 		template<class TType>
@@ -21,7 +21,7 @@ namespace EARS
 		{
 		public:
 
-			static uint32_t Hash(const TType& Value) = 0;
+			static uint32_t Hash(const TType& Value) { return Value.Hash(); }
 		};
 
 		template<class TType>
@@ -29,8 +29,8 @@ namespace EARS
 		{
 		public:
 
-			static TType* GetHashNext(const TType& Value) = 0;
-			static void SetHashNext(TType& Value, TType* Next) = 0;
+			static TType* GetHashNext(const TType& Value) { return Value.GetHashNext(); }
+			static void SetHashNext(TType& Value, TType* Next) { Value.SetHashNext(Next); }
 		};
 
 		template<class TValue, typename TKey>
@@ -38,7 +38,7 @@ namespace EARS
 		{
 		public:
 
-			static TKey* GetKey(const TValue& Value) = 0;
+			static TKey GetKey(const TValue& Value) { return Value.GetKey(); }
 		};
 
 		uint32_t HashMem_SDBM(const void* pVoidData, uint32_t dataLen);
