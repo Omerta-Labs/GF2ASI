@@ -86,6 +86,13 @@ namespace RWS
 	{
 		struct CAttributeDataChunk
 		{
+		public:
+
+			const CAttributeDataChunk* pNextChunk() const
+			{
+				return (CAttributeDataChunk*)((uint8_t*)(this + m_Size));
+			}
+
 			uint32_t m_Size = 0;
 			uint32_t m_Type = 0;
 
@@ -105,6 +112,33 @@ namespace RWS
 				RwMatrixTag RwMatrixTagNoCtor_;			// RwMatrixTagNoCtor
 				RwV3d RwV3d_;
 			};
+		};
+
+		struct CAttributeDataChunkIterator
+		{
+		public:
+
+			CAttributeDataChunkIterator() = default;
+			CAttributeDataChunkIterator(const CAttributeDataChunk& InChunk)
+				: m_DataChunk(&InChunk)
+			{
+				// nothing otherwise
+			}
+
+			void Init(const CAttributeDataChunk& InChunk) { m_DataChunk = &InChunk; }
+
+			bool IsFinished() const { return m_DataChunk != nullptr; }
+
+			const CAttributeDataChunk* GetDataChunk() const { return m_DataChunk; }
+
+			// operator overloads
+			CAttributeDataChunkIterator& operator++(int a1) { m_DataChunk = m_DataChunk->pNextChunk(); }
+			const CAttributeDataChunk& operator*() const { return *m_DataChunk; }
+			const CAttributeDataChunk* operator->() const { return m_DataChunk; }
+
+		private:
+
+			const CAttributeDataChunk* m_DataChunk = nullptr;
 		};
 	};
 
@@ -128,7 +162,7 @@ namespace RWS
 
 		const char* GetAs_char_ptr() const;
 
-		EARS::Common::guid128_t* GetAs_RWS_GUID() const;
+		EARS::Common::guid128_t* GetAs_RWSGUID() const;
 
 		float GetAs_float() const { return m_Chunk.m_Float; }
 
@@ -144,28 +178,6 @@ namespace RWS
 	};
 
 	static_assert(sizeof(CAttributeCommand) == 0x48);
-
-	struct CAttributeDataChunk
-	{
-	public:
-
-	private:
-
-		uint32_t m_Size = 0;
-		uint32_t m_Type = 0;
-		char m_Padding[0x40];
-	};
-
-	struct CAttributeDataChunkIterator
-	{
-	public:
-
-		const CAttributeDataChunk* GetDataChunk() const { return m_DataChunk; }
-
-	private:
-
-		const CAttributeDataChunk* m_DataChunk = nullptr;
-	};
 
 	/**
 	 * Iterate through the commands stored within the attribute packet.
@@ -189,10 +201,10 @@ namespace RWS
 		// Seek to a specific command within the buffer
 		void SeekTo(const uint32_t NewIdx);
 
-		const CAttributeDataChunk* GetDataChunk() const { return m_ChunkIterator.GetDataChunk(); }
+		const RWS::__Internal::CAttributeDataChunk* GetDataChunk() const { return m_ChunkIterator.GetDataChunk(); }
 
 		// operator overloads
-		CAttributeDataChunkIterator& operator++(int a1);
+		RWS::__Internal::CAttributeDataChunkIterator& operator++(int a1);
 		//const CAttributeDataChunk& operator*() const;
 		const CAttributeCommand* operator->() const;
 		//const CAttributeDataChunk* GetDataChunk(void) { return pCurrChunk_; }
@@ -205,7 +217,7 @@ namespace RWS
 		int32_t m_CurIdx = -1;
 		int32_t m_NumAttrs = -1;
 		RWS::CAttributeCommand m_CompactCommand;
-		RWS::CAttributeDataChunkIterator m_ChunkIterator;
+		RWS::__Internal::CAttributeDataChunkIterator m_ChunkIterator;
 		uint32_t m_TargetClassID = 0;
 
 	};
@@ -249,6 +261,8 @@ namespace RWS
 		void SetNext(CAttributePacket* InNext) { m_pHashNext = InNext; }
 
 	private:
+
+		bool IsInstanceCreationPacket() const;
 
 		uint32_t m_hStream = 0;
 		CAttributePacket* m_PrevSibling = nullptr;

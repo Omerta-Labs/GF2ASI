@@ -85,7 +85,7 @@ bool Mod::ObjectManager::RequestSpawnCar(const ObjectSpawnRequestParams& Request
 
 	// NB: This is Stream GUID!
 	// TODO: Should check whether the guid is actually valid?
-	const EARS::Common::guid128_t* RWSGuid = AnimatedIt->GetAs_RWS_GUID();
+	const EARS::Common::guid128_t* RWSGuid = AnimatedIt->GetAs_RWSGUID();
 	const uint32_t AsGuid32 = RWSGuid->GetGuid32();
 
 	EARS::Framework::StreamManager* StreamMgr = EARS::Framework::StreamManager::GetInstance();

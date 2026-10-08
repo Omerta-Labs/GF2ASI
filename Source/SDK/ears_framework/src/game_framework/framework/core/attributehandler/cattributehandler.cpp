@@ -107,7 +107,7 @@ const char* RWS::CAttributeCommand::GetAs_char_ptr() const
 	return MemUtils::CallClassMethod<const char*, const RWS::CAttributeCommand*>(0x43AB90, this);
 }
 
-EARS::Common::guid128_t* RWS::CAttributeCommand::GetAs_RWS_GUID() const
+EARS::Common::guid128_t* RWS::CAttributeCommand::GetAs_RWSGUID() const
 {
 	return MemUtils::CallClassMethod<EARS::Common::guid128_t*, const RWS::CAttributeCommand*>(0x043ABC0, this);
 }
@@ -120,7 +120,14 @@ RWS::CAttributeCommandIterator::CAttributeCommandIterator(const CAttributePacket
 
 bool RWS::CAttributeCommandIterator::IsFinished() const
 {
-	return MemUtils::CallClassMethod<bool, const RWS::CAttributeCommandIterator*>(0x043B120, this);
+	if (m_bIsCompact)
+	{
+		return (m_NumAttrs == m_CurIdx);
+	}
+	else
+	{
+		return m_ChunkIterator.IsFinished();
+	}
 }
 
 uint32_t RWS::CAttributeCommandIterator::GetCommandID() const
@@ -131,9 +138,7 @@ uint32_t RWS::CAttributeCommandIterator::GetCommandID() const
 	}
 	else
 	{
-		// TODO: Complete this code. We don't run it in GF2 ever.
-		assert(false);
-		return 0;
+		return m_ChunkIterator->m_Type;
 	}
 }
 
@@ -147,9 +152,9 @@ void RWS::CAttributeCommandIterator::SeekTo(const uint32_t NewIdx)
 	MemUtils::CallClassMethod<void, RWS::CAttributeCommandIterator*, uint32_t>(0x043AF00, this, NewIdx);
 }
 
-RWS::CAttributeDataChunkIterator& RWS::CAttributeCommandIterator::operator++(int a1)
+RWS::__Internal::CAttributeDataChunkIterator& RWS::CAttributeCommandIterator::operator++(int a1)
 {
-	return MemUtils::CallClassMethod<RWS::CAttributeDataChunkIterator&, RWS::CAttributeCommandIterator*>(0x043B1A0, this);
+	return MemUtils::CallClassMethod<RWS::__Internal::CAttributeDataChunkIterator&, RWS::CAttributeCommandIterator*>(0x043B1A0, this);
 }
 
 const RWS::CAttributeCommand* RWS::CAttributeCommandIterator::operator->() const
@@ -159,7 +164,19 @@ const RWS::CAttributeCommand* RWS::CAttributeCommandIterator::operator->() const
 
 uint32_t RWS::CAttributePacket::GetIdOfClassToCreate() const
 {
-	return MemUtils::CallClassMethod<uint32_t, const CAttributePacket*>(0x043AAF0, this);
+	if (IsCompact())
+	{
+		return EntPacket()->m_BehaviorID;
+	}
+
+	// TODO: Fix this?
+	assert(false);
+	assert(IsInstanceCreationPacket());
+
+	__Internal::CAttributeDataChunkIterator ChunkIt = __Internal::CAttributeDataChunkIterator(m_FirstChunk);
+	const char* ClassName = &ChunkIt->char_;
+
+	return EARS::Common::HashString_SDBM(ClassName);
 }
 
 const EARS::Framework::EntityPacket* RWS::CAttributePacket::EntPacket() const
@@ -179,6 +196,12 @@ RWS::CAttributePacketEntityList::Iterator RWS::CAttributePacket::GetEntityIterat
 {
 	RWS::CAttributePacketEntityList::Iterator NewIt = RWS::CAttributePacketEntityList::Iterator(m_EntityList);
 	return NewIt;
+}
+
+bool RWS::CAttributePacket::IsInstanceCreationPacket() const
+{
+	__Internal::CAttributeDataChunkIterator ChunkIt = __Internal::CAttributeDataChunkIterator(m_FirstChunk);
+	return (!ChunkIt.IsFinished() && ChunkIt->m_Type == 0x20000000);
 }
 
 bool RWS::CAttributeHandler::HasAttributeHandlerFlag(const uint32_t InFlag) const
