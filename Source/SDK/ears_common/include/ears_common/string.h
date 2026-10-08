@@ -13,6 +13,8 @@ public:
 
 	void assign(const char* InSrc);
 
+	void clear();
+
 	const char* c_str() const;
 
 	const char* raw_c_str() const;
@@ -25,6 +27,8 @@ public:
 private:
 
 	typedef void (*StringAllocator_Free)(String* pThis);
+
+	void Free();
 
 	char* m_pCStr = nullptr;
 	uint32_t m_Length = 0;

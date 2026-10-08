@@ -33,18 +33,21 @@ String::String(const char* InSrc)
 
 String::~String()
 {
-	if (m_pCStr)
-	{
-		// TODO: This is actually called using m_Unk0, as its a function pointer
-		// For parity with GF2 exe, its probably best to follow suite
-		MemUtils::CallCdeclMethod<int, const char*>(0x4D38D0, m_pCStr);
-	}
+	Free();
 }
 
 void String::assign(const char* InSrc)
 {
 	// TODO: Move code from gf2 into asi
 	MemUtils::CallClassMethod<void, String*, const char*>(0x4D3D90, this, InSrc);
+}
+
+void String::clear()
+{
+	Free();
+	m_pCStr = nullptr;
+	m_AllocatedLength = 0;
+	m_Length = 0;
 }
 
 const char* String::c_str() const
@@ -61,4 +64,14 @@ const char* String::c_str() const
 const char* String::raw_c_str() const
 {
 	return m_pCStr;
+}
+
+void String::Free()
+{
+	if (m_pCStr)
+	{
+		// TODO: This is actually called using m_Unk0, as its a function pointer
+		// For parity with GF2 exe, its probably best to follow suite
+		MemUtils::CallCdeclMethod<int, const char*>(0x4D38D0, m_pCStr);
+	}
 }

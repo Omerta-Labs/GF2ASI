@@ -20,11 +20,7 @@ namespace EARS::Framework::Modules
 
 	DebugText::~DebugText()
 	{
-		if (m_DebugString)
-		{
-			delete[] m_DebugString;
-			m_DebugString = nullptr;
-		}
+		m_DebugString.clear();
 
 		UnLinkMsg(RWS::iMsgRunningTick);
 		UnLinkMsg(RWS::iMsgPausedTick);
@@ -54,19 +50,14 @@ namespace EARS::Framework::Modules
 					// The game code only applies changes if we have text
 					if (Text)
 					{
-						const uint32_t Length = strlen(Text);
-
 						// Make sure to delete existing
 						if (m_DebugString)
 						{
-							delete[] m_DebugString;
-							m_DebugString = nullptr;
+							m_DebugString.clear();
 						}
 
 						// allocate and copy
-						m_DebugString = new char[Length];
-						std::strncpy(m_DebugString, Text, Length);
-						m_DebugString[Length] = '\0';
+						m_DebugString.assign(Text);
 					}
 
 					break;
@@ -111,7 +102,7 @@ namespace EARS::Framework::Modules
 
 			if (m_DebugString && ((m_Options & MESSAGE_LOG) != 0))
 			{
-				EARS::Diag::Printf(m_DebugString);
+				EARS::Diag::Printf(m_DebugString.c_str());
 			}
 		}
 		else if (MsgEvent.IsEvent(RWS::iMsgRunningTick))

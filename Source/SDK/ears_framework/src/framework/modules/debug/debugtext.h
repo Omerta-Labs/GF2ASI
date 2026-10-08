@@ -1,6 +1,7 @@
 #pragma once
 
 // EARS_Framework
+#include "ears_common/string.h"
 #include "framework/core/attributehandler/cclassfactory.h"
 #include "framework/core/base/base.h"
 
@@ -42,10 +43,21 @@ namespace EARS::Framework::Modules
 			MESSAGE_LOG = 0x2,
 		};
 
+		// event to trigger the debug text
+		// (it will either fire immediately or start the timer)
 		RWS::CEventId m_TargetName;
-		char* m_DebugString = nullptr;
+
+		// DEVIATION: This was original const char, but it caused problems
+		// when allocating. To my knowledge, storing as String has no other side effects.
+		String m_DebugString;
+
+		// How long it shows on screen for
 		float m_DisplayTime = 0.0f;
+
+		// How long it will remain on screen for
 		float m_TimeRemaining = 0.0f;
+
+		// Flags for operation; see SCREEN or MESSAGE_LOG
 		uint32_t m_Options = 0;
 	};
 } //~ EARS::Framework::Modules
